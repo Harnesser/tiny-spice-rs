@@ -17,3 +17,7 @@ clippy:
 
 waves:
 	gtkwave --dump waves.vcd --save plot.gtkw
+
+clean:
+	cargo clean
+	\rm -rf *.log

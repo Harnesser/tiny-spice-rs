@@ -1,9 +1,13 @@
+extern crate tiny_spice;
+
+use tiny_spice::engine;
+
 fn main() {
-    println!("********************************************");
-    println!("***       Tiny-SPICE-Simulator           ***");
-    println!("***        (c) CrapCorp 2017             ***");
-    println!("*** Patent Pending, All rights reserved  ***");
-    println!("********************************************");
+    engine::banner();
 
     println!("*INFO* Initialising");
+    let eng = engine::Engine::new();
+
+
+    println!("*INFO* Done");
 }

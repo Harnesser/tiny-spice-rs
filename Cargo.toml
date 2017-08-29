@@ -1,5 +1,5 @@
 [package]
-name = "tiny-spice"
+name = "tiny_spice"
 version = "0.1.0"
 authors = ["Marty <harnesser+kartoffel@gmail.com>"]
 
