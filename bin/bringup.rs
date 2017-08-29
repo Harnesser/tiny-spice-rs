@@ -7,11 +7,10 @@ use tiny_spice::engine;
 fn main() {
     engine::banner();
 
-    println!("*INFO* Initialising");
-    let eng = engine::Engine::new();
+    let mut eng = engine::Engine::new();
 
     let ckt = build_001();
-    ckt.show();
+    eng.elaborate(&ckt);
 
     println!("*INFO* Done");
 }

@@ -58,4 +58,42 @@ impl Circuit {
         }
     }
 
+    pub fn count_nodes(&self) -> usize {
+
+        // number of nodes in the circuit - there is always at least ground
+        let mut c_nodes: usize = 1;
+
+        let mut seen = [false; 256]; // max nodes magic number
+        seen[0] = true; // always a ground
+
+        for el in &self.elements {
+                match *el {
+                    Element::I(CurrentSource{ ref p, ref n, ref value }) => {
+                        if !seen[*p] {
+                            seen[*p] = true;
+                            c_nodes += 1;
+                        }
+                        if !seen[*n] {
+                            seen[*n] = true;
+                            c_nodes += 1;
+                        }
+                    }
+                    Element::R(Resistor{ ref a, ref b, ref value }) => {
+                        if !seen[*a] {
+                            seen[*a] = true;
+                            c_nodes += 1;
+                        }
+                        if !seen[*b] {
+                            seen[*b] = true;
+                            c_nodes += 1;
+                        }
+                    }
+                }
+        }
+        c_nodes
+    } 
+
+
+
+
 }
