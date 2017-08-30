@@ -67,7 +67,38 @@ impl Engine {
         println!("{:?}", v);
 
         // naive implementation of gaussian elimination
+        // From `Introduction to Algorithms`, page 818
+        // "We start by subtracting multiples of the first equation from the other
+        // equations in order to remove the first variable from those equations.
+        // Then, we subtract multiples of the 2nd equation from the 3rd and 
+        // subsequent equations so now the 1st and 2nd variables are removed from
+        // them. 
+        // Divide by zeros everywhere...
         println!("*INFO* Gaussian Elimination");
+        for r_ref in 0..c_nodes-1 { // row we're scaling
+            if v[r_ref][r_ref] == 0.0 {
+                println!("Skipping v[{}][..]", r_ref);
+                continue;
+            }
+            for r_mod in r_ref+1..c_nodes { // row we're scaling
+                if v[r_mod][r_ref] == 0.0 {
+                    println!("Skipping v[{}][{}]", r_mod, r_ref);
+                    continue;
+                }
+                let ratio = v[r_mod][r_ref] / v[r_ref][r_ref];
+
+                for c_mod in r_ref..c_nodes+1 { // column we're scaling
+                    let val = v[r_mod][c_mod];
+                    let wiggle = v[r_ref][c_mod];
+                    v[r_mod][c_mod] = val -  wiggle * ratio; 
+                    println!("\nr_ref = {}, r_mod = {}, c_mod = {}, ratio = {}",
+                             r_ref, r_mod, c_mod, ratio);
+                    println!("{:?}", v);
+                }
+                println!(" ---------------------------------------------- ");
+            }
+        }
+        println!("{:?}", v);
        
         // back-substitution
         println!("*INFO* Back-substitution");
