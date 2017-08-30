@@ -64,7 +64,7 @@ impl Engine {
                 
             }
         }
-        println!("{:?}", v);
+        self.pp_matrix(&v);
 
         // naive implementation of gaussian elimination
         // From `Introduction to Algorithms`, page 818
@@ -90,19 +90,39 @@ impl Engine {
                 for c_mod in r_ref..c_nodes+1 { // column we're scaling
                     let val = v[r_mod][c_mod];
                     let wiggle = v[r_ref][c_mod];
-                    v[r_mod][c_mod] = val -  wiggle * ratio; 
+                    let new = val - (wiggle * ratio); 
+                    v[r_mod][c_mod] = new;
                     println!("\nr_ref = {}, r_mod = {}, c_mod = {}, ratio = {}",
                              r_ref, r_mod, c_mod, ratio);
-                    println!("{:?}", v);
+                    println!("{} - {}*{} -> {}", val, wiggle, ratio, new);
+                    self.pp_matrix(&v);
                 }
                 println!(" ---------------------------------------------- ");
             }
         }
-        println!("{:?}", v);
+        self.pp_matrix(&v);
        
         // back-substitution
-        println!("*INFO* Back-substitution");
+        let mut n = vec![0.0; c_nodes];
 
+        println!("*INFO* Back-substitution");
+        for r_solve_up in 0..c_nodes {
+            let r_solve = c_nodes - r_solve_up - 1;
+            println!("r_solve = {}, n[{}] = {}", r_solve, r_solve, n[r_solve]);
+            
+        }
+
+    }
+
+    fn pp_matrix( &self, m : &Vec<Vec<f32>> ) {
+        println!("Marty");
+        for r in m {
+            println!("\n");
+            for val in r {
+                print!("{:.3}   ", val);
+            }
+        }
+        println!("\n");
     }
 
 }
