@@ -68,7 +68,7 @@ impl Circuit {
 
         for el in &self.elements {
                 match *el {
-                    Element::I(CurrentSource{ ref p, ref n, ref value }) => {
+                    Element::I(CurrentSource{ ref p, ref n, .. }) => {
                         if !seen[*p] {
                             seen[*p] = true;
                             c_nodes += 1;
@@ -78,7 +78,7 @@ impl Circuit {
                             c_nodes += 1;
                         }
                     }
-                    Element::R(Resistor{ ref a, ref b, ref value }) => {
+                    Element::R(Resistor{ ref a, ref b, .. }) => {
                         if !seen[*a] {
                             seen[*a] = true;
                             c_nodes += 1;

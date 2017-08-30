@@ -13,14 +13,14 @@ pub fn banner() {
 }
 
 pub struct Engine {
-    next_id: circuit::NodeId,
+    //next_id: circuit::NodeId,
 }
 
 impl Engine {
 
     pub fn new() -> Engine {
         Engine {
-            next_id: 1,
+           //next_id: 1,
         }
     }
 
@@ -29,7 +29,7 @@ impl Engine {
         // where n is the number of nodes (including ground) in the circuit
 
         // Number of nodes, including ground (aka 0, aka gnd)
-        let mut c_nodes = ckt.count_nodes();
+        let c_nodes = ckt.count_nodes();
         println!("*INFO* There are {} nodes in the design, including ground", c_nodes);
 
         println!("*INFO* Building Voltage Node Matrix and Current Vector");
@@ -64,8 +64,14 @@ impl Engine {
                 
             }
         }
-
         println!("{:?}", v);
+
+        // naive implementation of gaussian elimination
+        println!("*INFO* Gaussian Elimination");
+       
+        // back-substitution
+        println!("*INFO* Back-substitution");
+
     }
 
 }
