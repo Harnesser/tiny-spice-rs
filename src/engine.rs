@@ -50,16 +50,32 @@ impl Engine {
                 circuit::Element::I(circuit::CurrentSource{ ref p, ref n, ref value }) => {
                     println!("  [ELEMENT] Current source: {} into node {} and out of node {}",
                             value, p, n);
-                    v[*p][i] = v[*p][i] + value; // += doesn't work here
-                    v[*n][i] = v[*n][i] - value;
+                    if *p != 0 {
+                        v[*p][i] = v[*p][i] + value; // += doesn't work here
+                    }
+                    if *n != 0 {
+                        v[*n][i] = v[*n][i] - value;
+                    }
                 }
                 circuit::Element::R(circuit::Resistor{ ref a, ref b, ref value }) => {
                     println!("  [ELEMENT] Resistor");
                     let over = 1.0 / value;
-                    v[*a][*a] = v[*a][*a] + over;
-                    v[*a][*b] = v[*a][*b] - over;
-                    v[*b][*b] = v[*b][*b] + over;
-                    v[*b][*a] = v[*b][*a] - over;
+
+                    // out of node 'a'
+                    if *a != 0 {
+                        v[*a][*a] = v[*a][*a] + over;
+                        if *b != 0 {
+                            v[*a][*b] = v[*a][*b] - over;
+                        }
+                    }
+
+                    // out of node 'b'
+                    if *b != 0 {
+                        v[*b][*b] = v[*b][*b] + over;
+                        if *a != 0 {
+                            v[*b][*a] = v[*b][*a] - over;
+                        }
+                    }
                 }
                 
             }
