@@ -58,8 +58,8 @@ impl Engine {
                     let over = 1.0 / value;
                     v[*a][*a] = v[*a][*a] + over;
                     v[*a][*b] = v[*a][*b] - over;
-                    v[*b][*a] = v[*b][*a] + over;
-                    v[*b][*b] = v[*b][*b] - over;
+                    v[*b][*b] = v[*b][*b] + over;
+                    v[*b][*a] = v[*b][*a] - over;
                 }
                 
             }
