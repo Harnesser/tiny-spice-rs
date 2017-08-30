@@ -38,9 +38,9 @@ impl Engine {
         // I think I have to make this out of Vecs (on the heap) because c_nodes is
         // not known at compile time. Makes sense, I suppose - could blow the stack if
         // c_nodes is any way huge.
-        let mut v = vec![ vec![0.0; c_nodes]; c_nodes];
-        let mut i = vec![0.0; c_nodes];
-
+        // [ V I ]
+        let mut v = vec![ vec![0.0; c_nodes+1]; c_nodes]; // +1 for currents
+        let i = c_nodes; // index for current vector
 
         // Fill up the voltage node and current vector
         // This needs to know about each of the kinds of circuit elements, so
@@ -50,8 +50,8 @@ impl Engine {
                 circuit::Element::I(circuit::CurrentSource{ ref p, ref n, ref value }) => {
                     println!("  [ELEMENT] Current source: {} into node {} and out of node {}",
                             value, p, n);
-                    i[*p] = i[*p] + value; // += doesn't work here
-                    i[*n] = i[*n] - value;
+                    v[*p][i] = v[*p][i] + value; // += doesn't work here
+                    v[*n][i] = v[*n][i] - value;
                 }
                 circuit::Element::R(circuit::Resistor{ ref a, ref b, ref value }) => {
                     println!("  [ELEMENT] Resistor");
@@ -65,7 +65,6 @@ impl Engine {
             }
         }
 
-        println!("{:?}", i);
         println!("{:?}", v);
     }
 
