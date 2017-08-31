@@ -5,27 +5,8 @@ pub trait Differentiable {
     fn slope(&self, x: f32) -> f32;
 }
 
-pub struct DifferentiableTerm {
-    f: fn(f32) -> f32,
-    fprime: fn(f32) -> f32,
-}
-
-impl Differentiable for DifferentiableTerm {
-
-    fn eval(&self, x: f32) -> f32 {
-        0.1
-    }
-
-    fn slope(&self, x: f32) -> f32 {
-        100.0
-    }
-
-}
-
-
 pub struct DifferentiableEqn {
-    node: Option<NodeId>,
-    eqns: Vec<DifferentiableTerm>,
+    pub eqns: Vec<Box<Differentiable>>,
 }
 
 impl DifferentiableEqn {
@@ -34,6 +15,14 @@ impl DifferentiableEqn {
         let mut res = 0.0;
         for eqn in &self.eqns {
             res += eqn.eval(x);
+        }
+        res
+    }
+
+    pub fn slope(&self, x: f32) -> f32 {
+        let mut res = 0.0;
+        for eqn in &self.eqns {
+            res += eqn.slope(x);
         }
         res
     }

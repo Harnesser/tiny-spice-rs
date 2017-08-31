@@ -21,6 +21,9 @@ waves:
 test:
 	cargo test --no-fail-fast
 
+newton:
+	cargo test --no-fail-fast --test newton
+
 clean:
 	cargo clean
 	\rm -rf *.log

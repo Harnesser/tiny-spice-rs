@@ -1,9 +1,9 @@
 use circuit::{NodeId, BOLTZMANN, CHARGE};
-use newton_raphson::{Differentiable, DifferentiableTerm, DifferentiableEqn};
+use newton_raphson::{Differentiable};
 
-struct Diode {
-    i_sat: f32,
-    tdegc: f32,
+pub struct Diode {
+    pub i_sat: f32,
+    pub tdegc: f32,
 }
 
 impl Differentiable for Diode {
