@@ -18,6 +18,9 @@ clippy:
 waves:
 	gtkwave --dump waves.vcd --save plot.gtkw
 
+test:
+	cargo test --no-fail-fast
+
 clean:
 	cargo clean
 	\rm -rf *.log

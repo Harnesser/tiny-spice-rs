@@ -2,6 +2,8 @@ use std::fmt;
 
 pub type NodeId = usize;
 
+pub const BOLTZMANN : f32 = 1.3806488e-23;
+pub const CHARGE : f32 = 1.603e-19;
 
 #[allow(dead_code)]
 pub struct Resistor {
