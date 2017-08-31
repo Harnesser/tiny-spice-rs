@@ -13,6 +13,8 @@ I can go a few ways now:
 The non-linear solver is the most interesting bit, I think. Although LC transient
 is kinda interesting too...
 
+Fixed back-substitution.
+
 
 ## 2017-08-30
 Have a basic KCL solver for Is and Rs.

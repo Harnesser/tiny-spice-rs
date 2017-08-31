@@ -56,10 +56,10 @@ impl Engine {
                     println!("  [ELEMENT] Current source: {} into node {} and out of node {}",
                             value, p, n);
                     if *p != 0 {
-                        v[*p][ia] = v[*p][ia] + value; // += doesn't work here
+                        v[*p][ia] = v[*p][ia] - value; // -= doesn't work here
                     }
                     if *n != 0 {
-                        v[*n][ia] = v[*n][ia] - value;
+                        v[*n][ia] = v[*n][ia] + value;
                     }
                 }
                 circuit::Element::R(circuit::Resistor{ ref a, ref b, ref value }) => {
