@@ -32,7 +32,7 @@ impl Engine {
         let c_nodes = ckt.count_nodes();
         println!("*INFO* There are {} nodes in the design, including ground", c_nodes);
 
-        println!("*INFO* Building Voltage Node Matrix and Current Vector");
+        println!("\n*INFO* Building Voltage Node Matrix and Current Vector");
 
         // Voltage Node Matrix
         // I think I have to make this out of Vecs (on the heap) because c_nodes is
@@ -40,21 +40,26 @@ impl Engine {
         // c_nodes is any way huge.
         // [ V I ]
         let mut v = vec![ vec![0.0; c_nodes+1]; c_nodes]; // +1 for currents
-        let i = c_nodes; // index for current vector
+        let ia = c_nodes; // index for ampere vector
 
         // Fill up the voltage node and current vector
         // This needs to know about each of the kinds of circuit elements, so
         // the node equations can be built up appropriately.
         for el in &ckt.elements {
             match *el {
+                // From NGSPICE manual:
+                // Positive current is assumed to flow from the positive node,
+                // through the source, to the negative node.
+                // A current source of positive value forces current to flow 
+                // out of the n+ node, through the source, and into the n- node.
                 circuit::Element::I(circuit::CurrentSource{ ref p, ref n, ref value }) => {
                     println!("  [ELEMENT] Current source: {} into node {} and out of node {}",
                             value, p, n);
                     if *p != 0 {
-                        v[*p][i] = v[*p][i] + value; // += doesn't work here
+                        v[*p][ia] = v[*p][ia] + value; // += doesn't work here
                     }
                     if *n != 0 {
-                        v[*n][i] = v[*n][i] - value;
+                        v[*n][ia] = v[*n][ia] - value;
                     }
                 }
                 circuit::Element::R(circuit::Resistor{ ref a, ref b, ref value }) => {
@@ -90,15 +95,15 @@ impl Engine {
         // subsequent equations so now the 1st and 2nd variables are removed from
         // them. 
         // Divide by zeros everywhere...
-        println!("*INFO* Gaussian Elimination");
+        println!("\n*INFO* Gaussian Elimination");
         for r_ref in 0..c_nodes-1 { // row we're scaling
             if v[r_ref][r_ref] == 0.0 {
-                println!("Skipping v[{}][..]", r_ref);
+                //println!("Skipping v[{}][..]", r_ref);
                 continue;
             }
             for r_mod in r_ref+1..c_nodes { // row we're scaling
                 if v[r_mod][r_ref] == 0.0 {
-                    println!("Skipping v[{}][{}]", r_mod, r_ref);
+                    //println!("Skipping v[{}][{}]", r_mod, r_ref);
                     continue;
                 }
                 let ratio = v[r_mod][r_ref] / v[r_ref][r_ref];
@@ -108,37 +113,53 @@ impl Engine {
                     let wiggle = v[r_ref][c_mod];
                     let new = val - (wiggle * ratio); 
                     v[r_mod][c_mod] = new;
-                    println!("\nr_ref = {}, r_mod = {}, c_mod = {}, ratio = {}",
-                             r_ref, r_mod, c_mod, ratio);
-                    println!("{} - {}*{} -> {}", val, wiggle, ratio, new);
-                    self.pp_matrix(&v);
+                    //println!("\nr_ref = {}, r_mod = {}, c_mod = {}, ratio = {}",
+                    //         r_ref, r_mod, c_mod, ratio);
+                    //println!("{} - {}*{} -> {}", val, wiggle, ratio, new);
+                    //self.pp_matrix(&v);
                 }
-                println!(" ---------------------------------------------- ");
+                //println!(" ---------------------------------------------- ");
             }
         }
         self.pp_matrix(&v);
-       
-        // back-substitution
+      
+        // TODO check result
+
+
+
+        println!("\n*INFO* Back-substitution");
+
+        // node voltage array
         let mut n = vec![0.0; c_nodes];
 
-        println!("*INFO* Back-substitution");
-        for r_solve_up in 0..c_nodes {
-            let r_solve = c_nodes - r_solve_up - 1;
-            println!("r_solve = {}, n[{}] = {}", r_solve, r_solve, n[r_solve]);
-            
+        // Solve easiest
+        let i_last = c_nodes - 1;
+        n[i_last] = v[i_last][c_nodes] / v[i_last][i_last];
+
+        // Solve the rest recursively
+        for i_solve in (1..c_nodes-1).rev() {
+            let mut sum = 0.0;
+            for i_term in i_solve+1..c_nodes {
+                sum += v[i_solve][i_term] * n[i_term];
+            }
+            n[i_solve] = ( v[i_solve][ia] - sum ) / v[i_solve][i_solve];
+        }
+
+
+        println!("\n*INFO* Results");
+        for i_res in 1..c_nodes {
+            println!(" n[{:2}] = {}", i_res, n[i_res]);
         }
 
     }
 
     fn pp_matrix( &self, m : &Vec<Vec<f32>> ) {
-        println!("Marty");
         for r in m {
-            println!("\n");
             for val in r {
                 print!("{:.3}   ", val);
             }
+            println!("");
         }
-        println!("\n");
     }
 
 }
