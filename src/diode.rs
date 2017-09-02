@@ -8,13 +8,13 @@ pub struct Diode {
 
 impl Differentiable for Diode {
 
-    fn eval(&self, x: f32) -> f32 {
+    fn eval(&self, v_d: f32) -> f32 {
         let v_t = BOLTZMANN * (363.0 + self.tdegc) / CHARGE;
-        self.i_sat * (x / v_t).exp()
+        self.i_sat * (v_d / v_t).exp()
     }
 
-    fn slope(&self, x: f32) -> f32 {
-        x * self.eval(x)
+    fn slope(&self, v_d: f32) -> f32 {
+        v_d * self.eval(v_d)
     }
 
 }
