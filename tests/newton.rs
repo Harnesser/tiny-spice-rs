@@ -3,8 +3,6 @@ extern crate tiny_spice;
 use tiny_spice::diode::Diode;
 use tiny_spice::newton_raphson::{Differentiable, DifferentiableEqn};
 
-const GMIN: f32 = 1.0e-12;
-
 struct Line {
     pub m: f32,
     pub c: f32,
@@ -15,7 +13,7 @@ impl Differentiable for Line {
         ( self.m * x ) + self.c
     }
 
-    fn slope(&self, x: f32) -> f32 {
+    fn slope(&self, _: f32) -> f32 {
         self.m
     }
 }
@@ -57,8 +55,8 @@ fn basic_r_solve() {
 // Diode and Norton Source
 //
 fn diode_resistor_isrc() -> DifferentiableEqn {
-
-    let alpha = 0.001 / 0.501;
+    let r = 2.0;
+    let i = 5.0;
 
     let d1 = Diode {
         tdegc: 27.0,
@@ -67,11 +65,11 @@ fn diode_resistor_isrc() -> DifferentiableEqn {
 
     let i1 = Line {
         m: 0.0,
-        c: 3.0 * alpha,
+        c: -i,
     };
 
     let r1 = Line {
-        m: ( -0.001 * alpha ) + 0.001 ,
+        m: 1.0/r,
         c: 0.0,
     };
 
@@ -118,6 +116,7 @@ fn basic_solve_eval() {
 
 
 
+#[allow(dead_code)]
 //#[test]
 fn plot_diode() {
 
