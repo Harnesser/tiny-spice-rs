@@ -1,3 +1,14 @@
+# Development Log
+
+
+## 2017-09-02
+I've been using PDF on the internet that got the F'(V) for a diode wrong. After
+fixing this, the DC operating point algorithm I have converges if the initial 
+guess for the diode voltage is larger than what it should be. For lower initial
+guesses, things fail.
+
+
+
 ## 2017-08-31
 
 I can go a few ways now:
