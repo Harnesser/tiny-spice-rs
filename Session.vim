@@ -16,6 +16,7 @@ set backspace=indent,eol,start
 set fileencodings=ucs-bom,utf-8,default,latin1
 set helplang=en
 set history=50
+set iminsert=0
 set matchpairs=(:),{:},[:],<:>
 set nomodeline
 set mouse=a
@@ -24,6 +25,7 @@ set ruler
 set runtimepath=~/.vim,~/.vim/bundle/rust.vim,/var/lib/vim/addons,/usr/share/vim/vimfiles,/usr/share/vim/vim74,/usr/share/vim/vimfiles/after,/var/lib/vim/addons/after,~/.vim/bundle/rust.vim/after,~/.vim/after
 set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc
 set termencoding=utf-8
+set window=56
 let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
 let v:this_session=expand("<sfile>:p")
 silent only
@@ -32,11 +34,14 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +3 bin/bringup.rs
-badd +14 src/engine.rs
-badd +53 src/circuit.rs
+badd +25 bin/bringup.rs
+badd +49 src/engine.rs
+badd +98 src/circuit.rs
+badd +0 src/diode.rs
+badd +0 tests/newton.rs
+badd +0 src/newton_raphson.rs
 args bin/bringup.rs src/engine.rs
-edit bin/bringup.rs
+edit src/diode.rs
 set splitbelow splitright
 wincmd _ | wincmd |
 split
@@ -49,10 +54,11 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winheight=1 winwidth=1
-exe '1resize ' . ((&lines * 8 + 24) / 49)
-exe '2resize ' . ((&lines * 28 + 24) / 49)
-exe '3resize ' . ((&lines * 9 + 24) / 49)
+exe '1resize ' . ((&lines * 9 + 28) / 57)
+exe '2resize ' . ((&lines * 23 + 28) / 57)
+exe '3resize ' . ((&lines * 21 + 28) / 57)
 argglobal
+edit src/diode.rs
 nnoremap <buffer> <D-R> :RustRun! =join(b:rust_last_rustc_args)erust#AppendCmdLine(' -- ' . join(b:rust_last_args))
 nnoremap <buffer> <silent> <D-r> :RustRun
 onoremap <buffer> <silent> [[ :call rust#Jump('o', 'Back')
@@ -167,15 +173,15 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 20 - ((0 * winheight(0) + 4) / 8)
+let s:l = 1 - ((0 * winheight(0) + 4) / 9)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-20
-normal! 043|
+1
+normal! 0
 wincmd w
 argglobal
-edit src/engine.rs
+edit tests/newton.rs
 nnoremap <buffer> <D-R> :RustRun! =join(b:rust_last_rustc_args)erust#AppendCmdLine(' -- ' . join(b:rust_last_args))
 nnoremap <buffer> <silent> <D-r> :RustRun
 onoremap <buffer> <silent> [[ :call rust#Jump('o', 'Back')
@@ -290,15 +296,15 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 35 - ((4 * winheight(0) + 14) / 28)
+let s:l = 1 - ((0 * winheight(0) + 11) / 23)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-35
-normal! 09|
+1
+normal! 0
 wincmd w
 argglobal
-edit src/circuit.rs
+edit src/newton_raphson.rs
 nnoremap <buffer> <D-R> :RustRun! =join(b:rust_last_rustc_args)erust#AppendCmdLine(' -- ' . join(b:rust_last_args))
 nnoremap <buffer> <silent> <D-r> :RustRun
 onoremap <buffer> <silent> [[ :call rust#Jump('o', 'Back')
@@ -413,17 +419,17 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 87 - ((6 * winheight(0) + 4) / 9)
+let s:l = 1 - ((0 * winheight(0) + 10) / 21)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-87
-normal! 035|
+1
+normal! 0
 wincmd w
-2wincmd w
-exe '1resize ' . ((&lines * 8 + 24) / 49)
-exe '2resize ' . ((&lines * 28 + 24) / 49)
-exe '3resize ' . ((&lines * 9 + 24) / 49)
+3wincmd w
+exe '1resize ' . ((&lines * 9 + 28) / 57)
+exe '2resize ' . ((&lines * 23 + 28) / 57)
+exe '3resize ' . ((&lines * 21 + 28) / 57)
 tabnext 1
 if exists('s:wipebuf')
   silent exe 'bwipe ' . s:wipebuf
