@@ -30,6 +30,42 @@ impl Differentiable for Linear {
     }
 }
 
+
+// Resistor and Current Source
+
+fn resistor_isrc() -> DifferentiableEqn {
+
+    let i1 = Constant {
+        val: -2.0,
+    };
+
+    let r1 = Linear {
+        gradient: 1.0/3.0 ,
+    };
+
+    let mut cde = DifferentiableEqn {
+        eqns: vec![],
+    };
+
+    cde.eqns.push(Box::new(i1));
+    cde.eqns.push(Box::new(r1));
+    cde
+}
+
+
+#[test]
+fn basic_r_solve() {
+    let cde = resistor_isrc();
+    let answer = cde.solve(1.0);
+    assert!(answer == Some(6.0), "answer was {:?}", answer);
+}
+
+
+//
+// Diode and current source
+// Keep current source low, so that diode can sink it alone
+//
+
 fn diode_isrc() -> DifferentiableEqn {
 
     let d1 = Diode {
@@ -47,33 +83,6 @@ fn diode_isrc() -> DifferentiableEqn {
 
     cde.eqns.push(Box::new(i1));
     cde.eqns.push(Box::new(d1));
-    cde
-}
-
-fn diode_resistor_isrc() -> DifferentiableEqn {
-
-    let alpha = 0.001 / 0.501;
-
-    let d1 = Diode {
-        tdegc: 27.0,
-        i_sat: 1.0e-9,
-    };
-
-    let i1 = Constant {
-        val: 3.0 * alpha,
-    };
-
-    let r1 = Linear {
-        gradient: ( -0.001 * alpha ) + 0.001 ,
-    };
-
-    let mut cde = DifferentiableEqn {
-        eqns: vec![],
-    };
-
-    cde.eqns.push(Box::new(i1));
-    cde.eqns.push(Box::new(d1));
-    cde.eqns.push(Box::new(r1));
     cde
 }
 
@@ -129,14 +138,21 @@ fn basic_solve_eval() {
 }
 
 
-fn resistor_isrc() -> DifferentiableEqn {
+fn diode_resistor_isrc() -> DifferentiableEqn {
+
+    let alpha = 0.001 / 0.501;
+
+    let d1 = Diode {
+        tdegc: 27.0,
+        i_sat: 1.0e-9,
+    };
 
     let i1 = Constant {
-        val: -2.0,
+        val: 3.0 * alpha,
     };
 
     let r1 = Linear {
-        gradient: 1.0/3.0 ,
+        gradient: ( -0.001 * alpha ) + 0.001 ,
     };
 
     let mut cde = DifferentiableEqn {
@@ -144,18 +160,9 @@ fn resistor_isrc() -> DifferentiableEqn {
     };
 
     cde.eqns.push(Box::new(i1));
+    cde.eqns.push(Box::new(d1));
     cde.eqns.push(Box::new(r1));
     cde
-}
-
-
-#[test]
-fn basic_r_solve() {
-    let cde = resistor_isrc();
-    let answer = cde.solve(1.0);
-    assert!(answer == Some(0.0), "answer was {:?}", answer);
-    //let reeval = cde.eval(answer.unwrap());
-    //assert!(reeval == 0.0, "reeval was {:?}", reeval);
 }
 
 //#[test]
