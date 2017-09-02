@@ -3,30 +3,18 @@ extern crate tiny_spice;
 use tiny_spice::diode::Diode;
 use tiny_spice::newton_raphson::{Differentiable, DifferentiableEqn};
 
-struct Constant {
-    pub val: f32,
+struct Line {
+    pub m: f32,
+    pub c: f32,
 }
-impl Differentiable for Constant {
+
+impl Differentiable for Line {
     fn eval(&self, x: f32) -> f32 {
-        self.val
+        ( self.m * x ) + self.c
     }
 
     fn slope(&self, x: f32) -> f32 {
-        0.0
-    }
-}
-
-
-struct Linear {
-    pub gradient: f32,
-}
-impl Differentiable for Linear {
-    fn eval(&self, x: f32) -> f32 {
-        self.gradient * x
-    }
-
-    fn slope(&self, x: f32) -> f32 {
-        self.gradient
+        self.m
     }
 }
 
@@ -35,12 +23,14 @@ impl Differentiable for Linear {
 
 fn resistor_isrc() -> DifferentiableEqn {
 
-    let i1 = Constant {
-        val: -2.0,
+    let i1 = Line {
+        m: 0.0,
+        c: -2.0,
     };
 
-    let r1 = Linear {
-        gradient: 1.0/3.0 ,
+    let r1 = Line{
+        m: 1.0/3.0 ,
+        c: 0.0,
     };
 
     let mut cde = DifferentiableEqn {
@@ -73,8 +63,9 @@ fn diode_isrc() -> DifferentiableEqn {
         i_sat: 1.0e-9,
     };
 
-    let i1 = Constant {
-        val: -0.001,
+    let i1 = Line {
+        m: 0.0,
+        c: -0.001,
     };
 
     let mut cde = DifferentiableEqn {
@@ -147,12 +138,14 @@ fn diode_resistor_isrc() -> DifferentiableEqn {
         i_sat: 1.0e-9,
     };
 
-    let i1 = Constant {
-        val: 3.0 * alpha,
+    let i1 = Line {
+        m: 0.0,
+        c: 3.0 * alpha,
     };
 
-    let r1 = Linear {
-        gradient: ( -0.001 * alpha ) + 0.001 ,
+    let r1 = Line {
+        m: ( -0.001 * alpha ) + 0.001 ,
+        c: 0.0,
     };
 
     let mut cde = DifferentiableEqn {
