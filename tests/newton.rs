@@ -102,6 +102,50 @@ fn basic_solve_0p3() {
 }
 
 #[test]
+fn basic_solve_0p4() {
+    let v_0 = 0.4;
+    let cde = diode_resistor_isrc();
+
+    let i_0 = cde.eqns[1].eval(v_0);
+    println!("\n*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
+    let answer = cde.solve(v_0);
+    assert!(answer == Some(0.0), "Answer was {:?}", answer);
+}
+
+#[test]
+fn basic_solve_0p5() {
+    let v_0 = 0.5;
+    let cde = diode_resistor_isrc();
+
+    let i_0 = cde.eqns[1].eval(v_0);
+    println!("\n*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
+    let answer = cde.solve(v_0);
+    assert!(answer == Some(0.0), "Answer was {:?}", answer);
+}
+
+#[test]
+fn basic_solve_0p6() {
+    let v_0 = 0.6;
+    let cde = diode_resistor_isrc();
+
+    let i_0 = cde.eqns[1].eval(v_0);
+    println!("\n*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
+    let answer = cde.solve(v_0);
+    assert!(answer == Some(0.0), "Answer was {:?}", answer);
+}
+
+#[test]
+fn basic_solve_0p7() {
+    let v_0 = 0.7;
+    let cde = diode_resistor_isrc();
+
+    let i_0 = cde.eqns[1].eval(v_0);
+    println!("\n*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
+    let answer = cde.solve(v_0);
+    assert!(answer == Some(0.0), "Answer was {:?}", answer);
+}
+
+#[test]
 fn basic_solve_0p8() {
     let v_0 = 0.8;
     let cde = diode_resistor_isrc();

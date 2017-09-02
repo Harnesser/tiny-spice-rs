@@ -15,7 +15,7 @@ impl DifferentiableEqn {
 
         const EPSILON : f32 = 10e-14;
         const TOLERANCE : f32 = 10e-7;
-        const MAX_ITERS : usize = 20;
+        const MAX_ITERS : usize = 100;
 
         let mut x0 = i;
         let mut converged = false;
