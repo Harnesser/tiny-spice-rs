@@ -1,4 +1,4 @@
-use circuit::NodeId;
+use circuit::{NodeId};
 
 pub trait Differentiable {
     fn eval(&self, x: f32) -> f32;
@@ -52,7 +52,7 @@ impl DifferentiableEqn {
         if converged {
             Some(x0)
         } else {
-            println!("*ERROR* Did not converge");
+            println!("*ERROR* Divergent");
             None
         }
     }

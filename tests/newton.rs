@@ -3,6 +3,8 @@ extern crate tiny_spice;
 use tiny_spice::diode::Diode;
 use tiny_spice::newton_raphson::{Differentiable, DifferentiableEqn};
 
+const GMIN: f32 = 1.0e-12;
+
 struct Line {
     pub m: f32,
     pub c: f32,
@@ -52,83 +54,8 @@ fn basic_r_solve() {
 
 
 //
-// Diode and current source
-// Keep current source low, so that diode can sink it alone
+// Diode and Norton Source
 //
-
-fn diode_isrc() -> DifferentiableEqn {
-
-    let d1 = Diode {
-        tdegc: 27.0,
-        i_sat: 1.0e-9,
-    };
-
-    let i1 = Line {
-        m: 0.0,
-        c: -0.001,
-    };
-
-    let mut cde = DifferentiableEqn {
-        eqns: vec![],
-    };
-
-    cde.eqns.push(Box::new(i1));
-    cde.eqns.push(Box::new(d1));
-    cde
-}
-
-#[test]
-fn basic_eval_0p1() {
-    let cde = diode_isrc();
-    let answer = cde.eval(0.1);
-    assert!(answer == 0.0, "Answer was {}", answer);
-}
-
-#[test]
-fn basic_eval_0p6() {
-    let cde = diode_isrc();
-    let answer = cde.eval(0.6);
-    assert!(answer == 0.0, "Answer was {}", answer);
-}
-
-#[test]
-fn basic_slope() {
-    let cde = diode_isrc();
-    let answer = cde.slope(0.1);
-    assert!(answer == 0.0, "Answer was {}", answer);
-}
-
-#[test]
-fn basic_solve_0p3() {
-    let v_0 = 0.3;
-    let cde = diode_isrc();
-
-    let i_0 = cde.eqns[1].eval(v_0);
-    println!("*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
-    let answer = cde.solve(v_0);
-    assert!(answer == Some(0.0), "Answer was {:?}", answer);
-}
-
-#[test]
-fn basic_solve_0p7() {
-    let v_0 = 0.7;
-    let cde = diode_isrc();
-
-    let i_0 = cde.eqns[1].eval(v_0);
-    println!("*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
-    let answer = cde.solve(v_0);
-    assert!(answer == Some(0.0), "Answer was {:?}", answer);
-}
-
-#[test]
-fn basic_solve_eval() {
-    let cde = diode_isrc();
-    let answer = cde.solve(0.1);
-    let reeval = cde.eval(answer.unwrap());
-    assert!(reeval == 0.0, "reeval was {:?}", reeval);
-}
-
-
 fn diode_resistor_isrc() -> DifferentiableEqn {
 
     let alpha = 0.001 / 0.501;
@@ -157,6 +84,39 @@ fn diode_resistor_isrc() -> DifferentiableEqn {
     cde.eqns.push(Box::new(r1));
     cde
 }
+
+
+#[test]
+fn basic_solve_0p3() {
+    let v_0 = 0.3;
+    let cde = diode_resistor_isrc();
+
+    let i_0 = cde.eqns[1].eval(v_0);
+    println!("*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
+    let answer = cde.solve(v_0);
+    assert!(answer == Some(0.0), "Answer was {:?}", answer);
+}
+
+#[test]
+fn basic_solve_0p7() {
+    let v_0 = 0.7;
+    let cde = diode_resistor_isrc();
+
+    let i_0 = cde.eqns[1].eval(v_0);
+    println!("*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
+    let answer = cde.solve(v_0);
+    assert!(answer == Some(0.0), "Answer was {:?}", answer);
+}
+
+#[test]
+fn basic_solve_eval() {
+    let cde = diode_resistor_isrc();
+    let answer = cde.solve(0.1);
+    let reeval = cde.eval(answer.unwrap());
+    assert!(reeval == 0.0, "reeval was {:?}", reeval);
+}
+
+
 
 //#[test]
 fn plot_diode() {
