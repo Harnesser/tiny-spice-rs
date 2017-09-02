@@ -14,7 +14,8 @@ impl Differentiable for Diode {
     }
 
     fn slope(&self, v_d: f32) -> f32 {
-        v_d * self.eval(v_d)
+        let v_t = BOLTZMANN * (363.0 + self.tdegc) / CHARGE;
+        (1.0/v_t) * self.i_sat * (v_d / v_t).exp()
     }
 
 }

@@ -73,6 +73,11 @@ fn diode_resistor_isrc() -> DifferentiableEqn {
         c: 0.0,
     };
 
+    let gmin = Line {
+        m: 1.0e-12,
+        c: 0.0,
+    };
+
     let mut cde = DifferentiableEqn {
         eqns: vec![],
     };
@@ -80,6 +85,7 @@ fn diode_resistor_isrc() -> DifferentiableEqn {
     cde.eqns.push(Box::new(i1));
     cde.eqns.push(Box::new(d1));
     cde.eqns.push(Box::new(r1));
+    //cde.eqns.push(Box::new(gmin));
     cde
 }
 
@@ -90,23 +96,24 @@ fn basic_solve_0p3() {
     let cde = diode_resistor_isrc();
 
     let i_0 = cde.eqns[1].eval(v_0);
-    println!("*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
+    println!("\n*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
     let answer = cde.solve(v_0);
     assert!(answer == Some(0.0), "Answer was {:?}", answer);
 }
 
 #[test]
-fn basic_solve_0p7() {
-    let v_0 = 0.7;
+fn basic_solve_0p8() {
+    let v_0 = 0.8;
     let cde = diode_resistor_isrc();
 
     let i_0 = cde.eqns[1].eval(v_0);
-    println!("*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
+    println!("\n*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
     let answer = cde.solve(v_0);
     assert!(answer == Some(0.0), "Answer was {:?}", answer);
 }
 
-#[test]
+#[allow(dead_code)]
+//#[test]
 fn basic_solve_eval() {
     let cde = diode_resistor_isrc();
     let answer = cde.solve(0.1);

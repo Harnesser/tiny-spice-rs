@@ -60,7 +60,7 @@ impl DifferentiableEqn {
     pub fn eval(&self, x: f32) -> f32 {
         let mut res = 0.0;
         for eqn in &self.eqns {
-            res += eqn.eval(x);
+            res -= eqn.eval(x);
         }
         res
     }
@@ -68,7 +68,7 @@ impl DifferentiableEqn {
     pub fn slope(&self, x: f32) -> f32 {
         let mut res = 0.0;
         for eqn in &self.eqns {
-            res += eqn.slope(x);
+            res -= eqn.slope(x);
         }
         res
     }
