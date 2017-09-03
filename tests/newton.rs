@@ -18,6 +18,22 @@ impl Differentiable for Line {
     }
 }
 
+fn unwrap_nearly(x: Option<f32>, y: f32) -> bool {
+    let delta = 1.2e-7;
+    if let Some(x1) = x {
+        if x1.is_finite() {
+            if x1 > ( y - delta ) && x1 < (y + delta) {
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    } else {
+        false
+    }
+}
 
 // Resistor and Current Source
 
@@ -73,11 +89,6 @@ fn diode_resistor_isrc() -> DifferentiableEqn {
         c: 0.0,
     };
 
-    let gmin = Line {
-        m: 1.0e-12,
-        c: 0.0,
-    };
-
     let mut cde = DifferentiableEqn {
         eqns: vec![],
     };
@@ -85,7 +96,13 @@ fn diode_resistor_isrc() -> DifferentiableEqn {
     cde.eqns.push(Box::new(i1));
     cde.eqns.push(Box::new(d1));
     cde.eqns.push(Box::new(r1));
+
+    let gmin = Line {
+        m: 1.0e-12,
+        c: 0.0,
+    };
     //cde.eqns.push(Box::new(gmin));
+
     cde
 }
 
@@ -98,7 +115,7 @@ fn basic_solve_0p3() {
     let i_0 = cde.eqns[1].eval(v_0);
     println!("\n*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
     let answer = cde.solve(v_0);
-    assert!(answer == Some(0.0), "Answer was {:?}", answer);
+    assert!( unwrap_nearly(answer, 0.74755305), "Answer was {:?}", answer);
 }
 
 #[test]
@@ -109,7 +126,7 @@ fn basic_solve_0p4() {
     let i_0 = cde.eqns[1].eval(v_0);
     println!("\n*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
     let answer = cde.solve(v_0);
-    assert!(answer == Some(0.0), "Answer was {:?}", answer);
+    assert!( unwrap_nearly(answer, 0.74755305), "Answer was {:?}", answer);
 }
 
 #[test]
@@ -120,7 +137,7 @@ fn basic_solve_0p5() {
     let i_0 = cde.eqns[1].eval(v_0);
     println!("\n*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
     let answer = cde.solve(v_0);
-    assert!(answer == Some(0.0), "Answer was {:?}", answer);
+    assert!( unwrap_nearly(answer, 0.74755305), "Answer was {:?}", answer);
 }
 
 #[test]
@@ -131,7 +148,7 @@ fn basic_solve_0p6() {
     let i_0 = cde.eqns[1].eval(v_0);
     println!("\n*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
     let answer = cde.solve(v_0);
-    assert!(answer == Some(0.0), "Answer was {:?}", answer);
+    assert!( unwrap_nearly(answer, 0.74755305), "Answer was {:?}", answer);
 }
 
 #[test]
@@ -142,7 +159,7 @@ fn basic_solve_0p7() {
     let i_0 = cde.eqns[1].eval(v_0);
     println!("\n*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
     let answer = cde.solve(v_0);
-    assert!(answer == Some(0.0), "Answer was {:?}", answer);
+    assert!( unwrap_nearly(answer, 0.74755305), "Answer was {:?}", answer);
 }
 
 #[test]
@@ -153,16 +170,16 @@ fn basic_solve_0p8() {
     let i_0 = cde.eqns[1].eval(v_0);
     println!("\n*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
     let answer = cde.solve(v_0);
-    assert!(answer == Some(0.0), "Answer was {:?}", answer);
+    assert!( unwrap_nearly(answer, 0.74755305), "Answer was {:?}", answer);
 }
 
 #[allow(dead_code)]
-//#[test]
+#[test]
 fn basic_solve_eval() {
     let cde = diode_resistor_isrc();
-    let answer = cde.solve(0.1);
+    let answer = cde.solve(0.8);
     let reeval = cde.eval(answer.unwrap());
-    assert!(reeval == 0.0, "reeval was {:?}", reeval);
+    assert!(reeval.abs() < 10e-7, "reeval was {:?}", reeval);
 }
 
 
