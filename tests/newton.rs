@@ -106,6 +106,16 @@ fn diode_resistor_isrc() -> DifferentiableEqn {
     cde
 }
 
+#[test]
+fn basic_solve_m0p3() {
+    let v_0 = -0.3;
+    let cde = diode_resistor_isrc();
+
+    let i_0 = cde.eqns[1].eval(v_0);
+    println!("\n*INFO* Initial diode current Vd = {}, Id = {}", v_0, i_0);
+    let answer = cde.solve(v_0);
+    assert!( unwrap_nearly(answer, 0.74755305), "Answer was {:?}", answer);
+}
 
 #[test]
 fn basic_solve_0p3() {

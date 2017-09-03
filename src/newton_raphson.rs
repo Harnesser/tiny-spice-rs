@@ -34,7 +34,13 @@ impl DifferentiableEqn {
             }
 
             // Do Newton-Raphson
-            let twiddle = y / yprime;
+            // !!!FIXME!!! Horrible hack to aid diode convergence
+            let mut twiddle = y / yprime;
+            if twiddle > 0.2 {
+                twiddle = 0.2;
+            } else if twiddle < -0.2 {
+                twiddle = -0.2;
+            }
             let x1 = x0 - twiddle;
             println!("        twiddle = {} x1 = {}", twiddle, x1);
 
