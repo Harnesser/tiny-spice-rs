@@ -9,6 +9,15 @@ sources and resistors.
 - Newton-Raphson solver (with horrible hack for convergence)
 
 
+## [0.3.0] Gaussian Elimination with Partial Pivot
+Use Guassian Elimination with partial pivot as in Wikipedia algorithm. This
+should help with numerical stability.
+
+### Changed
+- Gaussian Elimination now works from the column with the biggest `abs()`.
+  This helps with numerical stability, apparently.
+
+
 ## [0.2.0] Modified Nodal Analysis
 Can handle independent voltage sources now by incorporating Modified Nodal
 Anaysis (MNA) techniques. Solver didn't have to be changed!
