@@ -127,6 +127,17 @@ impl Engine {
         // Divide by zeros everywhere...
         println!("\n*INFO* Gaussian Elimination");
         for r_ref in 0..c_mna-1 { // row we're scaling
+
+            // find the k-th pivot
+            let r_max = self.index_of_next_abs(&v, r_ref);
+            println!("r_max = {} --> {}", r_max, r_ref);
+/*
+            if A[i_max, k] == 0 {
+                println!("Matrix is singular!");
+                break;
+            }
+*/
+                                
             if v[r_ref][r_ref] == 0.0 {
                 //println!("Skipping v[{}][..]", r_ref);
                 continue;
@@ -184,6 +195,20 @@ impl Engine {
             println!(" i[{:2}] = {}", i_res, n[i_res]);
         }
 
+    }
+
+    fn index_of_next_abs( &self, m: &Vec<Vec<f32>>, k: usize ) -> usize {
+        let mut biggest: f32 = 0.0;
+        let mut r_biggest: usize = k;
+        let c_rows = m.len();
+        for r in k..c_rows {
+            let this = m[r][k].abs();
+            if this > biggest {
+                biggest = this;
+                r_biggest = r;
+            }
+        }
+        r_biggest
     }
 
     fn pp_matrix( &self, m : &Vec<Vec<f32>> ) {
