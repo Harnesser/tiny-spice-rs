@@ -1,5 +1,11 @@
 # Development Log
 
+## 2017-09-05
+I'm having trouble figuring out how I might handle ODEs in matrices, so the new
+plan is:
+1
+2. Update Guassian Elimination algorithm
+
 
 ## 2017-09-02
 I've been using PDF on the internet that got the F'(V) for a diode wrong. After

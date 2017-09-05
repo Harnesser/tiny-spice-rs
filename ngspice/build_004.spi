@@ -1,0 +1,14 @@
+* Build 004 example
+
+R1 a 0 2
+V1 b a 32
+R2 b c 4
+R3 b 0 8
+V2 c 0 20
+
+.control
+  op
+  print all
+  quit
+.endc
+

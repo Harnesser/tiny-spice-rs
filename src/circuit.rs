@@ -21,11 +21,18 @@ pub struct CurrentSource {
     pub value: f32, // Amperes
 }
 
+#[allow(dead_code)]
+pub struct VoltageSource {
+    pub p: NodeId,
+    pub n: NodeId,
+    pub value: f32, // Volts
+}
 
 #[allow(dead_code)]
 pub enum Element {
     R(Resistor),
     I(CurrentSource),
+    V(VoltageSource),
 }
 
 
@@ -37,6 +44,9 @@ impl fmt::Display for Element {
             },
             Element::R(ref el) => {
                 write!(f, "R a:{} b:{} {}Ohms", el.a, el.b, el.value)
+            },
+            Element::V(ref el) => {
+                write!(f, "V a:{} b:{} {}Volts", el.p, el.n, el.value)
             },
         }
     }
@@ -91,12 +101,37 @@ impl Circuit {
                             c_nodes += 1;
                         }
                     }
+                    Element::V(VoltageSource{ ref p, ref n, .. }) => {
+                        if !seen[*p] {
+                            seen[*p] = true;
+                            c_nodes += 1;
+                        }
+                        if !seen[*n] {
+                            seen[*n] = true;
+                            c_nodes += 1;
+                        }
+                    }
                 }
         }
         c_nodes
     } 
 
+    pub fn count_voltage_sources(&self) -> usize {
 
+        // number of voltage sources in the circuit
+        let mut c_vsrc: usize = 0;
+
+        for el in &self.elements {
+                match *el {
+                    Element::V(VoltageSource{..}) => {
+                        c_vsrc += 1;
+                        }
+                    _ => {
+                    }
+                }
+        }
+        c_vsrc
+    } 
 
 
 }
