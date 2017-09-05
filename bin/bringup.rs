@@ -9,8 +9,11 @@ fn main() {
 
     let mut eng = engine::Engine::new();
 
-    let ckt = build_004();
-    eng.elaborate(&ckt);
+    let ckt_002 = build_002();
+    eng.elaborate(&ckt_002);
+
+    let ckt_004 = build_004();
+    eng.elaborate(&ckt_004);
 
     println!("\n*INFO* Done");
 }

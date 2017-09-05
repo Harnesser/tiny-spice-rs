@@ -117,31 +117,27 @@ impl Engine {
         }
         self.pp_matrix(&v);
 
-        // naive implementation of gaussian elimination
-        // From `Introduction to Algorithms`, page 818
-        // "We start by subtracting multiples of the first equation from the other
-        // equations in order to remove the first variable from those equations.
-        // Then, we subtract multiples of the 2nd equation from the 3rd and 
-        // subsequent equations so now the 1st and 2nd variables are removed from
-        // them. 
-        // Divide by zeros everywhere...
+        // Gaussian elimination with partial pivoting
+        // https://en.wikipedia.org/wiki/Gaussian_elimination#Pseudocode
         println!("\n*INFO* Gaussian Elimination");
-        for r_ref in 0..c_mna-1 { // row we're scaling
+        for r_ref in 1..c_mna-1 { // column we're eliminating, but index rows
 
             // find the k-th pivot
             let r_max = self.index_of_next_abs(&v, r_ref);
-            println!("r_max = {} --> {}", r_max, r_ref);
-/*
-            if A[i_max, k] == 0 {
-                println!("Matrix is singular!");
+
+            // swap
+            if v[r_max][r_ref] == 0.0 {
+                println!("Matrix is singular! {}", v[r_max][r_ref]);
                 break;
             }
-*/
-                                
+            v.swap(r_max, r_ref);
+
+            // check that we're not going to divide by zero
             if v[r_ref][r_ref] == 0.0 {
-                //println!("Skipping v[{}][..]", r_ref);
+                println!("Skipping v[{}][..]", r_ref);
                 continue;
             }
+
             for r_mod in r_ref+1..c_mna { // row we're scaling
                 if v[r_mod][r_ref] == 0.0 {
                     //println!("Skipping v[{}][{}]", r_mod, r_ref);
