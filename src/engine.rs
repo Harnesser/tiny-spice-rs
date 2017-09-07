@@ -58,9 +58,27 @@ impl Engine {
             // stamp
             unknowns = self.solve(v);
 
+            println!("*INFO* Convergence check");
+            println!("{:?}", unknowns);
+            println!("{:?}", unknowns_prev);
+
             // convergence check
             if c_iteration > 0 {
                 converged = true;
+                for (i,x) in unknowns.iter().enumerate() {
+                    let mut limit: f32 = 0.0;
+                    if i >= self.c_nodes {
+                        limit = x.abs() * RELTOL + VNTOL;
+                    } else {
+                        limit = x.abs() * RELTOL + ABSTOL;
+                    }
+                    let this = (x - unknowns_prev[i]).abs();
+                    println!(" {} < {} ({})", this, limit, converged);
+                    if this > limit {
+                        converged = false;
+                        // break;
+                    }
+                }
             }
 
             if converged {
@@ -74,12 +92,13 @@ impl Engine {
                     
 
         if converged {
-            println!("*INFO* Converged");
+            println!("*INFO* Converged after {} iterations", c_iteration + 1);
         } else {
             println!("*ERROR* Divergent");
         }
 
     }
+
 
     // Look at the circuit, and initialise linear version of the matrix
     pub fn elaborate(&mut self, ckt: &circuit::Circuit) {
