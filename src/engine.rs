@@ -1,7 +1,6 @@
 
 use circuit;
 
-
 pub fn banner() {
 
     println!("********************************************");
@@ -13,6 +12,11 @@ pub fn banner() {
 }
 
 pub struct Engine {
+    // Number of voltage nodes in the circuit
+    c_nodes: usize,
+    // Number of voltage sources in the circuit
+    // we have to solve for the current through these too
+    c_vsrcs: usize,
     //next_id: circuit::NodeId,
 }
 
@@ -20,7 +24,8 @@ impl Engine {
 
     pub fn new() -> Engine {
         Engine {
-           //next_id: 1,
+            c_nodes: 0,
+            c_vsrcs: 0,
         }
     }
 
@@ -29,17 +34,17 @@ impl Engine {
         // where n is the number of nodes (including ground) in the circuit
 
         // Number of nodes, including ground (aka 0, aka gnd)
-        let c_nodes = ckt.count_nodes();
-        println!("*INFO* There are {} nodes in the design, including ground", c_nodes);
+        self.c_nodes = ckt.count_nodes();
+        println!("*INFO* There are {} nodes in the design, including ground", self.c_nodes);
 
         // Number of voltage sources in the design
-        let c_vsrcs = ckt.count_voltage_sources();
-        println!("*INFO* There are {} voltage sources in the design", c_vsrcs);
+        self.c_vsrcs = ckt.count_voltage_sources();
+        println!("*INFO* There are {} voltage sources in the design", self.c_vsrcs);
 
         println!("\n*INFO* Building Voltage Node Matrix and Current Vector");
 
         // Modified Nodal Analysis (MNA) Matrix
-        let c_mna = c_nodes + c_vsrcs;
+        let c_mna = self.c_nodes + self.c_vsrcs;
         // I think I have to make this out of Vecs (on the heap) because c_nodes is
         // not known at compile time. Makes sense, I suppose - could blow the stack if
         // c_nodes is any way huge.
@@ -50,7 +55,7 @@ impl Engine {
         // Fill up the voltage node and current vector
         // This needs to know about each of the kinds of circuit elements, so
         // the node equations can be built up appropriately.
-        let mut i_vsrc : usize = c_nodes; // index, not amperage...
+        let mut i_vsrc : usize = self.c_nodes; // index, not amperage...
         #[allow(unused_parens)]
         for el in &ckt.elements {
             match *el {
@@ -184,10 +189,10 @@ impl Engine {
 
 
         println!("\n*INFO* Results");
-        for i_res in 1..c_nodes {
+        for i_res in 1..self.c_nodes {
             println!(" v[{:2}] = {}", i_res, n[i_res]);
         }
-        for i_res in c_nodes..c_nodes+c_vsrcs {
+        for i_res in self.c_nodes..self.c_nodes+self.c_vsrcs {
             println!(" i[{:2}] = {}", i_res, n[i_res]);
         }
 
