@@ -34,6 +34,11 @@ impl Engine {
         }
     }
 
+    pub fn dc_operating_point(&mut self, ckt: &circuit::Circuit) {
+        self.elaborate(&ckt);
+        self.solve(&self.base_matrix);
+    }
+
     // Look at the circuit, and initialise linear version of the matrix
     pub fn elaborate(&mut self, ckt: &circuit::Circuit) {
         // assume here that nodes have been indexed 0 -> N-1
@@ -128,39 +133,51 @@ impl Engine {
         }
         self.pp_matrix(&self.base_matrix);
 
+    }
+
+    // Solve the system of linear equations
+    pub fn solve(&self, linear_sys: &Vec<Vec<f32>>) -> Vec<f32> {
+
+        let c_mna = self.c_nodes + self.c_vsrcs;
+        let ia = c_mna; // index for ampere vector
+
+        // copy of the base matrix, cos we're going swapping as part of
+        // gaussian elimination
+        let mut v = linear_sys.clone();
+
         // Gaussian elimination with partial pivoting
         // https://en.wikipedia.org/wiki/Gaussian_elimination#Pseudocode
         println!("\n*INFO* Gaussian Elimination");
         for r_ref in 1..c_mna-1 { // column we're eliminating, but index rows
 
             // find the k-th pivot
-            let r_max = self.index_of_next_abs(&self.base_matrix, r_ref);
+            let r_max = self.index_of_next_abs(&v, r_ref);
 
             // swap
-            if self.base_matrix[r_max][r_ref] == 0.0 {
-                println!("Matrix is singular! {}", self.base_matrix[r_max][r_ref]);
+            if v[r_max][r_ref] == 0.0 {
+                println!("Matrix is singular! {}", v[r_max][r_ref]);
                 break;
             }
-            self.base_matrix.swap(r_max, r_ref);
+            v.swap(r_max, r_ref);
 
             // check that we're not going to divide by zero
-            if self.base_matrix[r_ref][r_ref] == 0.0 {
+            if v[r_ref][r_ref] == 0.0 {
                 println!("Skipping v[{}][..]", r_ref);
                 continue;
             }
 
             for r_mod in r_ref+1..c_mna { // row we're scaling
-                if self.base_matrix[r_mod][r_ref] == 0.0 {
+                if v[r_mod][r_ref] == 0.0 {
                     //println!("Skipping v[{}][{}]", r_mod, r_ref);
                     continue;
                 }
-                let ratio = self.base_matrix[r_mod][r_ref] / self.base_matrix[r_ref][r_ref];
+                let ratio = v[r_mod][r_ref] / v[r_ref][r_ref];
 
                 for c_mod in r_ref..c_mna+1 { // column we're scaling
-                    let val = self.base_matrix[r_mod][c_mod];
-                    let wiggle = self.base_matrix[r_ref][c_mod];
+                    let val = v[r_mod][c_mod];
+                    let wiggle = v[r_ref][c_mod];
                     let new = val - (wiggle * ratio); 
-                    self.base_matrix[r_mod][c_mod] = new;
+                    v[r_mod][c_mod] = new;
                     //println!("\nr_ref = {}, r_mod = {}, c_mod = {}, ratio = {}",
                     //         r_ref, r_mod, c_mod, ratio);
                     //println!("{} - {}*{} -> {}", val, wiggle, ratio, new);
@@ -169,7 +186,7 @@ impl Engine {
                 //println!(" ---------------------------------------------- ");
             }
         }
-        self.pp_matrix(&self.base_matrix);
+        self.pp_matrix(&v);
       
         // TODO check result
 
@@ -182,15 +199,15 @@ impl Engine {
 
         // Solve easiest
         let i_last = c_mna - 1;
-        n[i_last] = self.base_matrix[i_last][c_mna] / self.base_matrix[i_last][i_last];
+        n[i_last] = v[i_last][c_mna] / v[i_last][i_last];
 
         // Solve the rest recursively
         for i_solve in (1..c_mna-1).rev() {
             let mut sum = 0.0;
             for i_term in i_solve+1..c_mna {
-                sum += self.base_matrix[i_solve][i_term] * n[i_term];
+                sum += v[i_solve][i_term] * n[i_term];
             }
-            n[i_solve] = ( self.base_matrix[i_solve][ia] - sum ) / self.base_matrix[i_solve][i_solve];
+            n[i_solve] = ( v[i_solve][ia] - sum ) / v[i_solve][i_solve];
         }
 
 
@@ -201,6 +218,8 @@ impl Engine {
         for i_res in self.c_nodes..self.c_nodes+self.c_vsrcs {
             println!(" i[{:2}] = {}", i_res, n[i_res]);
         }
+
+        n
 
     }
 
