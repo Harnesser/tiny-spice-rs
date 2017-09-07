@@ -1,6 +1,6 @@
 [package]
 name = "tiny_spice"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Marty <harnesser+kartoffel@gmail.com>"]
 
 [dependencies]

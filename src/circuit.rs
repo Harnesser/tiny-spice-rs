@@ -1,5 +1,7 @@
 use std::fmt;
 
+use diode;
+
 pub type NodeId = usize;
 
 pub const BOLTZMANN : f32 = 1.3806488e-23;
@@ -33,6 +35,7 @@ pub enum Element {
     R(Resistor),
     I(CurrentSource),
     V(VoltageSource),
+    D(diode::Diode),
 }
 
 
@@ -47,6 +50,9 @@ impl fmt::Display for Element {
             },
             Element::V(ref el) => {
                 write!(f, "V a:{} b:{} {}Volts", el.p, el.n, el.value)
+            },
+            Element::D(ref el) => {
+                write!(f, "I p:{} n:{} I_sat={}A", el.p, el.n, el.i_sat)
             },
         }
     }
@@ -102,6 +108,16 @@ impl Circuit {
                         }
                     }
                     Element::V(VoltageSource{ ref p, ref n, .. }) => {
+                        if !seen[*p] {
+                            seen[*p] = true;
+                            c_nodes += 1;
+                        }
+                        if !seen[*n] {
+                            seen[*n] = true;
+                            c_nodes += 1;
+                        }
+                    }
+                    Element::D(diode::Diode{ ref p, ref n, .. }) => {
                         if !seen[*p] {
                             seen[*p] = true;
                             c_nodes += 1;

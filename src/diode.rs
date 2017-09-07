@@ -2,6 +2,8 @@ use circuit::{NodeId, BOLTZMANN, CHARGE};
 use newton_raphson::{Differentiable};
 
 pub struct Diode {
+    pub p: NodeId,
+    pub n: NodeId,
     pub i_sat: f32,
     pub tdegc: f32,
 }

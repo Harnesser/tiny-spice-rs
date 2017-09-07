@@ -1,5 +1,7 @@
 
 use circuit;
+use diode;
+use newton_raphson;
 
 pub fn banner() {
 
@@ -22,6 +24,9 @@ pub struct Engine {
     // base matrix - all the linear things
     base_matrix: Vec<Vec<f32>>,
 
+    // list of non-linear elements in the circuit
+    nonlinear_elements: Vec<circuit::Element>,
+
 }
 
 impl Engine {
@@ -31,6 +36,7 @@ impl Engine {
             c_nodes: 0,
             c_vsrcs: 0,
             base_matrix: vec![vec![]],
+            nonlinear_elements: vec![],
         }
     }
 
@@ -45,7 +51,8 @@ impl Engine {
         self.elaborate(&ckt);
         
         // prep values for convergence checks
-        let mut unknowns_prev : Vec<f32> = vec![];
+        let c_mna = self.c_nodes + self.c_vsrcs;
+        let mut unknowns_prev : Vec<f32> = vec![0.0; c_mna];
         let mut unknowns : Vec<f32> = vec![];
 
         // Newton-Raphson loop
@@ -53,16 +60,24 @@ impl Engine {
         let mut c_iteration: usize = 0;
         while c_iteration < ITL1 {
 
-            let v = self.base_matrix.clone();
-            // linearise
-            // stamp
+            // copy the base matrix, cos we're going to change it a lot:
+            // * stamp non-linear element companion models
+            // * re-order during guassian elimination
+            let mut v = self.base_matrix.clone();
+
+            // stamp companion models of non-linear devices
+            self.nonlinear_stamp(&mut v, &unknowns_prev);
+
+            // Guassian elimination & back solve of the now linearized
+            // circuit matrix
             unknowns = self.solve(v);
 
+
+            // Convergence check
             println!("*INFO* Convergence check");
             println!("{:?}", unknowns);
             println!("{:?}", unknowns_prev);
 
-            // convergence check
             if c_iteration > 0 {
                 converged = true;
                 for (i,x) in unknowns.iter().enumerate() {
@@ -89,7 +104,7 @@ impl Engine {
             unknowns_prev = unknowns.clone();
             c_iteration += 1;
         }
-                    
+
 
         if converged {
             println!("*INFO* Converged after {} iterations", c_iteration + 1);
@@ -101,7 +116,7 @@ impl Engine {
 
 
     // Look at the circuit, and initialise linear version of the matrix
-    pub fn elaborate(&mut self, ckt: &circuit::Circuit) {
+    fn elaborate(&mut self, ckt: &circuit::Circuit) {
         // assume here that nodes have been indexed 0 -> N-1
         // where n is the number of nodes (including ground) in the circuit
 
@@ -189,6 +204,14 @@ impl Engine {
                     i_vsrc += 1; // voltage source matrix index update 
                     
                 }
+                circuit::Element::D(diode::Diode{ ref p, ref n, ref i_sat, .. }) => {
+                    println!("  [ELEMENT] Diode: {}A into node {} and out of node {}",
+                            i_sat, p, n);
+                    if *p != 0 {
+                    }
+                    if *n != 0 {
+                    }
+                }
                 
             }
         }
@@ -197,7 +220,7 @@ impl Engine {
     }
 
     // Solve the system of linear equations
-    pub fn solve(&self, mut v: Vec<Vec<f32>>) -> Vec<f32> {
+    fn solve(&self, mut v: Vec<Vec<f32>>) -> Vec<f32> {
 
         let c_mna = self.c_nodes + self.c_vsrcs;
         let ia = c_mna; // index for ampere vector
@@ -300,6 +323,31 @@ impl Engine {
                 print!("{:.3}   ", val);
             }
             println!("");
+        }
+    }
+
+
+    // stamp a matrix with linearized companion models of all the non-linear
+    // devices listed in the SPICE netlist
+    fn nonlinear_stamp(&self, m: &mut Vec<Vec<f32>>, n: &Vec<f32> ) {
+
+        for el in &self.nonlinear_elements {
+            // linearise & stamp
+            match *el {
+
+                circuit::Element::D(diode::Diode{ ref p, ref n, ref i_sat, .. }) => {
+                    println!("  [ELEMENT] Diode: {}A into node {} and out of node {}",
+                            i_sat, p, n);
+                    if *p != 0 {
+                    }
+                    if *n != 0 {
+                    }
+                }
+
+                _ => {
+                    println!("*ERROR* This ain't a non-linear device");
+                }
+            }
         }
     }
 
