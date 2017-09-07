@@ -35,8 +35,50 @@ impl Engine {
     }
 
     pub fn dc_operating_point(&mut self, ckt: &circuit::Circuit) {
+
+        const RELTOL: f32 = 0.0001;
+        const VNTOL: f32 = 1.0e-6;
+        const ABSTOL: f32 = 1.0e-9;
+        const ITL1: usize = 100;
+
+        // build the circuit matrix
         self.elaborate(&ckt);
-        self.solve(&self.base_matrix);
+        
+        // prep values for convergence checks
+        let mut unknowns_prev : Vec<f32> = vec![];
+        let mut unknowns : Vec<f32> = vec![];
+
+        // Newton-Raphson loop
+        let mut converged = false;
+        let mut c_iteration: usize = 0;
+        while c_iteration < ITL1 {
+
+            let v = self.base_matrix.clone();
+            // linearise
+            // stamp
+            unknowns = self.solve(v);
+
+            // convergence check
+            if c_iteration > 0 {
+                converged = true;
+            }
+
+            if converged {
+                break;
+            }
+
+            //
+            unknowns_prev = unknowns.clone();
+            c_iteration += 1;
+        }
+                    
+
+        if converged {
+            println!("*INFO* Converged");
+        } else {
+            println!("*ERROR* Divergent");
+        }
+
     }
 
     // Look at the circuit, and initialise linear version of the matrix
@@ -136,14 +178,10 @@ impl Engine {
     }
 
     // Solve the system of linear equations
-    pub fn solve(&self, linear_sys: &Vec<Vec<f32>>) -> Vec<f32> {
+    pub fn solve(&self, mut v: Vec<Vec<f32>>) -> Vec<f32> {
 
         let c_mna = self.c_nodes + self.c_vsrcs;
         let ia = c_mna; // index for ampere vector
-
-        // copy of the base matrix, cos we're going swapping as part of
-        // gaussian elimination
-        let mut v = linear_sys.clone();
 
         // Gaussian elimination with partial pivoting
         // https://en.wikipedia.org/wiki/Gaussian_elimination#Pseudocode
@@ -155,14 +193,14 @@ impl Engine {
 
             // swap
             if v[r_max][r_ref] == 0.0 {
-                println!("Matrix is singular! {}", v[r_max][r_ref]);
+                println!("*ERROR* Matrix is singular! {}", v[r_max][r_ref]);
                 break;
             }
             v.swap(r_max, r_ref);
 
             // check that we're not going to divide by zero
             if v[r_ref][r_ref] == 0.0 {
-                println!("Skipping v[{}][..]", r_ref);
+                println!("*INFO* Skipping v[{}][..]", r_ref);
                 continue;
             }
 
