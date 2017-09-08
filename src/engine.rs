@@ -1,6 +1,5 @@
 
 use circuit;
-use diode;
 
 pub fn banner() {
 
@@ -204,11 +203,11 @@ impl Engine {
                     i_vsrc += 1; // voltage source matrix index update 
                     
                 }
-                circuit::Element::D(diode::Diode{ ref p, ref n, ref i_sat, ref tdegc }) => {
+                circuit::Element::D(circuit::Diode{ ref p, ref n, ref i_sat, ref tdegc }) => {
                     println!("  [ELEMENT] Diode:");
                     self.nonlinear_elements.push(
                         circuit::Element::D(
-                            diode::Diode {
+                            circuit::Diode {
                                 p: *p,
                                 n: *n,
                                 i_sat: *i_sat,
@@ -338,7 +337,7 @@ impl Engine {
         println!("*INFO* Stamping non-linear elements");
         for el in &self.nonlinear_elements {
             match *el {
-                circuit::Element::D(diode::Diode{ ref p, ref n, ref i_sat, ref tdegc }) => {
+                circuit::Element::D(circuit::Diode{ ref p, ref n, ref i_sat, ref tdegc }) => {
                     println!("*INFO* {}", el);
                 }
 

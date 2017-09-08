@@ -1,6 +1,6 @@
 use std::fmt;
 
-use diode;
+pub use diode::Diode;
 
 pub type NodeId = usize;
 
@@ -35,7 +35,7 @@ pub enum Element {
     R(Resistor),
     I(CurrentSource),
     V(VoltageSource),
-    D(diode::Diode),
+    D(Diode),
 }
 
 
@@ -117,7 +117,7 @@ impl Circuit {
                             c_nodes += 1;
                         }
                     }
-                    Element::D(diode::Diode{ ref p, ref n, .. }) => {
+                    Element::D(Diode{ ref p, ref n, .. }) => {
                         if !seen[*p] {
                             seen[*p] = true;
                             c_nodes += 1;
