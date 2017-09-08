@@ -153,8 +153,8 @@ impl Engine {
                     self.stamp_current_source(&mut m, isrc);
                 }
 
-                circuit::Element::R(circuit::Resistor{ ref a, ref b, ref value }) => {
-                    self.stamp_resistor(&mut m, *a, *b, *value);
+                circuit::Element::R(ref r) => {
+                    self.stamp_resistor(&mut m, r);
                 }
 
                 circuit::Element::V(ref vsrc) => {
@@ -332,23 +332,23 @@ impl Engine {
 
 
 
-    fn stamp_resistor(&self, m: &mut Vec<Vec<f32>>, a: NodeId, b: NodeId, value: f32) {
+    fn stamp_resistor(&self, m: &mut Vec<Vec<f32>>, r: &circuit::Resistor) {
         println!("  [ELEMENT] Resistor");
-        let over = 1.0 / value;
+        let over = 1.0 / r.value;
 
         // out of node 'a'
-        if a != 0 {
-            m[a][a] = m[a][a] + over;
-            if b != 0 {
-                m[a][b] = m[a][b] - over;
+        if r.a != 0 {
+            m[r.a][r.a] = m[r.a][r.a] + over;
+            if r.b != 0 {
+                m[r.a][r.b] = m[r.a][r.b] - over;
             }
         }
 
         // out of node 'b'
-        if b != 0 {
-            m[b][b] = m[b][b] + over;
-            if a != 0 {
-                m[b][a] = m[b][a] - over;
+        if r.b != 0 {
+            m[r.b][r.b] = m[r.b][r.b] + over;
+            if r.a != 0 {
+                m[r.b][r.a] = m[r.b][r.a] - over;
             }
         }
     }
@@ -372,8 +372,11 @@ impl Engine {
                         n: d.n,
                         value: i_eq
                     });
-                    self.stamp_resistor(m, d.p, d.n, 1.0/g_eq);
-
+                    self.stamp_resistor(m, &circuit::Resistor{
+                        a: d.p,
+                        b: d.n,
+                        value: 1.0/g_eq
+                    });
                 }
 
                 _ => { println!("*ERROR* - unrecognised nonlinear element"); }
