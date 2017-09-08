@@ -80,7 +80,7 @@ impl Engine {
             if c_iteration > 0 {
                 converged = true;
                 for (i,x) in unknowns.iter().enumerate() {
-                    let mut limit: f32 = 0.0;
+                    let limit: f32;
                     if i >= self.c_nodes {
                         limit = x.abs() * RELTOL + VNTOL;
                     } else {
@@ -137,13 +137,11 @@ impl Engine {
         // c_nodes is any way huge.
         // [ V I ]
         let mut m = vec![ vec![0.0; c_mna+1]; c_mna]; // +1 for currents
-        let ia = c_mna; // index for ampere vector
 
         // Fill up the voltage node and current vector
         // This needs to know about each of the kinds of circuit elements, so
         // the node equations can be built up appropriately.
         let mut i_vsrc : usize = self.c_nodes; // index, not amperage...
-        #[allow(unused_parens)]
         for el in &ckt.elements {
             match *el {
                 // From NGSPICE manual:
@@ -160,25 +158,7 @@ impl Engine {
                 }
 
                 circuit::Element::V(circuit::VoltageSource{ ref p, ref n, ref value }) => {
-                    println!("  [ELEMENT] Voltage source: {}V from node {} to node {}",
-                            value, p, n);
-
-                    // put the voltage value in the 'known' vector
-                    m[i_vsrc][ia] = *value;
-
-                    let p_not_grounded = (*p != 0);
-                    let n_not_grounded = (*n != 0);
-
-                    if p_not_grounded {
-                        m[i_vsrc][*p] = 1.0;
-                        m[*p][i_vsrc] = 1.0;
-                    }
-
-                    if n_not_grounded {
-                        m[i_vsrc][*n] = -1.0;
-                        m[*n][i_vsrc] = -1.0;
-                    }
-
+                    self.stamp_voltage_source(&mut m, *p, *n, *value, i_vsrc);
                     i_vsrc += 1; // voltage source matrix index update 
                     
                 }
@@ -321,6 +301,38 @@ impl Engine {
             m[n][ia] = m[n][ia] + value;
         }
     }
+
+    #[allow(unused_parens)]
+    fn stamp_voltage_source(
+        &self,
+        m: &mut Vec<Vec<f32>>,
+        p: NodeId,
+        n: NodeId,
+        value: f32,
+        i_vsrc: NodeId,
+    ) {
+        println!("  [ELEMENT] Voltage source: {}V from node {} to node {}",
+                value, p, n);
+        let ia = self.c_nodes + self.c_vsrcs; // index for ampere vector
+
+        // put the voltage value in the 'known' vector
+        m[i_vsrc][ia] = value;
+
+        let p_not_grounded = (p != 0);
+        let n_not_grounded = (n != 0);
+
+        if p_not_grounded {
+            m[i_vsrc][p] = 1.0;
+            m[p][i_vsrc] = 1.0;
+        }
+
+        if n_not_grounded {
+            m[i_vsrc][n] = -1.0;
+            m[n][i_vsrc] = -1.0;
+        }
+    }
+
+
 
     fn stamp_resistor(&self, m: &mut Vec<Vec<f32>>, a: NodeId, b: NodeId, value: f32) {
         println!("  [ELEMENT] Resistor");
