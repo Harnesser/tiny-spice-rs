@@ -1,5 +1,6 @@
 
 use circuit;
+use circuit::NodeId;
 
 pub fn banner() {
 
@@ -135,7 +136,7 @@ impl Engine {
         // not known at compile time. Makes sense, I suppose - could blow the stack if
         // c_nodes is any way huge.
         // [ V I ]
-        self.base_matrix = vec![ vec![0.0; c_mna+1]; c_mna]; // +1 for currents
+        let mut m = vec![ vec![0.0; c_mna+1]; c_mna]; // +1 for currents
         let ia = c_mna; // index for ampere vector
 
         // Fill up the voltage node and current vector
@@ -151,53 +152,31 @@ impl Engine {
                 // A current source of positive value forces current to flow 
                 // out of the n+ node, through the source, and into the n- node.
                 circuit::Element::I(circuit::CurrentSource{ ref p, ref n, ref value }) => {
-                    println!("  [ELEMENT] Current source: {}A into node {} and out of node {}",
-                            value, p, n);
-                    if *p != 0 {
-                        self.base_matrix[*p][ia] = self.base_matrix[*p][ia] - value;
-                    }
-                    if *n != 0 {
-                        self.base_matrix[*n][ia] = self.base_matrix[*n][ia] + value;
-                    }
+                    self.stamp_current_source(&mut m, *p, *n, *value);
                 }
+
                 circuit::Element::R(circuit::Resistor{ ref a, ref b, ref value }) => {
-                    println!("  [ELEMENT] Resistor");
-                    let over = 1.0 / value;
-
-                    // out of node 'a'
-                    if *a != 0 {
-                        self.base_matrix[*a][*a] = self.base_matrix[*a][*a] + over;
-                        if *b != 0 {
-                            self.base_matrix[*a][*b] = self.base_matrix[*a][*b] - over;
-                        }
-                    }
-
-                    // out of node 'b'
-                    if *b != 0 {
-                        self.base_matrix[*b][*b] = self.base_matrix[*b][*b] + over;
-                        if *a != 0 {
-                            self.base_matrix[*b][*a] = self.base_matrix[*b][*a] - over;
-                        }
-                    }
+                    self.stamp_resistor(&mut m, *a, *b, *value);
                 }
+
                 circuit::Element::V(circuit::VoltageSource{ ref p, ref n, ref value }) => {
                     println!("  [ELEMENT] Voltage source: {}V from node {} to node {}",
                             value, p, n);
 
                     // put the voltage value in the 'known' vector
-                    self.base_matrix[i_vsrc][ia] = *value;
+                    m[i_vsrc][ia] = *value;
 
                     let p_not_grounded = (*p != 0);
                     let n_not_grounded = (*n != 0);
 
                     if p_not_grounded {
-                        self.base_matrix[i_vsrc][*p] = 1.0;
-                        self.base_matrix[*p][i_vsrc] = 1.0;
+                        m[i_vsrc][*p] = 1.0;
+                        m[*p][i_vsrc] = 1.0;
                     }
 
                     if n_not_grounded {
-                        self.base_matrix[i_vsrc][*n] = -1.0;
-                        self.base_matrix[*n][i_vsrc] = -1.0;
+                        m[i_vsrc][*n] = -1.0;
+                        m[*n][i_vsrc] = -1.0;
                     }
 
                     i_vsrc += 1; // voltage source matrix index update 
@@ -219,6 +198,7 @@ impl Engine {
                 
             }
         }
+        self.base_matrix = m.to_vec();
         self.pp_matrix(&self.base_matrix);
 
     }
@@ -321,7 +301,7 @@ impl Engine {
         r_biggest
     }
 
-    fn pp_matrix( &self, m : &Vec<Vec<f32>> ) {
+    fn pp_matrix(&self, m : &Vec<Vec<f32>> ) {
         for r in m {
             for val in r {
                 print!("{:.3}   ", val);
@@ -330,6 +310,38 @@ impl Engine {
         }
     }
 
+    fn stamp_current_source(&self, m: &mut Vec<Vec<f32>>, n: NodeId, p: NodeId, value: f32) {
+        println!("  [ELEMENT] Current source: {}A into node {} and out of node {}",
+                value, p, n);
+        let ia = self.c_nodes + self.c_vsrcs; // index for ampere vector
+        if p != 0 {
+            m[p][ia] = m[p][ia] - value;
+        }
+        if n != 0 {
+            m[n][ia] = m[n][ia] + value;
+        }
+    }
+
+    fn stamp_resistor(&self, m: &mut Vec<Vec<f32>>, a: NodeId, b: NodeId, value: f32) {
+        println!("  [ELEMENT] Resistor");
+        let over = 1.0 / value;
+
+        // out of node 'a'
+        if a != 0 {
+            m[a][a] = m[a][a] + over;
+            if b != 0 {
+                m[a][b] = m[a][b] - over;
+            }
+        }
+
+        // out of node 'b'
+        if b != 0 {
+            m[b][b] = m[b][b] + over;
+            if a != 0 {
+                m[b][a] = m[b][a] - over;
+            }
+        }
+    }
 
     // stamp a matrix with linearized companion models of all the non-linear
     // devices listed in the SPICE netlist
@@ -337,8 +349,17 @@ impl Engine {
         println!("*INFO* Stamping non-linear elements");
         for el in &self.nonlinear_elements {
             match *el {
-                circuit::Element::D(circuit::Diode{ ref p, ref n, ref i_sat, ref tdegc }) => {
+                circuit::Element::D(ref d) => {
                     println!("*INFO* {}", el);
+
+                    // linearize
+                    let v_d = n[d.p] - n[d.n];
+                    let (g_eq, i_eq) = d.linearize(v_d);
+
+                    // stamp
+                    self.stamp_current_source(m, d.p, d.n, i_eq);
+                    self.stamp_resistor(m, d.p, d.n, 1.0/g_eq);
+
                 }
 
                 _ => { println!("*ERROR* - unrecognised nonlinear element"); }

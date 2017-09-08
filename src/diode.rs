@@ -19,4 +19,7 @@ impl Diode {
         (1.0/v_t) * self.i_sat * (v_d / v_t).exp()
     }
 
+    pub fn linearize(&self, v_d: f32) -> (f32, f32) {
+        (1.0, 1.0)
+    }
 }
