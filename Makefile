@@ -24,6 +24,9 @@ test:
 newton:
 	cargo test --no-fail-fast --test newton
 
+diode:
+	cargo test --no-fail-fast --test test_ird
+
 clean:
 	cargo clean
 	\rm -rf *.log
