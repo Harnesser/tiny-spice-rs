@@ -39,7 +39,7 @@ impl Engine {
         }
     }
 
-    pub fn dc_operating_point(&mut self, ckt: &circuit::Circuit) {
+    pub fn dc_operating_point(&mut self, ckt: &circuit::Circuit) -> Vec<f32> {
 
         const RELTOL: f32 = 0.0001;
         const VNTOL: f32 = 1.0e-6;
@@ -111,6 +111,7 @@ impl Engine {
             println!("*ERROR* Divergent");
         }
 
+        unknowns
     }
 
 
