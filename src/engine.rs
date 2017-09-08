@@ -1,7 +1,6 @@
 
 use circuit;
 use diode;
-use newton_raphson;
 
 pub fn banner() {
 
@@ -204,13 +203,18 @@ impl Engine {
                     i_vsrc += 1; // voltage source matrix index update 
                     
                 }
-                circuit::Element::D(diode::Diode{ ref p, ref n, ref i_sat, .. }) => {
-                    println!("  [ELEMENT] Diode: {}A into node {} and out of node {}",
-                            i_sat, p, n);
-                    if *p != 0 {
-                    }
-                    if *n != 0 {
-                    }
+                circuit::Element::D(diode::Diode{ ref p, ref n, ref i_sat, ref tdegc }) => {
+                    println!("  [ELEMENT] Diode:");
+                    self.nonlinear_elements.push(
+                        circuit::Element::D(
+                            diode::Diode {
+                                p: *p,
+                                n: *n,
+                                i_sat: *i_sat,
+                                tdegc: *tdegc,
+                            }
+                        )
+                    );
                 }
                 
             }
@@ -330,25 +334,17 @@ impl Engine {
     // stamp a matrix with linearized companion models of all the non-linear
     // devices listed in the SPICE netlist
     fn nonlinear_stamp(&self, m: &mut Vec<Vec<f32>>, n: &Vec<f32> ) {
-
+        println!("*INFO* Stamping non-linear elements");
         for el in &self.nonlinear_elements {
-            // linearise & stamp
             match *el {
-
-                circuit::Element::D(diode::Diode{ ref p, ref n, ref i_sat, .. }) => {
-                    println!("  [ELEMENT] Diode: {}A into node {} and out of node {}",
-                            i_sat, p, n);
-                    if *p != 0 {
-                    }
-                    if *n != 0 {
-                    }
+                circuit::Element::D(diode::Diode{ ref p, ref n, ref i_sat, ref tdegc }) => {
+                    println!("*INFO* {}", el);
                 }
 
-                _ => {
-                    println!("*ERROR* This ain't a non-linear device");
-                }
+                _ => { println!("*ERROR* - unrecognised nonlinear element"); }
             }
         }
+
     }
 
 }

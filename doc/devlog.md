@@ -1,15 +1,25 @@
 # Development Log
 
+## 2017-09-08
+I'm gonna stamp some diodes tonight.
+Gonna stamp some diodes.
+My moves are non-linear, but that's ok.
+Gonna stamp some diodes.
+
+
 ## 2017-09-07
 I hope to implement DC operating points with diodes in the circuit.
 
 Things I have to solve:
 * Generating parameters for a diode companion model
 * Stamping some kind of base linear matrix with diode companion model
-* Updating the matrix after every iteration. Either
- * keep a linear matrix base around and reuse
- * stamp and unstamp
-* Convergence testing: VNTOL, ABSTOL & RELTOL
+* [DONE] Updating the matrix after every iteration. Either
+ * [DONE] keep a linear matrix base around and reuse
+ * [NO] stamp and unstamp
+* [DONE] Convergence testing: VNTOL, ABSTOL & RELTOL
+
+Next: figure out how non-linear devices live in an enumeration for linear
+devices.
 
 
 ## 2017-09-06
