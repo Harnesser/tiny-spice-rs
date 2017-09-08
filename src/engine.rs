@@ -157,11 +157,11 @@ impl Engine {
                     self.stamp_resistor(&mut m, *a, *b, *value);
                 }
 
-                circuit::Element::V(circuit::VoltageSource{ ref p, ref n, ref value }) => {
-                    self.stamp_voltage_source(&mut m, *p, *n, *value, i_vsrc);
+                circuit::Element::V(ref vsrc) => {
+                    self.stamp_voltage_source(&mut m, vsrc, i_vsrc);
                     i_vsrc += 1; // voltage source matrix index update 
-                    
                 }
+
                 circuit::Element::D(circuit::Diode{ ref p, ref n, ref i_sat, ref tdegc }) => {
                     println!("  [ELEMENT] Diode:");
                     self.nonlinear_elements.push(
@@ -306,29 +306,27 @@ impl Engine {
     fn stamp_voltage_source(
         &self,
         m: &mut Vec<Vec<f32>>,
-        p: NodeId,
-        n: NodeId,
-        value: f32,
+        vsrc: &circuit::VoltageSource,
         i_vsrc: NodeId,
     ) {
         println!("  [ELEMENT] Voltage source: {}V from node {} to node {}",
-                value, p, n);
+                vsrc.value, vsrc.p, vsrc.n);
         let ia = self.c_nodes + self.c_vsrcs; // index for ampere vector
 
         // put the voltage value in the 'known' vector
-        m[i_vsrc][ia] = value;
+        m[i_vsrc][ia] = vsrc.value;
 
-        let p_not_grounded = (p != 0);
-        let n_not_grounded = (n != 0);
+        let p_not_grounded = (vsrc.p != 0);
+        let n_not_grounded = (vsrc.n != 0);
 
         if p_not_grounded {
-            m[i_vsrc][p] = 1.0;
-            m[p][i_vsrc] = 1.0;
+            m[i_vsrc][vsrc.p] = 1.0;
+            m[vsrc.p][i_vsrc] = 1.0;
         }
 
         if n_not_grounded {
-            m[i_vsrc][n] = -1.0;
-            m[n][i_vsrc] = -1.0;
+            m[i_vsrc][vsrc.n] = -1.0;
+            m[vsrc.n][i_vsrc] = -1.0;
         }
     }
 
