@@ -310,7 +310,7 @@ impl Engine {
         }
     }
 
-    fn stamp_current_source(&self, m: &mut Vec<Vec<f32>>, n: NodeId, p: NodeId, value: f32) {
+    fn stamp_current_source(&self, m: &mut Vec<Vec<f32>>, p: NodeId, n: NodeId, value: f32) {
         println!("  [ELEMENT] Current source: {}A into node {} and out of node {}",
                 value, p, n);
         let ia = self.c_nodes + self.c_vsrcs; // index for ampere vector
