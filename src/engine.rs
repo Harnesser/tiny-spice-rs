@@ -149,8 +149,8 @@ impl Engine {
                 // through the source, to the negative node.
                 // A current source of positive value forces current to flow 
                 // out of the n+ node, through the source, and into the n- node.
-                circuit::Element::I(circuit::CurrentSource{ ref p, ref n, ref value }) => {
-                    self.stamp_current_source(&mut m, *p, *n, *value);
+                circuit::Element::I(ref isrc) => {
+                    self.stamp_current_source(&mut m, isrc);
                 }
 
                 circuit::Element::R(circuit::Resistor{ ref a, ref b, ref value }) => {
@@ -290,15 +290,15 @@ impl Engine {
         }
     }
 
-    fn stamp_current_source(&self, m: &mut Vec<Vec<f32>>, p: NodeId, n: NodeId, value: f32) {
+    fn stamp_current_source(&self, m: &mut Vec<Vec<f32>>, isrc: &circuit::CurrentSource) {
         println!("  [ELEMENT] Current source: {}A into node {} and out of node {}",
-                value, p, n);
+                isrc.value, isrc.p, isrc.n);
         let ia = self.c_nodes + self.c_vsrcs; // index for ampere vector
-        if p != 0 {
-            m[p][ia] = m[p][ia] - value;
+        if isrc.p != 0 {
+            m[isrc.p][ia] = m[isrc.p][ia] - isrc.value;
         }
-        if n != 0 {
-            m[n][ia] = m[n][ia] + value;
+        if isrc.n != 0 {
+            m[isrc.n][ia] = m[isrc.n][ia] + isrc.value;
         }
     }
 
@@ -369,7 +369,11 @@ impl Engine {
                     let (g_eq, i_eq) = d.linearize(v_d);
 
                     // stamp
-                    self.stamp_current_source(m, d.p, d.n, i_eq);
+                    self.stamp_current_source(m, &circuit::CurrentSource{
+                        p: d.p,
+                        n: d.n,
+                        value: i_eq
+                    });
                     self.stamp_resistor(m, d.p, d.n, 1.0/g_eq);
 
                 }
