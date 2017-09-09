@@ -6,6 +6,11 @@ Gonna stamp some diodes.
 My moves are non-linear, but that's ok.
 Gonna stamp some diodes.
 
+The other option is to stamp everything once. And update the parameters at each
+iteration. This means keeping the twiddle values and their locations, but means
+we don't have to copy/reallocate the huge matrix all the time. After all, the
+companion models don't change.
+
 
 ## 2017-09-07
 I hope to implement DC operating points with diodes in the circuit.
