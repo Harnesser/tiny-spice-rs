@@ -44,7 +44,7 @@ impl Engine {
         const RELTOL: f32 = 0.0001;
         const VNTOL: f32 = 1.0e-6;
         const ABSTOL: f32 = 1.0e-9;
-        const ITL1: usize = 100;
+        const ITL1: usize = 10;
 
         // build the circuit matrix
         self.elaborate(&ckt);
@@ -56,6 +56,7 @@ impl Engine {
 
         // Newton-Raphson loop
         let mut converged = false;
+        let mut busted = false;
         let mut c_iteration: usize = 0;
         while c_iteration < ITL1 {
 
@@ -66,6 +67,8 @@ impl Engine {
 
             // stamp companion models of non-linear devices
             self.nonlinear_stamp(&mut v, &unknowns_prev);
+            println!("*INFO* Non-linear stamped matrix");
+            self.pp_matrix(&v);
 
             // Guassian elimination & back solve of the now linearized
             // circuit matrix
@@ -73,13 +76,19 @@ impl Engine {
 
 
             // Convergence check
-            println!("*INFO* Convergence check");
+            println!("*INFO* Convergence check {}", c_iteration);
             println!("{:?}", unknowns);
             println!("{:?}", unknowns_prev);
 
             if c_iteration > 0 {
                 converged = true;
                 for (i,x) in unknowns.iter().enumerate() {
+                    if !x.is_finite() {
+                        println!("*ERROR* math gone bad");
+                        converged = false;
+                        busted = true;
+                        break;
+                    }
                     let limit: f32;
                     if i >= self.c_nodes {
                         limit = x.abs() * RELTOL + VNTOL;
@@ -92,10 +101,13 @@ impl Engine {
                         converged = false;
                         // break;
                     }
+                    if busted {
+                        break;
+                    }
                 }
             }
 
-            if converged {
+            if converged || busted {
                 break;
             }
 
@@ -333,7 +345,8 @@ impl Engine {
 
 
     fn stamp_resistor(&self, m: &mut Vec<Vec<f32>>, r: &circuit::Resistor) {
-        println!("  [ELEMENT] Resistor");
+        println!("  [ELEMENT] Resistor {} Ohms between node {} and node {}",
+                r.value, r.a, r.b);
         let over = 1.0 / r.value;
 
         // out of node 'a'
@@ -376,6 +389,11 @@ impl Engine {
                         a: d.p,
                         b: d.n,
                         value: 1.0/g_eq
+                    });
+                    self.stamp_resistor(m, &circuit::Resistor{
+                        a: d.p,
+                        b: d.n,
+                        value: 1.0/circuit::GMIN,
                     });
                 }
 
