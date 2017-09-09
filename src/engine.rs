@@ -390,11 +390,6 @@ impl Engine {
                         b: d.n,
                         value: 1.0/g_eq
                     });
-                    self.stamp_resistor(m, &circuit::Resistor{
-                        a: d.p,
-                        b: d.n,
-                        value: 1.0/circuit::GMIN,
-                    });
                 }
 
                 _ => { println!("*ERROR* - unrecognised nonlinear element"); }
