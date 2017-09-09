@@ -35,13 +35,12 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
 endif
 set shortmess=aoO
 badd +25 bin/bringup.rs
-badd +49 src/engine.rs
+badd +1 src/engine.rs
 badd +98 src/circuit.rs
-badd +0 src/diode.rs
-badd +0 tests/newton.rs
-badd +0 src/newton_raphson.rs
+badd +14 src/diode.rs
+badd +1 tests/test_ird.rs
 args bin/bringup.rs src/engine.rs
-edit src/diode.rs
+edit tests/test_ird.rs
 set splitbelow splitright
 wincmd _ | wincmd |
 split
@@ -55,10 +54,10 @@ set nosplitright
 wincmd t
 set winheight=1 winwidth=1
 exe '1resize ' . ((&lines * 9 + 28) / 57)
-exe '2resize ' . ((&lines * 23 + 28) / 57)
-exe '3resize ' . ((&lines * 21 + 28) / 57)
+exe '2resize ' . ((&lines * 17 + 28) / 57)
+exe '3resize ' . ((&lines * 27 + 28) / 57)
 argglobal
-edit src/diode.rs
+edit tests/test_ird.rs
 nnoremap <buffer> <D-R> :RustRun! =join(b:rust_last_rustc_args)erust#AppendCmdLine(' -- ' . join(b:rust_last_args))
 nnoremap <buffer> <silent> <D-r> :RustRun
 onoremap <buffer> <silent> [[ :call rust#Jump('o', 'Back')
@@ -181,7 +180,7 @@ normal! zt
 normal! 0
 wincmd w
 argglobal
-edit tests/newton.rs
+edit src/diode.rs
 nnoremap <buffer> <D-R> :RustRun! =join(b:rust_last_rustc_args)erust#AppendCmdLine(' -- ' . join(b:rust_last_args))
 nnoremap <buffer> <silent> <D-r> :RustRun
 onoremap <buffer> <silent> [[ :call rust#Jump('o', 'Back')
@@ -296,7 +295,7 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 11) / 23)
+let s:l = 1 - ((0 * winheight(0) + 8) / 17)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -304,7 +303,7 @@ normal! zt
 normal! 0
 wincmd w
 argglobal
-edit src/newton_raphson.rs
+edit src/engine.rs
 nnoremap <buffer> <D-R> :RustRun! =join(b:rust_last_rustc_args)erust#AppendCmdLine(' -- ' . join(b:rust_last_args))
 nnoremap <buffer> <silent> <D-r> :RustRun
 onoremap <buffer> <silent> [[ :call rust#Jump('o', 'Back')
@@ -419,7 +418,7 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 10) / 21)
+let s:l = 1 - ((0 * winheight(0) + 13) / 27)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -428,8 +427,8 @@ normal! 0
 wincmd w
 3wincmd w
 exe '1resize ' . ((&lines * 9 + 28) / 57)
-exe '2resize ' . ((&lines * 23 + 28) / 57)
-exe '3resize ' . ((&lines * 21 + 28) / 57)
+exe '2resize ' . ((&lines * 17 + 28) / 57)
+exe '3resize ' . ((&lines * 27 + 28) / 57)
 tabnext 1
 if exists('s:wipebuf')
   silent exe 'bwipe ' . s:wipebuf
