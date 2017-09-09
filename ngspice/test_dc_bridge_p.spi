@@ -1,0 +1,17 @@
+* Diode bridge
+
+V1 1 2 10 ; input voltage
+V2 2 0 0  ; ground, and current measure
+D1 1 3    ;
+D2 4 1    ;
+D3 2 3    ;
+D4 4 2    ;
+
+Rl 3 4 1k ;
+
+.control
+  op
+  print all
+  quit
+.endc
+
