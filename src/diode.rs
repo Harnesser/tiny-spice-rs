@@ -28,7 +28,7 @@ impl Diode {
 
         // calculate the diode companion model parameters
         // companion model is a current source in parallel with a resistor
-        let g_eq: f32;
+        let mut g_eq: f32;
         let i_eq: f32;
         if i_d.is_finite() {
             println!("{}V", v_thermal);
@@ -42,6 +42,9 @@ impl Diode {
 
         // check that the companion model variables reasonable before
         // returning them to the main loop.
+        if g_eq < GMIN {
+            g_eq = GMIN;
+        }
         if !g_eq.is_finite() || !i_eq.is_finite() {
             println!("*ERROR* - banjaxed");
         }
