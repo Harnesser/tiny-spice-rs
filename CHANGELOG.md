@@ -1,12 +1,15 @@
 # Changelog
 
-## [Unreleased] Non-Linear Solver
+## [0.4.0] Non-Linear Solver
 DC operating point of simple circuits with: non-linear diode model; current 
 sources and resistors.
 
 ### Added
 - Diode model (forward biased)
-- Newton-Raphson solver (with horrible hack for convergence)
+- Newton-Raphson solver
+
+### Changed
+- Added proper testing for different circuits
 
 
 ## [0.3.0] Gaussian Elimination with Partial Pivot
