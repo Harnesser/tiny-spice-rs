@@ -1,5 +1,24 @@
 # Development Log
 
+## 2017-09-10
+The unloaded diode bridge does find a DC solution, but if I load the output
+with a resistor, there are NaNs all around the place.
+
+It was having problems solving the current through the 0V source to ground.
+I put in a hack to make the result 0.0 if the results isn't a finite number,
+and things seem to work!
+
+## 2017-09-09
+Got a simple diode-Isource-resistor circuit to converge by limiting
+the voltage I calculate currents for in the diode model. I was quite happy
+about this.
+
+But then I tried to go for broke and find the DC solution for a diode bridge.
+This did not work.
+
+Liverpool got blown out today. Feck.
+
+
 ## 2017-09-08
 I'm gonna stamp some diodes tonight.
 Gonna stamp some diodes.

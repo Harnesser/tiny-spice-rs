@@ -234,14 +234,15 @@ impl Engine {
                     let wiggle = v[r_ref][c_mod];
                     let new = val - (wiggle * ratio); 
                     v[r_mod][c_mod] = new;
-                    //println!("\nr_ref = {}, r_mod = {}, c_mod = {}, ratio = {}",
-                    //         r_ref, r_mod, c_mod, ratio);
-                    //println!("{} - {}*{} -> {}", val, wiggle, ratio, new);
-                    //self.pp_matrix(&v);
+                    println!("\nr_ref = {}, r_mod = {}, c_mod = {}, ratio = {}",
+                             r_ref, r_mod, c_mod, ratio);
+                    println!("{} - {}*{} -> {}", val, wiggle, ratio, new);
+                    self.pp_matrix(&v);
                 }
                 //println!(" ---------------------------------------------- ");
             }
         }
+        println!("\n*INFO* Final Matrix");
         self.pp_matrix(&v);
       
         // TODO check result
@@ -256,14 +257,27 @@ impl Engine {
         // Solve easiest
         let i_last = c_mna - 1;
         n[i_last] = v[i_last][c_mna] / v[i_last][i_last];
+        //println!("[lst]  {} / {}",  v[i_last][c_mna], v[i_last][i_last] );
+        if !n[i_last].is_finite() {
+            println!("*WARNING* have to hack the first solve to 0.0");
+            println!(" This can happen if solving a 0V source from a node to ground");
+            n[i_last] = 0.0;
+        }
 
         // Solve the rest recursively
         for i_solve in (1..c_mna-1).rev() {
             let mut sum = 0.0;
             for i_term in i_solve+1..c_mna {
                 sum += v[i_solve][i_term] * n[i_term];
+                //println!("[{:3}]  {} * {}",  i_solve, v[i_solve][i_term], n[i_term]);
+
             }
             n[i_solve] = ( v[i_solve][ia] - sum ) / v[i_solve][i_solve];
+            //println!("*INFO* {} - {} / {} = {}", 
+            //        v[i_solve][ia], sum,
+            //        v[i_solve][i_solve],
+            //        n[i_solve]
+            //);
         }
 
 
