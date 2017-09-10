@@ -44,7 +44,7 @@ impl Engine {
         const RELTOL: f32 = 0.0001;
         const VNTOL: f32 = 1.0e-6;
         const ABSTOL: f32 = 1.0e-9;
-        const ITL1: usize = 10;
+        const ITL1: usize = 50;
 
         // build the circuit matrix
         self.elaborate(&ckt);
