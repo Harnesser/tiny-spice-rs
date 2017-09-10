@@ -19,13 +19,19 @@ waves:
 	gtkwave --dump waves.vcd --save plot.gtkw
 
 test:
-	cargo test --no-fail-fast
+	cargo test --no-fail-fast --all
 
 newton:
 	cargo test --no-fail-fast --test newton
 
 diode:
-	cargo test --no-fail-fast --test test_ird
+	cargo test --no-fail-fast \
+		--test test_ird \
+		--test test_ir_drev \
+		--test test_v_d_vs_d \
+		--test test_irdvv \
+		--test test_dc_bridge_p_unloaded \
+		--test test_dc_bridge_p_loaded
 
 clean:
 	cargo clean
