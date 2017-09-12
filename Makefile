@@ -33,6 +33,10 @@ diode:
 		--test test_dc_bridge_p_unloaded \
 		--test test_dc_bridge_p_loaded
 
+trans:
+	cargo test --no-fail-fast \
+		--test test_trans_ir
+
 clean:
 	cargo clean
 	\rm -rf *.log

@@ -43,7 +43,7 @@ impl Engine {
 
         const TSTART: f32 = 0.0;
         const TSTOP: f32 = 1e-3;
-        const TSTEP: f32 = 1e-2;
+        const TSTEP: f32 = 5e-2;
         const ITL6: usize = 300;
 
         // build the circuit matrix
@@ -56,21 +56,52 @@ impl Engine {
 
         // Find the DC operating point
         // used as the initial values in the transient simulation
-        unknowns_prev = self.dc_operating_point(&ckt);
+        unknowns = self.dc_operating_point(&ckt);
+        println!("*INFO*: DC : {:?}", &unknowns);
 
         // transient loop
-        let mut t_step = (TSTART - TSTOP)/50.0;
+        let mut t_step = (TSTOP - TSTART)/50.0;
         let mut t_now = 0.0;
+
+        // announce
+        println!("Transient analysis: {} to {} by {}", TSTART, TSTOP, t_step);
 
         // timestep loop
         let mut error = false;
+        let mut is_final_timestep = false;
+        let mut c_step = 0;
         loop {
 
             // solver iteration count
             let mut c_iteration: usize = 0;
 
+            if t_now >= TSTART && t_now != 0.0 {
+                println!("*INFO*: [{}] t={} : {:?}", c_step, t_now, unknowns);
+            }
+
+            // update things for next loop
+            unknowns_prev = unknowns.to_vec();
+
+            t_now += t_step;
+            c_step += 1;
+            if t_now > TSTOP {
+                t_now = TSTOP;
+                is_final_timestep = true;
+            }
+
             // solver loop
+            println!("*INFO* Time: {}", t_now);
+            let mut lte = 0.0;
             loop {
+                println!("*INFO* Iteration {}", c_iteration);
+
+                // check if the timestep leads to convergence
+                if lte < 10.0 {
+                    // FIXME - don't leave me in
+                    if c_iteration > 5 {
+                        break;
+                    }
+                }
 
                 // check if we're ok to continue iterating
                 c_iteration += 1;
@@ -87,15 +118,13 @@ impl Engine {
                 break;
             }
 
-            // check if we've run the simulation to the end
-            t_now += t_step;
-            if t_now > TSTOP {
-                println!("*INFO* Finished at time {}", t_now - t_step);
+            if is_final_timestep {
                 break;
             }
 
-
         } // time
+
+        println!("*INFO* Finished at time {}", t_now);
 
     }
 
