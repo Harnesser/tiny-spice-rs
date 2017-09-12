@@ -39,6 +39,66 @@ impl Engine {
         }
     }
 
+    pub fn transient_analysis(&mut self, ckt: &circuit::Circuit) {
+
+        const TSTART: f32 = 0.0;
+        const TSTOP: f32 = 1e-3;
+        const TSTEP: f32 = 1e-2;
+        const ITL6: usize = 300;
+
+        // build the circuit matrix
+        self.elaborate(&ckt);
+
+        // prep values
+        let c_mna = self.c_nodes + self.c_vsrcs;
+        let mut unknowns_prev : Vec<f32> = vec![0.0; c_mna];
+        let mut unknowns : Vec<f32> = vec![];
+
+        // Find the DC operating point
+        // used as the initial values in the transient simulation
+        unknowns_prev = self.dc_operating_point(&ckt);
+
+        // transient loop
+        let mut t_step = (TSTART - TSTOP)/50.0;
+        let mut t_now = 0.0;
+
+        // timestep loop
+        let mut error = false;
+        loop {
+
+            // solver iteration count
+            let mut c_iteration: usize = 0;
+
+            // solver loop
+            loop {
+
+                // check if we're ok to continue iterating
+                c_iteration += 1;
+                if c_iteration >= ITL6 {
+                    println!("*ERROR* Max iteration loop reached");
+                    error = true;
+                    break;
+                }
+
+            } // solver
+
+            // break out of this loop if an error was detected
+            if error {
+                break;
+            }
+
+            // check if we've run the simulation to the end
+            t_now += t_step;
+            if t_now > TSTOP {
+                println!("*INFO* Finished at time {}", t_now - t_step);
+                break;
+            }
+
+
+        } // time
+
+    }
+
     pub fn dc_operating_point(&mut self, ckt: &circuit::Circuit) -> Vec<f32> {
 
         const RELTOL: f32 = 0.0001;
