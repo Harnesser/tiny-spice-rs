@@ -41,10 +41,35 @@ impl Engine {
 
     pub fn transient_analysis(&mut self, ckt: &circuit::Circuit) {
 
+        // user-supplied control on the sim time
         const TSTART: f32 = 0.0;
         const TSTOP: f32 = 1e-3;
         const TSTEP: f32 = 5e-2;
-        const ITL6: usize = 300;
+
+        // Iteration limits
+
+        // Initial timestep factor
+        const FS: f32 = 0.25;
+
+        // Timestamp adjustment factor on iteration failure
+        const FT: f32 = 0.25;
+
+        // Smallest delta-time step allowed
+        const RMIN: f32 = 1e-9;
+
+        // Largest delta-time step allowed factor
+        const RMAX: f32 = 5.0;
+
+        // 'Easy' iteration count limit
+        // If we solve in fewer iterations, increase delta-time
+        const ITL3: usize = 6;
+
+        // 'Struggling' iteration count limit
+        // If this count is reached before a solution is found, reduce the 
+        // delta-time step and restart the solution attempt
+        const ITL4: usize = 20;
+
+
 
         // build the circuit matrix
         self.elaborate(&ckt);
@@ -79,6 +104,10 @@ impl Engine {
                 println!("*INFO*: [{}] t={} : {:?}", c_step, t_now, unknowns);
             }
 
+            if is_final_timestep {
+                break;
+            }
+
             // update things for next loop
             unknowns_prev = unknowns.to_vec();
 
@@ -105,7 +134,7 @@ impl Engine {
 
                 // check if we're ok to continue iterating
                 c_iteration += 1;
-                if c_iteration >= ITL6 {
+                if c_iteration >= ITL4 {
                     println!("*ERROR* Max iteration loop reached");
                     error = true;
                     break;
@@ -115,10 +144,6 @@ impl Engine {
 
             // break out of this loop if an error was detected
             if error {
-                break;
-            }
-
-            if is_final_timestep {
                 break;
             }
 
