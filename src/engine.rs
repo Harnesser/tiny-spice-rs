@@ -33,6 +33,9 @@ pub struct Engine {
     // list of non-linear elements in the circuit
     nonlinear_elements: Vec<circuit::Element>,
 
+    // list of independent sources
+    independent_sources: Vec<circuit::Element>,
+
 }
 
 impl Engine {
@@ -43,6 +46,7 @@ impl Engine {
             c_vsrcs: 0,
             base_matrix: vec![vec![]],
             nonlinear_elements: vec![],
+            independent_sources: vec![],
         }
     }
 
@@ -237,8 +241,6 @@ impl Engine {
 
             // stamp companion models of non-linear devices
             self.nonlinear_stamp(&mut v, &unknowns_prev);
-            println!("*INFO* Non-linear stamped matrix");
-            self.pp_matrix(&v);
 
             // Guassian elimination & back solve of the now linearized
             // circuit matrix
@@ -328,23 +330,18 @@ impl Engine {
                     i_vsrc += 1; // voltage source matrix index update 
                 }
 
-                circuit::Element::D(circuit::Diode{ ref p, ref n, ref i_sat, ref tdegc }) => {
+                circuit::Element::D(ref d) => {
                     println!("  [ELEMENT] Diode:");
                     self.nonlinear_elements.push(
-                        circuit::Element::D(
-                            circuit::Diode {
-                                p: *p,
-                                n: *n,
-                                i_sat: *i_sat,
-                                tdegc: *tdegc,
-                            }
-                        )
+                        circuit::Element::D(d.clone())
                     );
                 }
 
                 circuit::Element::Isin(ref isrcsine) => {
                     let t_eval = 0.0;
-                    self.stamp_current_source_sine(&mut m, isrcsine, t_eval);
+                    self.independent_sources.push(
+                        circuit::Element::Isin(isrcsine.clone())
+                    );
                 }
                 
             }
@@ -587,7 +584,11 @@ impl Engine {
                 _ => { println!("*ERROR* - unrecognised nonlinear element"); }
             }
         }
+        println!("*INFO* Non-linear stamped matrix");
+        self.pp_matrix(&m);
     }
+
+    // stamp independent sources
 
 
     // check for convergence by testing new and previous solutions against

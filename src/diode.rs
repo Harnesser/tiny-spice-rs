@@ -1,5 +1,6 @@
 use circuit::{NodeId, BOLTZMANN, CHARGE, GMIN};
 
+#[derive(Clone)]
 pub struct Diode {
     pub p: NodeId,
     pub n: NodeId,

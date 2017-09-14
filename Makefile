@@ -19,7 +19,8 @@ waves:
 	gtkwave --dump waves.vcd --save plot.gtkw
 
 test:
-	cargo test --no-fail-fast --all
+	cargo test --no-fail-fast --all | tee test.log; \
+	grep "test result" test.log
 
 newton:
 	cargo test --no-fail-fast --test newton

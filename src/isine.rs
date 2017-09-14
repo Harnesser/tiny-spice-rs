@@ -2,6 +2,7 @@
 
 use circuit::{NodeId};
 
+#[derive(Clone)]
 pub struct CurrentSourceSine {
     pub p: NodeId,
     pub n: NodeId,
