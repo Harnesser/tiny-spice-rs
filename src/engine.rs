@@ -51,7 +51,7 @@ impl Engine {
         // user-supplied control on the sim time
         const TSTART: f32 = 0.0;
         const TSTOP: f32 = 1e-3;
-        const TSTEP: f32 = 5e-2;
+        const TSTEP: f32 = 1e-4;
 
         // Iteration limits
 
@@ -113,7 +113,8 @@ impl Engine {
             // stamp non-linear components, passing in the current time as
             // some ... dunno sinewaves will take t_try, but maybe caps need
             // t_delta? pass both?
-            
+            // !!!TODO!!!
+
             if t_now >= TSTART && t_now != 0.0 {
                 println!("*INFO*: [{}] t={} : {:?}", c_step, t_now, unknowns);
             }
@@ -128,47 +129,68 @@ impl Engine {
             // solver loop
             // breaks when solved, or time-step too small
 
+            let mut converged = false;
+            let mut error = false;
+
             // solver iteration count
             let mut c_iteration: usize = 0;
-/*
             println!("*INFO* Time: {}", t_now);
             loop {
                 println!("*INFO* Iteration {}", c_iteration);
 
-                // Solve
-                //if let Some(unknowns) = solve_trans(v, t_now, t_delta);
+                // copy the base matrix, cos we're going to change it a lot:
+                // * stamp non-linear element companion models
+                // * re-order during guassian elimination
+                let mut v = self.base_matrix.clone();
 
-                // check if we're ok to continue iterating
-                if c_iterations >= ITL4 {
-                    t_delta = t_delta * FT;
-                    if t_delta < TF {
-                        println!("*ERROR* Timestep too small");
-                        error = true;
-                    } else {
-                        // reset iteration count
-                        c_iteration = 0;
-                    }
-                } else {
-                    // update iteration counts
-                    c_iteration += 1;
+                // Stamp nonlinear
+                // stamp(t_now, t_delta);
+
+                // Solve
+                unknowns = self.solve(v);
+
+                // Convergence check
+                match self.convergence_check(&unknowns, &unknowns_prev) {
+                    Ok(cnvg) => {
+                        if cnvg {
+                            println!("*INFO* Timestep converged after {} iterations", c_iteration);
+                            converged = true;
+                            break;
+                        }
+                    },
+                    Err(_) => {
+                        // adjust timestep if we can
+                        if c_iteration >= ITL4 {
+                            t_delta = t_delta * FT;
+                            // check if we're ok to continue iterating
+                            if t_delta < FT {
+                                println!("*ERROR* Timestep too small");
+                                error = true;
+                                break;
+                            } else {
+                                // reset iteration count
+                                println!("*INFO* Upshifting");
+                                c_iteration = 0;
+                            }
+                        }
+                    },
                 }
 
             }
 
+            println!("*INFO* Updating timestep");
             if converged {
                 // solver found it too easy, maybe there's not a lot going on
                 // reduce the t_delta
-                if c_iterations < ITL3 {
+                if c_iteration < ITL3 {
+                    println!("*INFO* Downshifting");
                     t_delta = t_delta * 2.0;
                     let t_delta_max = TSTEP * RMAX;
                     if t_delta > t_delta_max {
+                        println!("*INFO* Downshifting maxed out");
                         t_delta = t_delta_max;
                     }
                 }
-            }
-            if !converged {
-                }
-
             }
 
             t_now += t_delta;
@@ -179,13 +201,11 @@ impl Engine {
 
             } // solver
 
-
-
             // break out of this loop if an error was detected
             if error {
+                println!("*ERROR* bad stuff happened, breaking out of timestep loop");
                 break;
             }
-*/
         } // time
 
         println!("*INFO* Finished at time {}", t_now);
