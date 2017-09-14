@@ -12,6 +12,13 @@ pub fn banner() {
 
 }
 
+pub enum ConvergenceError {
+    Divergent,
+}
+
+pub type ConvergenceResult = Result<bool, ConvergenceError>;
+
+
 pub struct Engine {
     // Number of voltage nodes in the circuit
     c_nodes: usize,
@@ -85,11 +92,11 @@ impl Engine {
         println!("*INFO*: DC : {:?}", &unknowns);
 
         // transient loop
-        let mut t_step = (TSTOP - TSTART)/50.0;
+        let mut t_delta = TSTEP * FS;
         let mut t_now = 0.0;
 
         // announce
-        println!("Transient analysis: {} to {} by {}", TSTART, TSTOP, t_step);
+        println!("Transient analysis: {} to {} by {}", TSTART, TSTOP, t_delta);
 
         // timestep loop
         let mut error = false;
@@ -97,9 +104,16 @@ impl Engine {
         let mut c_step = 0;
         loop {
 
-            // solver iteration count
-            let mut c_iteration: usize = 0;
+            // At the start of the loop, we've a candidate t_delta to solve on.
+            // This comes from either:
+            // * the initial calculation after DC on the initial iteration
+            // * the prevous go round the loop for other iterations
+            let t_try = t_now + t_delta;
 
+            // stamp non-linear components, passing in the current time as
+            // some ... dunno sinewaves will take t_try, but maybe caps need
+            // t_delta? pass both?
+            
             if t_now >= TSTART && t_now != 0.0 {
                 println!("*INFO*: [{}] t={} : {:?}", c_step, t_now, unknowns);
             }
@@ -111,42 +125,67 @@ impl Engine {
             // update things for next loop
             unknowns_prev = unknowns.to_vec();
 
-            t_now += t_step;
+            // solver loop
+            // breaks when solved, or time-step too small
+
+            // solver iteration count
+            let mut c_iteration: usize = 0;
+/*
+            println!("*INFO* Time: {}", t_now);
+            loop {
+                println!("*INFO* Iteration {}", c_iteration);
+
+                // Solve
+                //if let Some(unknowns) = solve_trans(v, t_now, t_delta);
+
+                // check if we're ok to continue iterating
+                if c_iterations >= ITL4 {
+                    t_delta = t_delta * FT;
+                    if t_delta < TF {
+                        println!("*ERROR* Timestep too small");
+                        error = true;
+                    } else {
+                        // reset iteration count
+                        c_iteration = 0;
+                    }
+                } else {
+                    // update iteration counts
+                    c_iteration += 1;
+                }
+
+            }
+
+            if converged {
+                // solver found it too easy, maybe there's not a lot going on
+                // reduce the t_delta
+                if c_iterations < ITL3 {
+                    t_delta = t_delta * 2.0;
+                    let t_delta_max = TSTEP * RMAX;
+                    if t_delta > t_delta_max {
+                        t_delta = t_delta_max;
+                    }
+                }
+            }
+            if !converged {
+                }
+
+            }
+
+            t_now += t_delta;
             c_step += 1;
             if t_now > TSTOP {
                 t_now = TSTOP;
                 is_final_timestep = true;
-            }
-
-            // solver loop
-            println!("*INFO* Time: {}", t_now);
-            let mut lte = 0.0;
-            loop {
-                println!("*INFO* Iteration {}", c_iteration);
-
-                // check if the timestep leads to convergence
-                if lte < 10.0 {
-                    // FIXME - don't leave me in
-                    if c_iteration > 5 {
-                        break;
-                    }
-                }
-
-                // check if we're ok to continue iterating
-                c_iteration += 1;
-                if c_iteration >= ITL4 {
-                    println!("*ERROR* Max iteration loop reached");
-                    error = true;
-                    break;
-                }
 
             } // solver
+
+
 
             // break out of this loop if an error was detected
             if error {
                 break;
             }
-
+*/
         } // time
 
         println!("*INFO* Finished at time {}", t_now);
@@ -155,9 +194,6 @@ impl Engine {
 
     pub fn dc_operating_point(&mut self, ckt: &circuit::Circuit) -> Vec<f32> {
 
-        const RELTOL: f32 = 0.0001;
-        const VNTOL: f32 = 1.0e-6;
-        const ABSTOL: f32 = 1.0e-9;
         const ITL1: usize = 50;
 
         // build the circuit matrix
@@ -168,9 +204,9 @@ impl Engine {
         let mut unknowns_prev : Vec<f32> = vec![0.0; c_mna];
         let mut unknowns : Vec<f32> = vec![];
 
-        // Newton-Raphson loop
         let mut converged = false;
-        let mut busted = false;
+
+        // Newton-Raphson loop
         let mut c_iteration: usize = 0;
         while c_iteration < ITL1 {
 
@@ -195,34 +231,18 @@ impl Engine {
             println!("{:?}", unknowns_prev);
 
             if c_iteration > 0 {
-                converged = true;
-                for (i,x) in unknowns.iter().enumerate() {
-                    if !x.is_finite() {
+                match self.convergence_check(&unknowns, &unknowns_prev) {
+                    Ok(cnvd) => {
+                        if cnvd {
+                            converged = true;
+                            break;
+                        }
+                    },
+                    Err(_) => {
                         println!("*ERROR* math gone bad");
-                        converged = false;
-                        busted = true;
                         break;
-                    }
-                    let limit: f32;
-                    if i >= self.c_nodes {
-                        limit = x.abs() * RELTOL + VNTOL;
-                    } else {
-                        limit = x.abs() * RELTOL + ABSTOL;
-                    }
-                    let this = (x - unknowns_prev[i]).abs();
-                    println!(" {} < {} ({})", this, limit, converged);
-                    if this > limit {
-                        converged = false;
-                        // break;
-                    }
-                    if busted {
-                        break;
-                    }
+                    },
                 }
-            }
-
-            if converged || busted {
-                break;
             }
 
             //
@@ -523,7 +543,38 @@ impl Engine {
                 _ => { println!("*ERROR* - unrecognised nonlinear element"); }
             }
         }
+    }
 
+
+    // check for convergence by testing new and previous solutions against
+    // RELTOL and the like
+    pub fn convergence_check(&self, xv: &Vec<f32>, yv: &Vec<f32>) -> ConvergenceResult {
+
+        // 
+        const RELTOL: f32 = 0.0001;
+        const VNTOL: f32 = 1.0e-6;
+        const ABSTOL: f32 = 1.0e-9;
+
+        let mut res = Ok(true);
+        for (i,x) in xv.iter().enumerate() {
+            if !x.is_finite() {
+                println!("*ERROR* math gone bad");
+                res = Err(ConvergenceError::Divergent);
+                break;
+            }
+            let limit: f32;
+            if i >= self.c_nodes {
+                limit = x.abs() * RELTOL + VNTOL;
+            } else {
+                limit = x.abs() * RELTOL + ABSTOL;
+            }
+            let this = (x - yv[i]).abs();
+            println!(" {} < {}", this, limit);
+            if this > limit {
+                res = Ok(false);
+            }
+        }
+        res
     }
 
 }
