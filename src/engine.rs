@@ -341,6 +341,11 @@ impl Engine {
                         )
                     );
                 }
+
+                circuit::Element::Isin(ref isrcsine) => {
+                    let t_eval = 0.0;
+                    self.stamp_current_source_sine(&mut m, isrcsine, t_eval);
+                }
                 
             }
         }
@@ -470,6 +475,7 @@ impl Engine {
         }
     }
 
+
     fn stamp_current_source(&self, m: &mut Vec<Vec<f32>>, isrc: &circuit::CurrentSource) {
         println!("  [ELEMENT] Current source: {}A into node {} and out of node {}",
                 isrc.value, isrc.p, isrc.n);
@@ -479,6 +485,24 @@ impl Engine {
         }
         if isrc.n != 0 {
             m[isrc.n][ia] = m[isrc.n][ia] + isrc.value;
+        }
+    }
+
+
+    fn stamp_current_source_sine(&self,
+        m: &mut Vec<Vec<f32>>,
+        isrc: &circuit::CurrentSourceSine,
+        t_now: f32, // time of sim
+    ) {
+        println!("  [ELEMENT] Current source (~): into node {} and out of node {}",
+                isrc.p, isrc.n);
+        let ia = self.c_nodes + self.c_vsrcs; // index for ampere vector
+        let i_now = isrc.evaluate(t_now);
+        if isrc.p != 0 {
+            m[isrc.p][ia] = m[isrc.p][ia] - i_now;
+        }
+        if isrc.n != 0 {
+            m[isrc.n][ia] = m[isrc.n][ia] + i_now;
         }
     }
 

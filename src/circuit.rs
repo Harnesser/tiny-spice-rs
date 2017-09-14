@@ -1,6 +1,7 @@
 use std::fmt;
 
 pub use diode::Diode;
+pub use isine::CurrentSourceSine;
 
 pub type NodeId = usize;
 
@@ -36,6 +37,7 @@ pub enum Element {
     I(CurrentSource),
     V(VoltageSource),
     D(Diode),
+    Isin(CurrentSourceSine),
 }
 
 
@@ -52,7 +54,11 @@ impl fmt::Display for Element {
                 write!(f, "V a:{} b:{} {}Volts", el.p, el.n, el.value)
             },
             Element::D(ref el) => {
-                write!(f, "I p:{} n:{} I_sat={}A", el.p, el.n, el.i_sat)
+                write!(f, "D p:{} n:{} I_sat={}A", el.p, el.n, el.i_sat)
+            },
+            Element::Isin(ref el) => {
+                write!(f, "Isin p:{} n:{} = {} + {} * sin(2pi {})",
+                    el.p, el.n, el.vo, el.va, el.freq)
             },
         }
     }
@@ -118,6 +124,16 @@ impl Circuit {
                         }
                     }
                     Element::D(Diode{ ref p, ref n, .. }) => {
+                        if !seen[*p] {
+                            seen[*p] = true;
+                            c_nodes += 1;
+                        }
+                        if !seen[*n] {
+                            seen[*n] = true;
+                            c_nodes += 1;
+                        }
+                    }
+                    Element::Isin(CurrentSourceSine{ ref p, ref n, .. }) => {
                         if !seen[*p] {
                             seen[*p] = true;
                             c_nodes += 1;
