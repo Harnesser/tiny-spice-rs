@@ -35,7 +35,8 @@ diode:
 
 trans:
 	cargo test --no-fail-fast \
-		--test test_trans_ir
+		--test test_trans_ir \
+		-- --nocapture | tee trans.log
 
 clean:
 	cargo clean

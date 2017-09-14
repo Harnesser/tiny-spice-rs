@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased] Transient Analysis
+Added iteration count based transient analysis.
+
+### Added
+- Iteration count based time marching algorithm form SPICE2
+
+### Changed
+- Extracted the convergence test to a seperate function
+
+### Fixed
+
+
 ## [0.4.0] Non-Linear Solver
 DC operating point of simple circuits with: non-linear diode model; current 
 sources and resistors.

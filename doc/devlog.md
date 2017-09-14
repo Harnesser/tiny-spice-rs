@@ -1,12 +1,35 @@
 # Development Log
 
+## 2017-09-14
+Think I've an implementation of the iteration-count time-marching loop. Albeit
+that I've just ran it on a static circuit, but at least I can see the timesteps
+increasing in time because there's nothing happening.
+
+## 2017-09-12
+Found an algorithm for time-stepping that uses only iteration counts and
+no fancy error calculations (used in SPICE2). See openoffice doc for more 
+details.
+
 ## 2017-09-10
 The unloaded diode bridge does find a DC solution, but if I load the output
 with a resistor, there are NaNs all around the place.
 
 It was having problems solving the current through the 0V source to ground.
 I put in a hack to make the result 0.0 if the results isn't a finite number,
-and things seem to work!
+and things seem to work! [TAG 0.4.0]
+
+### Next?
+Where to I go next?
+
+* DC Sweep
+ - sweeping parameters
+ - recording results
+* Transient Analysis
+ - sinewave source
+ - sweeping time
+ - recording waveforms
+ - L & C models mean numerical integration routines
+
 
 ## 2017-09-09
 Got a simple diode-Isource-resistor circuit to converge by limiting

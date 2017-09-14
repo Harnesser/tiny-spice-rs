@@ -116,7 +116,7 @@ impl Engine {
             // !!!TODO!!!
 
             if t_now >= TSTART && t_now != 0.0 {
-                println!("*INFO*: [{}] t={} : {:?}", c_step, t_now, unknowns);
+                println!("*DATA*: [{}] t={} : {:?}", c_step, t_now, unknowns);
             }
 
             if is_final_timestep {
