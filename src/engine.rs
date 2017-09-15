@@ -1,6 +1,7 @@
 
 use circuit;
 use circuit::NodeId;
+use wavewriter::WaveWriter;
 
 pub fn banner() {
 
@@ -56,7 +57,7 @@ impl Engine {
         // user-supplied control on the sim time
         const TSTART: f32 = 0.0;
         const TSTOP: f32 = 2e-3;
-        const TSTEP: f32 = 1e-4;
+        const TSTEP: f32 = 1e-5;
 
         // Iteration limits
 
@@ -101,6 +102,9 @@ impl Engine {
         println!("*************************************************************");
         println!("Transient analysis: {} to {} by {}", TSTART, TSTOP, t_delta);
 
+        // open waveform database
+        let mut wavedb = WaveWriter::new("waves/out.dat").unwrap();
+
         // timestep loop
         let mut error = false;
         let mut is_final_timestep = false;
@@ -120,6 +124,7 @@ impl Engine {
 
             if t_now >= TSTART && t_now != 0.0 {
                 println!("*DATA*: [{}] t={} : {:?}", c_step, t_now, unknowns);
+                wavedb.dump_vector(t_now, &unknowns);
             }
 
             if is_final_timestep {

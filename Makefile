@@ -1,4 +1,5 @@
 ARGS:=
+PLOT:=
 
 go:
 	cargo run bringup
@@ -22,6 +23,7 @@ test: test_rust test_grep
 
 test_rust:
 	cargo test --no-fail-fast --all | tee test.log
+
 test_grep:
 	grep "test result" test.log
 
@@ -37,6 +39,9 @@ diode:
 		--test test_irdvv \
 		--test test_dc_bridge_p_unloaded \
 		--test test_dc_bridge_p_loaded
+
+plot:
+	kst2 ${PLOT} -x 1 -y 3
 
 trans:
 	cargo test --no-fail-fast \

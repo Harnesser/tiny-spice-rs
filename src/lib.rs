@@ -7,3 +7,6 @@ pub mod engine;
 pub mod diode;
 pub mod isine;
 
+pub mod wavewriter;
+
+
