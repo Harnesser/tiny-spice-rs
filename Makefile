@@ -18,9 +18,13 @@ clippy:
 waves:
 	gtkwave --dump waves.vcd --save plot.gtkw
 
-test:
-	cargo test --no-fail-fast --all | tee test.log; \
+test: test_rust test_grep
+
+test_rust:
+	cargo test --no-fail-fast --all | tee test.log
+test_grep:
 	grep "test result" test.log
+
 
 newton:
 	cargo test --no-fail-fast --test newton

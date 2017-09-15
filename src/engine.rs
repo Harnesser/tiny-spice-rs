@@ -12,6 +12,7 @@ pub fn banner() {
 
 }
 
+#[derive(Debug)]
 pub enum ConvergenceError {
     Divergent,
 }
@@ -54,7 +55,7 @@ impl Engine {
 
         // user-supplied control on the sim time
         const TSTART: f32 = 0.0;
-        const TSTOP: f32 = 1e-3;
+        const TSTOP: f32 = 2e-3;
         const TSTEP: f32 = 1e-4;
 
         // Iteration limits
@@ -81,10 +82,6 @@ impl Engine {
         const ITL4: usize = 20;
 
 
-
-        // build the circuit matrix
-        self.elaborate(&ckt);
-
         // prep values
         let c_mna = self.c_nodes + self.c_vsrcs;
         let mut unknowns_prev : Vec<f32> = vec![0.0; c_mna];
@@ -92,6 +89,7 @@ impl Engine {
 
         // Find the DC operating point
         // used as the initial values in the transient simulation
+        // this will also build the circuit
         unknowns = self.dc_operating_point(&ckt);
         println!("*INFO*: DC : {:?}", &unknowns);
 
@@ -100,6 +98,7 @@ impl Engine {
         let mut t_now = 0.0;
 
         // announce
+        println!("*************************************************************");
         println!("Transient analysis: {} to {} by {}", TSTART, TSTOP, t_delta);
 
         // timestep loop
@@ -127,8 +126,6 @@ impl Engine {
                 break;
             }
 
-            // update things for next loop
-            unknowns_prev = unknowns.to_vec();
 
             // solver loop
             // breaks when solved, or time-step too small
@@ -138,67 +135,80 @@ impl Engine {
 
             // solver iteration count
             let mut c_iteration: usize = 0;
+            let mut c_itl: usize = 0;
             println!("*INFO* Time: {}", t_now);
             loop {
-                println!("*INFO* Iteration {}", c_iteration);
+                println!("*INFO* Iteration {}({})", c_iteration, c_itl);
 
                 // copy the base matrix, cos we're going to change it a lot:
                 // * stamp non-linear element companion models
                 // * re-order during guassian elimination
                 let mut v = self.base_matrix.clone();
 
-                // Stamp nonlinear
+                // stamp independent sources
+                self.independent_source_stamp(&mut v, t_try);
+
+                // stamp nonlinear elements
                 // stamp(t_now, t_delta);
+
+                // update things for next loop
+                unknowns_prev = unknowns.to_vec();
 
                 // Solve
                 unknowns = self.solve(v);
+                c_itl += 1;
+                c_iteration += 1;
 
                 // Convergence check
                 match self.convergence_check(&unknowns, &unknowns_prev) {
                     Ok(cnvg) => {
                         if cnvg {
-                            println!("*INFO* Timestep converged after {} iterations", c_iteration);
+                            println!("*INFO* Timestep converged after {} iterations", c_itl);
                             converged = true;
                             break;
-                        }
-                    },
-                    Err(_) => {
-                        // adjust timestep if we can
-                        if c_iteration >= ITL4 {
-                            t_delta = t_delta * FT;
-                            // check if we're ok to continue iterating
-                            if t_delta < FT {
-                                println!("*ERROR* Timestep too small");
-                                error = true;
-                                break;
-                            } else {
-                                // reset iteration count
-                                println!("*INFO* Upshifting");
-                                c_iteration = 0;
+                        } else {
+                            // adjust timestep if we can
+                            if c_itl >= ITL4 {
+                                t_delta = t_delta * FT;
+                                // check if we're ok to continue iterating
+                                if t_delta < RMIN {
+                                    println!("*ERROR* Timestep too small");
+                                    error = true;
+                                    break;
+                                } else {
+                                    // reset iteration count
+                                    println!("*INFO* Upshifting: {}", t_delta);
+                                    c_itl = 0;
+                                }
                             }
                         }
                     },
+                    Err(_) => {
+                        println!("*ERROR* There was a numerical error");
+                        error = true;
+                        break;
+                    },
                 }
-
             }
 
             println!("*INFO* Updating timestep");
             if converged {
                 // solver found it too easy, maybe there's not a lot going on
                 // reduce the t_delta
-                if c_iteration < ITL3 {
-                    println!("*INFO* Downshifting");
+                if c_itl < ITL3 {
                     t_delta = t_delta * 2.0;
                     let t_delta_max = TSTEP * RMAX;
                     if t_delta > t_delta_max {
                         println!("*INFO* Downshifting maxed out");
                         t_delta = t_delta_max;
+                    } else {
+                        println!("*INFO* Downshifting: {}", t_delta);
                     }
                 }
             }
 
-            t_now += t_delta;
             c_step += 1;
+            t_now += t_delta;
             if t_now > TSTOP {
                 t_now = TSTOP;
                 is_final_timestep = true;
@@ -222,7 +232,7 @@ impl Engine {
 
         // build the circuit matrix
         self.elaborate(&ckt);
-        
+       
         // prep values for convergence checks
         let c_mna = self.c_nodes + self.c_vsrcs;
         let mut unknowns_prev : Vec<f32> = vec![0.0; c_mna];
@@ -232,12 +242,17 @@ impl Engine {
 
         // Newton-Raphson loop
         let mut c_iteration: usize = 0;
+
         while c_iteration < ITL1 {
 
             // copy the base matrix, cos we're going to change it a lot:
             // * stamp non-linear element companion models
             // * re-order during guassian elimination
             let mut v = self.base_matrix.clone();
+
+            // Stamp independent sources at time=0.0
+            // !!!FIXME!!! - hoist out of loop?
+            self.independent_source_stamp(&mut v, 0.0);
 
             // stamp companion models of non-linear devices
             self.nonlinear_stamp(&mut v, &unknowns_prev);
@@ -267,7 +282,7 @@ impl Engine {
                 }
             }
 
-            //
+            // leave
             unknowns_prev = unknowns.clone();
             c_iteration += 1;
         }
@@ -338,7 +353,7 @@ impl Engine {
                 }
 
                 circuit::Element::Isin(ref isrcsine) => {
-                    let t_eval = 0.0;
+                    println!("  [ELEMENT] Current Source (~):");
                     self.independent_sources.push(
                         circuit::Element::Isin(isrcsine.clone())
                     );
@@ -486,23 +501,6 @@ impl Engine {
     }
 
 
-    fn stamp_current_source_sine(&self,
-        m: &mut Vec<Vec<f32>>,
-        isrc: &circuit::CurrentSourceSine,
-        t_now: f32, // time of sim
-    ) {
-        println!("  [ELEMENT] Current source (~): into node {} and out of node {}",
-                isrc.p, isrc.n);
-        let ia = self.c_nodes + self.c_vsrcs; // index for ampere vector
-        let i_now = isrc.evaluate(t_now);
-        if isrc.p != 0 {
-            m[isrc.p][ia] = m[isrc.p][ia] - i_now;
-        }
-        if isrc.n != 0 {
-            m[isrc.n][ia] = m[isrc.n][ia] + i_now;
-        }
-    }
-
     #[allow(unused_parens)]
     fn stamp_voltage_source(
         &self,
@@ -588,7 +586,33 @@ impl Engine {
         self.pp_matrix(&m);
     }
 
+
     // stamp independent sources
+    fn independent_source_stamp(&self, m: &mut Vec<Vec<f32>>, t_now: f32) {
+        println!("*INFO* Stamping independent source elements");
+        println!("*INFO*  {} of them", &self.independent_sources.len());
+        for el in &self.independent_sources {
+            match *el {
+                circuit::Element::Isin(ref isrc) => {
+                    println!("*INFO* {}", el);
+
+                    // evaluate at the present sim time
+                    let i_now = isrc.evaluate(t_now);
+
+                    // stamp
+                    self.stamp_current_source(m, &circuit::CurrentSource{
+                        p: isrc.p,
+                        n: isrc.n,
+                        value: i_now,
+                    });
+                }
+
+                _ => { println!("*ERROR* - unrecognised independent source element"); }
+            }
+        }
+        println!("*INFO* Independent source stamped matrix");
+        self.pp_matrix(&m);
+    }
 
 
     // check for convergence by testing new and previous solutions against
@@ -619,6 +643,7 @@ impl Engine {
                 res = Ok(false);
             }
         }
+        println!("*INFO* Convergence check: {:?}", res); 
         res
     }
 

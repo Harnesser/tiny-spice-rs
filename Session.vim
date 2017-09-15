@@ -39,9 +39,10 @@ badd +21 src/engine.rs
 badd +98 src/circuit.rs
 badd +24 src/diode.rs
 badd +13 tests/test_ird.rs
-badd +0 tests/test_trans_ir.rs
+badd +17 tests/test_trans_ir.rs
+badd +0 tests/test_trans_ir_sine.rs
 args bin/bringup.rs src/engine.rs
-edit tests/test_trans_ir.rs
+edit tests/test_trans_ir_sine.rs
 set splitbelow splitright
 wincmd _ | wincmd |
 split
@@ -54,11 +55,11 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winheight=1 winwidth=1
-exe '1resize ' . ((&lines * 4 + 28) / 57)
-exe '2resize ' . ((&lines * 41 + 28) / 57)
+exe '1resize ' . ((&lines * 25 + 28) / 57)
+exe '2resize ' . ((&lines * 20 + 28) / 57)
 exe '3resize ' . ((&lines * 8 + 28) / 57)
 argglobal
-edit tests/test_trans_ir.rs
+edit tests/test_trans_ir_sine.rs
 nnoremap <buffer> <D-R> :RustRun! =join(b:rust_last_rustc_args)erust#AppendCmdLine(' -- ' . join(b:rust_last_args))
 nnoremap <buffer> <silent> <D-r> :RustRun
 onoremap <buffer> <silent> [[ :call rust#Jump('o', 'Back')
@@ -173,7 +174,7 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 2) / 4)
+let s:l = 1 - ((0 * winheight(0) + 12) / 25)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -296,12 +297,12 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 172 - ((8 * winheight(0) + 20) / 41)
+let s:l = 205 - ((15 * winheight(0) + 10) / 20)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-172
-normal! 047|
+205
+normal! 067|
 wincmd w
 argglobal
 edit src/circuit.rs
@@ -426,9 +427,8 @@ normal! zt
 1
 normal! 0
 wincmd w
-2wincmd w
-exe '1resize ' . ((&lines * 4 + 28) / 57)
-exe '2resize ' . ((&lines * 41 + 28) / 57)
+exe '1resize ' . ((&lines * 25 + 28) / 57)
+exe '2resize ' . ((&lines * 20 + 28) / 57)
 exe '3resize ' . ((&lines * 8 + 28) / 57)
 tabnext 1
 if exists('s:wipebuf')
