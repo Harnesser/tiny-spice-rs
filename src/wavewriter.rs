@@ -34,6 +34,35 @@ impl WaveWriter {
         Some(writer)
     }
 
+
+    pub fn header(&mut self, c_nodes: usize, c_vsrcs: usize) {
+
+        let mut names = "Time".to_string();
+
+        for i in 0..c_nodes {
+            names += &format!("\tv({})", i);
+        }
+        for j in 0..c_vsrcs {
+            names += &format!("\ti({})", j);
+        }
+        names += "\n";
+
+        let mut units = "s".to_string();
+        for _ in 0..c_nodes {
+            units += &format!("\tV");
+        }
+        for _ in 0..c_vsrcs {
+            units += &format!("\tA");
+        }
+        units += "\n";
+
+        if let Some(ref mut file) = self.file {
+            let _ = file.write_all(names.as_bytes());
+            let _ = file.write_all(units.as_bytes());
+        }
+    }
+
+
     pub fn dump_vector(&mut self, time: f32, vars: &Vec<f32>) {
         if let Some(ref mut file) = self.file {
             let mut line = format!("{}", time);

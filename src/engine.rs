@@ -52,7 +52,7 @@ impl Engine {
         }
     }
 
-    pub fn transient_analysis(&mut self, ckt: &circuit::Circuit) {
+    pub fn transient_analysis(&mut self, ckt: &circuit::Circuit, wavefile: &str) {
 
         // user-supplied control on the sim time
         const TSTART: f32 = 0.0;
@@ -103,7 +103,8 @@ impl Engine {
         println!("Transient analysis: {} to {} by {}", TSTART, TSTOP, t_delta);
 
         // open waveform database
-        let mut wavedb = WaveWriter::new("waves/out.dat").unwrap();
+        let mut wavedb = WaveWriter::new(wavefile).unwrap();
+        wavedb.header(self.c_nodes, self.c_vsrcs);
 
         // timestep loop
         let mut error = false;

@@ -1,5 +1,5 @@
 ARGS:=
-PLOT:=
+WAVES:=
 
 go:
 	cargo run bringup
@@ -41,13 +41,20 @@ diode:
 		--test test_dc_bridge_p_loaded
 
 plot:
-	kst2 ${PLOT} -x 1 -y 3
+	kst2 ${WAVES} -x 1 -y 3
 
-trans:
+waves/stamp:
+	mkdir -p waves; touch waves/stamp
+
+trans: waves/stamp
 	cargo test --no-fail-fast \
 		--test test_trans_ir_sine \
 		-- --nocapture | tee trans.log
 
+trans_plot: trans
+	kst2 kst/trans.kst
+
 clean:
 	cargo clean
 	\rm -rf *.log
+	\rm -rf waves

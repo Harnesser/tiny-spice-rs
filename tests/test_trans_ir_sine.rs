@@ -12,7 +12,7 @@ fn test_trans_ir_sine_10Hz() {
 
     let mut eng = engine::Engine::new();
     let ckt = build(10.0);
-    let v = eng.transient_analysis(&ckt);
+    let v = eng.transient_analysis(&ckt, "waves/trans_ir_sine_10Hz.dat");
     println!("\n*INFO* Done");
 
     assert!(false);
@@ -25,7 +25,7 @@ fn test_trans_ir_sine_1kHz() {
 
     let mut eng = engine::Engine::new();
     let ckt = build(1e3);
-    let v = eng.transient_analysis(&ckt);
+    let v = eng.transient_analysis(&ckt, "waves/trans_ir_sine_1kHz.dat");
     println!("\n*INFO* Done");
 
     assert!(false);
