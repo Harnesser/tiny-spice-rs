@@ -5,8 +5,7 @@ Deal with capacitors
 
 ### Added
 - Capacitor model for DC operating point analysis
-
-
+- Capacitor in transient analysis
 
 ## [0.5.0] Transient Analysis
 Added iteration count based transient analysis.

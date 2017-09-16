@@ -38,6 +38,9 @@ pub struct Engine {
     // list of independent sources
     independent_sources: Vec<circuit::Element>,
 
+    // list of elements with energy storage (caps & inductors)
+    storage_elements: Vec<circuit::Element>,
+
 }
 
 impl Engine {
@@ -49,6 +52,7 @@ impl Engine {
             base_matrix: vec![vec![]],
             nonlinear_elements: vec![],
             independent_sources: vec![],
+            storage_elements: vec![],
         }
     }
 
@@ -57,7 +61,7 @@ impl Engine {
         // user-supplied control on the sim time
         const TSTART: f32 = 0.0;
         const TSTOP: f32 = 2e-3;
-        const TSTEP: f32 = 1e-5;
+        const TSTEP: f32 = 1.0e-6;
 
         // Iteration limits
 
@@ -83,16 +87,15 @@ impl Engine {
         const ITL4: usize = 20;
 
 
-        // prep values
-        let c_mna = self.c_nodes + self.c_vsrcs;
-        let mut unknowns_prev : Vec<f32> = vec![0.0; c_mna];
-        let mut unknowns : Vec<f32> = vec![];
-
         // Find the DC operating point
         // used as the initial values in the transient simulation
         // this will also build the circuit
-        unknowns = self.dc_operating_point(&ckt);
+        let mut unknowns : Vec<f32> = self.dc_operating_point(&ckt);
         println!("*INFO*: DC : {:?}", &unknowns);
+
+        // prep values
+        let c_mna = self.c_nodes + self.c_vsrcs;
+        let mut unknowns_prev : Vec<f32> = vec![0.0; c_mna];
 
         // transient loop
         let mut t_delta = TSTEP * FS;
@@ -143,9 +146,12 @@ impl Engine {
 
             // solver iteration count
             let mut c_itl: usize = 0;
+            let mut unknowns_solve : Vec<f32> = vec![0.0; c_mna];
+            let mut geared = false;
+
             loop {
                 println!("*METRIC* {} {} {} {} {}",
-                         c_step, t_now, t_try, c_iteration, c_itl);
+                         c_step, t_now, t_delta, c_iteration, c_itl);
 
                 // copy the base matrix, cos we're going to change it a lot:
                 // * stamp non-linear element companion models
@@ -153,21 +159,22 @@ impl Engine {
                 let mut v = self.base_matrix.clone();
 
                 // stamp independent sources
-                self.independent_source_stamp(&mut v, t_try);
+                self.independent_source_stamp(&mut v, t_now + t_delta);
+
+                // stamp elements that store energy
+                self.storage_stamp(&mut v, &unknowns_prev, t_delta);
 
                 // stamp companion models of non-linear devices
                 self.nonlinear_stamp(&mut v, &unknowns);
 
-                // update things for next loop
-                unknowns_prev = unknowns.to_vec();
-
                 // Solve
                 unknowns = self.solve(v);
+
                 c_itl += 1;
                 c_iteration += 1;
 
                 // Convergence check
-                match self.convergence_check(&unknowns, &unknowns_prev) {
+                match self.convergence_check(&unknowns, &unknowns_solve) {
                     Ok(cnvg) => {
                         if cnvg {
                             println!("*INFO* Timestep converged after {} iterations", c_itl);
@@ -185,6 +192,7 @@ impl Engine {
                                 } else {
                                     // reset iteration count
                                     println!("*INFO* Upshifting: {}", t_delta);
+                                    geared = true;
                                     c_itl = 0;
                                 }
                             }
@@ -196,13 +204,17 @@ impl Engine {
                         break;
                     },
                 }
+                unknowns_solve = unknowns.to_vec();
             }
 
             println!("*INFO* Updating timestep");
             if converged {
+                // update things for next loop
+                unknowns_prev = unknowns.to_vec();
+
                 // solver found it too easy, maybe there's not a lot going on
                 // reduce the t_delta
-                if c_itl < ITL3 {
+                if !geared & (c_itl < ITL3) {
                     t_delta = t_delta * 2.0;
                     let t_delta_max = TSTEP * RMAX;
                     if t_delta > t_delta_max {
@@ -367,8 +379,10 @@ impl Engine {
                 }
 
                 circuit::Element::C(ref c) => {
-                    println!("  [ELEMENT] Capacitor):");
-                    // do nothing for DC operating point - it's an open
+                    println!("  [ELEMENT] Capacitor:");
+                    self.storage_elements.push(
+                        circuit::Element::C(c.clone())
+                    );
                 }
                 
             }
@@ -565,6 +579,38 @@ impl Engine {
         }
     }
 
+
+    fn storage_stamp(&self, m: &mut Vec<Vec<f32>>, n: &Vec<f32>, t: f32) {
+        println!("*INFO* Stamping storage elements");
+        for el in &self.storage_elements {
+            match *el {
+                circuit::Element::C(ref c) => {
+
+                    // linearize
+                    let v_c = n[c.a] - n[c.b];
+                    let (g_eq, i_eq) = c.linearize(v_c, t);
+
+                    // stamp
+                    self.stamp_current_source(m, &circuit::CurrentSource{
+                        p: c.b,
+                        n: c.a,
+                        value: i_eq
+                    });
+                    self.stamp_resistor(m, &circuit::Resistor{
+                        a: c.a,
+                        b: c.b,
+                        value: 1.0/g_eq
+                    });
+
+                },
+                _ => { println!("*ERROR* - unrecognised storage element"); }
+            }
+        }
+        println!("*INFO* Energy storage stamped matrix");
+        self.pp_matrix(&m);
+    }
+
+
     // stamp a matrix with linearized companion models of all the non-linear
     // devices listed in the SPICE netlist
     fn nonlinear_stamp(&self, m: &mut Vec<Vec<f32>>, n: &Vec<f32> ) {
@@ -644,13 +690,13 @@ impl Engine {
                 break;
             }
             let limit: f32;
-            if i >= self.c_nodes {
+            if i < self.c_nodes {
                 limit = x.abs() * RELTOL + VNTOL;
             } else {
                 limit = x.abs() * RELTOL + ABSTOL;
             }
             let this = (x - yv[i]).abs();
-            println!(" {} < {}", this, limit);
+            println!(" {} < {} = {}", this, limit, (this < limit));
             if this > limit {
                 res = Ok(false);
             }

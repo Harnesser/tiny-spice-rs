@@ -1,7 +1,22 @@
 # Development Log
 
 ## 2017-09-16
-Last night I got transient analysis working! I even tried it on the diode bridge
+Had a go at simulating capacitors in transient.
+
+With an RC low-pass filter test circuit, I'm seeing a few problems:
+1. The output wave seems to depend on timestep, not on input wave
+  frequency.
+2. The output wave is leading the input wave.
+
+[FIX] - wire up the current source in the capacitor companion model in the
+correct direction.
+
+And I've noticed on the diode bridge sim:
+1. It's not very robust with timestep.
+
+
+## 2017-09-15
+Got transient analysis working! I even tried it on the diode bridge
 circuit and it was a success!
 
 Interestingly, even with non-linear devices in there, the timestep maxes out on
