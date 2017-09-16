@@ -1,0 +1,11 @@
+* RC low-pass filter
+
+I1 0 1 SIN(0 1 10e3)   ; current flows from n+ through to n-
+R1 1 0 1
+Rlpf 1 2 1k
+Clpf 2 0 0.032uF
+
+.control
+  tran 1u 2m
+  plot v(1), v(2)
+.endc
