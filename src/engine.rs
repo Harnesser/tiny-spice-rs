@@ -111,6 +111,7 @@ impl Engine {
         let mut error = false;
         let mut is_final_timestep = false;
         let mut c_step = 0;
+        let mut c_iteration: usize = 0;
         loop {
 
             // At the start of the loop, we've a candidate t_delta to solve on.
@@ -141,11 +142,10 @@ impl Engine {
             let mut error = false;
 
             // solver iteration count
-            let mut c_iteration: usize = 0;
             let mut c_itl: usize = 0;
-            println!("*INFO* Time: {}", t_now);
             loop {
-                println!("*INFO* Iteration {}({})", c_iteration, c_itl);
+                println!("*METRIC* {} {} {} {} {}",
+                         c_step, t_now, t_try, c_iteration, c_itl);
 
                 // copy the base matrix, cos we're going to change it a lot:
                 // * stamp non-linear element companion models
