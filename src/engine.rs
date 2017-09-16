@@ -365,6 +365,11 @@ impl Engine {
                         circuit::Element::Isin(isrcsine.clone())
                     );
                 }
+
+                circuit::Element::C(ref c) => {
+                    println!("  [ELEMENT] Capacitor):");
+                    // do nothing for DC operating point - it's an open
+                }
                 
             }
         }

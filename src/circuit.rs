@@ -2,6 +2,7 @@ use std::fmt;
 
 pub use diode::Diode;
 pub use isine::CurrentSourceSine;
+pub use capacitor::Capacitor;
 
 pub type NodeId = usize;
 
@@ -38,6 +39,7 @@ pub enum Element {
     V(VoltageSource),
     D(Diode),
     Isin(CurrentSourceSine),
+    C(Capacitor),
 }
 
 
@@ -59,6 +61,9 @@ impl fmt::Display for Element {
             Element::Isin(ref el) => {
                 write!(f, "Isin p:{} n:{} = {} + {} * sin(2pi {})",
                     el.p, el.n, el.vo, el.va, el.freq)
+            },
+            Element::C(ref el) => {
+                write!(f, "C a:{} b:{} {}Farads", el.a, el.b, el.value)
             },
         }
     }
@@ -140,6 +145,16 @@ impl Circuit {
                         }
                         if !seen[*n] {
                             seen[*n] = true;
+                            c_nodes += 1;
+                        }
+                    }
+                    Element::C(Capacitor{ ref a, ref b, .. }) => {
+                        if !seen[*a] {
+                            seen[*a] = true;
+                            c_nodes += 1;
+                        }
+                        if !seen[*b] {
+                            seen[*b] = true;
                             c_nodes += 1;
                         }
                     }

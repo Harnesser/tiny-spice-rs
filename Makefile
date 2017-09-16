@@ -54,6 +54,12 @@ trans: waves/stamp
 trans_plot: trans
 	kst2 kst/trans.kst
 
+
+cap_dc:
+	cargo test --no-fail-fast \
+		--test test_irrc
+
+
 clean:
 	cargo clean
 	\rm -rf *.log
