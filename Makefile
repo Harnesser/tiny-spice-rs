@@ -59,6 +59,11 @@ cap_dc:
 	cargo test --no-fail-fast \
 		--test test_irrc
 
+cap_lpf:
+	cargo test --no-fail-fast \
+		--test test_trans_irrc \
+		-- --nocapture | tee trans_lpf.log
+
 
 clean:
 	cargo clean
