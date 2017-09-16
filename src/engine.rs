@@ -61,7 +61,7 @@ impl Engine {
         // user-supplied control on the sim time
         const TSTART: f32 = 0.0;
         const TSTOP: f32 = 2e-3;
-        const TSTEP: f32 = 1.0e-6;
+        const TSTEP: f32 = 0.1e-5;
 
         // Iteration limits
 

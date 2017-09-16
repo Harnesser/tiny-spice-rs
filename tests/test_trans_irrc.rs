@@ -11,8 +11,44 @@ fn test_irrc_trans_1kHz() {
     engine::banner();
 
     let mut eng = engine::Engine::new();
-    let ckt = build(5.0e3);
+    let ckt = build(1.0e3);
     let v = eng.transient_analysis(&ckt, "waves/trans_irrc_1kHz.dat");
+    println!("\n*INFO* Done");
+
+    assert!(false);
+}
+
+#[test]
+fn test_irrc_trans_2kHz() {
+    engine::banner();
+
+    let mut eng = engine::Engine::new();
+    let ckt = build(2.0e3);
+    let v = eng.transient_analysis(&ckt, "waves/trans_irrc_2kHz.dat");
+    println!("\n*INFO* Done");
+
+    assert!(false);
+}
+
+#[test]
+fn test_irrc_trans_5kHz() {
+    engine::banner();
+
+    let mut eng = engine::Engine::new();
+    let ckt = build(5.0e3);
+    let v = eng.transient_analysis(&ckt, "waves/trans_irrc_5kHz.dat");
+    println!("\n*INFO* Done");
+
+    assert!(false);
+}
+
+#[test]
+fn test_irrc_trans_10kHz() {
+    engine::banner();
+
+    let mut eng = engine::Engine::new();
+    let ckt = build(10.0e3);
+    let v = eng.transient_analysis(&ckt, "waves/trans_irrc_10kHz.dat");
     println!("\n*INFO* Done");
 
     assert!(false);

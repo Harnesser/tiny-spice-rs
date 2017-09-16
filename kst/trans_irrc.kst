@@ -1,46 +1,134 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kst version="2.0">
     <data>
-        <source reader="ASCII file" file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_1kHz.dat" fileRelative="../waves/trans_irrc_1kHz.dat">
+        <source reader="ASCII file" file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_1kHz.dat" fileRelative="waves/trans_irrc_1kHz.dat">
+            <properties vector="INDEX" interpretation="1" delimiters="#" columntype="0" headerstart="2" fields="0" readfields="true" usedot="true" columnwidthisconst="false" readunits="true" units="1"/>
+        </source>
+        <source reader="ASCII file" file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_10kHz.dat" fileRelative="waves/trans_irrc_10kHz.dat">
+            <properties vector="INDEX" interpretation="1" delimiters="#" columntype="0" headerstart="2" fields="0" readfields="true" usedot="true" columnwidthisconst="false" readunits="true" units="1"/>
+        </source>
+        <source reader="ASCII file" file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_2kHz.dat" fileRelative="waves/trans_irrc_2kHz.dat">
+            <properties vector="INDEX" interpretation="1" delimiters="#" columntype="0" headerstart="2" fields="0" readfields="true" usedot="true" columnwidthisconst="false" readunits="true" units="1"/>
+        </source>
+        <source reader="ASCII file" file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_5kHz.dat" fileRelative="waves/trans_irrc_5kHz.dat">
             <properties vector="INDEX" interpretation="1" delimiters="#" columntype="0" headerstart="2" fields="0" readfields="true" usedot="true" columnwidthisconst="false" readunits="true" units="1"/>
         </source>
     </data>
     <variables>
-        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_1kHz.dat" fileRelative="../waves/trans_irrc_1kHz.dat" field="Time" start="0" count="-1" skip="-1" doAve="false" initialVNum="1" initialXNum="1"/>
-        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_1kHz.dat" fileRelative="../waves/trans_irrc_1kHz.dat" field="v(1)" start="0" count="-1" skip="-1" doAve="false" initialVNum="2" initialXNum="13"/>
-        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_1kHz.dat" fileRelative="../waves/trans_irrc_1kHz.dat" field="v(2)" start="0" count="-1" skip="-1" doAve="false" initialVNum="3" initialXNum="25"/>
-        <string value="2017-09-16 16:33:01" initialTNum="1"/>
-        <string value="2017-09-16 16:33:01" initialTNum="2"/>
+        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_1kHz.dat" fileRelative="waves/trans_irrc_1kHz.dat" field="Time" start="0" count="-1" skip="-1" doAve="false" initialVNum="1" initialXNum="1"/>
+        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_1kHz.dat" fileRelative="waves/trans_irrc_1kHz.dat" field="v(1)" start="0" count="-1" skip="-1" doAve="false" initialVNum="2" initialXNum="13"/>
+        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_1kHz.dat" fileRelative="waves/trans_irrc_1kHz.dat" field="v(2)" start="0" count="-1" skip="-1" doAve="false" initialVNum="3" initialXNum="25"/>
+        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_10kHz.dat" fileRelative="waves/trans_irrc_10kHz.dat" field="Time" start="0" count="-1" skip="-1" doAve="false" initialVNum="4" initialXNum="37"/>
+        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_10kHz.dat" fileRelative="waves/trans_irrc_10kHz.dat" field="v(1)" start="0" count="-1" skip="-1" doAve="false" initialVNum="5" initialXNum="49"/>
+        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_10kHz.dat" fileRelative="waves/trans_irrc_10kHz.dat" field="v(2)" start="0" count="-1" skip="-1" doAve="false" initialVNum="6" initialXNum="61"/>
+        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_2kHz.dat" fileRelative="waves/trans_irrc_2kHz.dat" field="Time" start="0" count="-1" skip="-1" doAve="false" initialVNum="7" initialXNum="73"/>
+        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_2kHz.dat" fileRelative="waves/trans_irrc_2kHz.dat" field="v(1)" start="0" count="-1" skip="-1" doAve="false" initialVNum="8" initialXNum="85"/>
+        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_2kHz.dat" fileRelative="waves/trans_irrc_2kHz.dat" field="v(2)" start="0" count="-1" skip="-1" doAve="false" initialVNum="9" initialXNum="97"/>
+        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_5kHz.dat" fileRelative="waves/trans_irrc_5kHz.dat" field="Time" start="0" count="-1" skip="-1" doAve="false" initialVNum="10" initialXNum="109"/>
+        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_5kHz.dat" fileRelative="waves/trans_irrc_5kHz.dat" field="v(1)" start="0" count="-1" skip="-1" doAve="false" initialVNum="11" initialXNum="121"/>
+        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_irrc_5kHz.dat" fileRelative="waves/trans_irrc_5kHz.dat" field="v(2)" start="0" count="-1" skip="-1" doAve="false" initialVNum="12" initialXNum="133"/>
+        <string value="2017-09-16 18:06:23" initialTNum="1"/>
+        <string value="2017-09-16 18:06:23" initialTNum="2"/>
         <string value="trans_irrc_1kHz.dat" initialTNum="3"/>
-        <string value="waves" initialTNum="4"/>
-        <string value="2017-09-16 16:33:01" initialTNum="5"/>
-        <string value="2017-09-16 16:33:01" initialTNum="6"/>
-        <string value="trans_irrc_1kHz.dat" initialTNum="7"/>
-        <string value="/home/harnesser/Projects/tiny-spice-rs/waves" initialTNum="8"/>
-        <string value="s" initialTNum="9"/>
-        <string value="V" initialTNum="10"/>
-        <string value="V" initialTNum="11"/>
+        <string value="/home/harnesser/Projects/tiny-spice-rs/waves" initialTNum="4"/>
+        <string value="s" initialTNum="5"/>
+        <string value="V" initialTNum="6"/>
+        <string value="V" initialTNum="7"/>
+        <string orphan="true" editable="true" value="2017-09-16 16:33:01" initialTNum="1"/>
+        <string orphan="true" editable="true" value="2017-09-16 16:33:01" initialTNum="2"/>
+        <string orphan="true" editable="true" value="trans_irrc_1kHz.dat" initialTNum="3"/>
+        <string orphan="true" editable="true" value="waves" initialTNum="4"/>
+        <string orphan="true" editable="true" value="2017-09-16 16:33:01" initialTNum="5"/>
+        <string orphan="true" editable="true" value="2017-09-16 16:33:01" initialTNum="6"/>
+        <string orphan="true" editable="true" value="trans_irrc_1kHz.dat" initialTNum="7"/>
+        <string orphan="true" editable="true" value="/home/harnesser/Projects/tiny-spice-rs/waves" initialTNum="8"/>
+        <string orphan="true" editable="true" value="s" initialTNum="9"/>
+        <string orphan="true" editable="true" value="V" initialTNum="10"/>
+        <string orphan="true" editable="true" value="V" initialTNum="11"/>
+        <string value="2017-09-16 22:21:21" initialTNum="12"/>
+        <string value="2017-09-16 22:21:21" initialTNum="13"/>
+        <string value="trans_irrc_10kHz.dat" initialTNum="14"/>
+        <string value="/home/harnesser/Projects/tiny-spice-rs/waves" initialTNum="15"/>
+        <string value="s" initialTNum="16"/>
+        <string value="V" initialTNum="17"/>
+        <string value="V" initialTNum="18"/>
+        <string value="2017-09-16 22:25:05" initialTNum="19"/>
+        <string value="2017-09-16 22:25:05" initialTNum="20"/>
+        <string value="trans_irrc_2kHz.dat" initialTNum="21"/>
+        <string value="/home/harnesser/Projects/tiny-spice-rs/waves" initialTNum="22"/>
+        <string value="s" initialTNum="23"/>
+        <string value="V" initialTNum="24"/>
+        <string value="V" initialTNum="25"/>
+        <string value="2017-09-16 22:25:05" initialTNum="26"/>
+        <string value="2017-09-16 22:25:05" initialTNum="27"/>
+        <string value="trans_irrc_5kHz.dat" initialTNum="28"/>
+        <string value="/home/harnesser/Projects/tiny-spice-rs/waves" initialTNum="29"/>
+        <string value="s" initialTNum="30"/>
+        <string value="V" initialTNum="31"/>
+        <string value="V" initialTNum="32"/>
     </variables>
     <objects/>
     <relations>
         <curve xvector="Time (V1)" yvector="v(1) (V2)" color="#008000" headcolor="#000000" haslines="true" linewidth="0" linestyle="0" haspoints="true" pointtype="0" pointdensity="0" hasbars="false" barstyle="0" ignoreautoscale="false" hashead="false" headtype="0" initialCNum="1"/>
         <curve xvector="Time (V1)" yvector="v(2) (V3)" color="#000000" headcolor="#000000" haslines="true" linewidth="0" linestyle="0" haspoints="true" pointtype="1" pointdensity="0" hasbars="false" barstyle="0" ignoreautoscale="false" hashead="false" headtype="7680" initialCNum="2"/>
+        <curve xvector="Time (V4)" yvector="v(1) (V5)" color="#008000" headcolor="#000000" haslines="true" linewidth="0" linestyle="0" haspoints="true" pointtype="0" pointdensity="0" hasbars="false" barstyle="0" ignoreautoscale="false" hashead="false" headtype="-3158065" initialCNum="3"/>
+        <curve xvector="Time (V4)" yvector="v(2) (V6)" color="#000000" headcolor="#000000" haslines="true" linewidth="0" linestyle="0" haspoints="true" pointtype="1" pointdensity="0" hasbars="false" barstyle="0" ignoreautoscale="false" hashead="false" headtype="16777215" initialCNum="4"/>
+        <curve xvector="Time (V7)" yvector="v(1) (V8)" color="#4682b4" headcolor="#000000" haslines="true" linewidth="0" linestyle="0" haspoints="true" pointtype="0" pointdensity="0" hasbars="false" barstyle="0" ignoreautoscale="false" hashead="false" headtype="-65314" initialCNum="5"/>
+        <curve xvector="Time (V7)" yvector="v(2) (V9)" color="#501010" headcolor="#000000" haslines="true" linewidth="0" linestyle="0" haspoints="true" pointtype="1" pointdensity="0" hasbars="false" barstyle="0" ignoreautoscale="false" hashead="false" headtype="-2697514" initialCNum="6"/>
+        <curve xvector="Time (V10)" yvector="v(1) (V11)" color="#aa0000" headcolor="#000000" haslines="true" linewidth="0" linestyle="0" haspoints="true" pointtype="0" pointdensity="0" hasbars="false" barstyle="0" ignoreautoscale="false" hashead="false" headtype="0" initialCNum="7"/>
+        <curve xvector="Time (V10)" yvector="v(2) (V12)" color="#0000aa" headcolor="#000000" haslines="true" linewidth="0" linestyle="0" haspoints="true" pointtype="1" pointdensity="0" hasbars="false" barstyle="0" ignoreautoscale="false" hashead="false" headtype="0" initialCNum="8"/>
     </relations>
     <graphics>
-        <view name="View &amp;1" width="1051" height="557">
-            <plot tiedxzoom="false" tiedyzoom="false" leftlabelvisible="true" bottomlabelvisible="true" rightlabelvisible="true" toplabelvisible="true" globalfont="Noto Sans,12,-1,5,50,0,0,0,0,0" globalfontscale="16" globalfontcolor="#000000" showlegend="true" hidebottomaxislabel="false" hidetopaxislabel="false" hideleftaxislabel="false" hiderightaxislabel="false" initialPlotNum="1" name="Plot">
-                <position x="525.474" y="278.4978"/>
-                <rect x="-522.4758" y="-275.5125" width="1044.9516" height="551.025"/>
-                <relativesize width="0.9933" height="0.9875" centerx="0.4995" centery="0.4991" posx="0.00285000000000011" posy="0.00534999999999999"/>
+        <view name="View &amp;1" width="1051" height="1410">
+            <plot tiedxzoom="false" tiedyzoom="false" leftlabelvisible="true" bottomlabelvisible="true" rightlabelvisible="true" toplabelvisible="true" globalfont="Noto Sans,9,-1,5,50,0,0,0,0,0" globalfontscale="12" globalfontcolor="#000000" showlegend="false" hidebottomaxislabel="false" hidetopaxislabel="false" hideleftaxislabel="false" hiderightaxislabel="false" initialPlotNum="1" name="Plot">
+                <position x="3" y="1056"/>
+                <rect x="0" y="0" width="1045" height="351"/>
+                <relativesize width="0.993346007604563" height="0.2487597448618" centerx="0.499524714828897" centery="0.872785258681786" posx="0.00285171102661597" posy="0.748405386250886"/>
                 <transform m11="1" m12="0" m13="0" m21="0" m22="1" m23="0" m31="0" m32="0" m33="1"/>
                 <pen style="1" width="0" miterlimit="2" cap="16" joinStyle="64">
                     <brush color="#000000" style="1"/>
                 </pen>
                 <brush color="#ffffff" style="1"/>
-                <legend auto="true" title="" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="12" verticaldisplay="true" name="Legend">
-                    <position x="-416.474" y="80.5022"/>
-                    <rect x="0" y="0" width="109" height="54"/>
-                    <relativesize width="0.114169931311337" height="0.113798008534851" centerx="0.0924539986172344" centery="0.778704388599125" posx="0.0353690329615661" posy="0.7218053843317"/>
+                <legend auto="true" title="" font="Noto Sans,9,-1,5,50,0,0,0,0,0" fontscale="12" verticaldisplay="false" name="Legend">
+                    <position x="44.0708194642533" y="42.3918530757499"/>
+                    <rect x="0" y="0" width="0" height="0"/>
+                    <relativesize width="0" height="0" centerx="-0.0337441672574981" centery="0.108820538891713" posx="-0.0337441672574981" posy="0.108820538891713"/>
+                    <transform m11="1" m12="0" m13="0" m21="0" m22="1" m23="0" m31="0" m32="0" m33="1"/>
+                    <pen style="1" width="0" miterlimit="2" cap="16" joinStyle="64">
+                        <brush color="#000000" style="1"/>
+                    </pen>
+                    <brush color="#ffffff" style="1"/>
+                </legend>
+                <cartesianrender name="Cartesian Plot" type="1">
+                    <relation tag="v(1) vs Time (C3)"/>
+                    <relation tag="v(2) vs Time (C4)"/>
+                </cartesianrender>
+                <plotaxis id="xaxis" visible="true" log="false" reversed="false" autobaseoffset="true" baseoffset="false" interpret="false" interpretation="1" display="4" majortickmode="5" minortickcount="5" autominortickcount="true" drawmajorticks="true" drawminorticks="true" drawmajorgridlines="true" drawminorgridlines="false" drawmajorgridlinecolor="#a0a0a4" drawminorgridlinecolor="#a0a0a4" drawmajorgridlinestyle="2" drawminorgridlinestyle="2" drawmajorgridlinewidth="1" drawminorgridlinewidth="1" significantdigits="9" rotation="0" zoommode="0">
+                    <plotmarkers xaxis="true" linecolor="#000000" linestyle="1" linewidth="1" curvemode="3"/>
+                </plotaxis>
+                <plotaxis id="yaxis" visible="true" log="false" reversed="false" autobaseoffset="true" baseoffset="false" interpret="false" interpretation="1" display="4" majortickmode="5" minortickcount="5" autominortickcount="true" drawmajorticks="true" drawminorticks="true" drawmajorgridlines="true" drawminorgridlines="false" drawmajorgridlinecolor="#a0a0a4" drawminorgridlinecolor="#a0a0a4" drawmajorgridlinestyle="2" drawminorgridlinestyle="2" drawmajorgridlinewidth="1" drawminorgridlinewidth="1" significantdigits="9" rotation="0" zoommode="1">
+                    <plotmarkers xaxis="false" linecolor="#000000" linestyle="1" linewidth="1" curvemode="256"/>
+                </plotaxis>
+                <plotlabel id="leftlabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,9,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="rightlabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,9,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="toplabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,9,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="bottomlabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,9,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="numberlabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,9,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <projectionrect x="0" y="-10.387817875" width="0.002" height="20.77504275"/>
+            </plot>
+            <plot tiedxzoom="false" tiedyzoom="false" leftlabelvisible="true" bottomlabelvisible="true" rightlabelvisible="true" toplabelvisible="true" globalfont="Noto Sans,12,-1,5,50,0,0,0,0,0" globalfontscale="12" globalfontcolor="#000000" showlegend="true" hidebottomaxislabel="false" hidetopaxislabel="false" hideleftaxislabel="false" hiderightaxislabel="false" initialPlotNum="1" name="Plot">
+                <position x="3" y="3"/>
+                <rect x="0" y="0" width="1045" height="351"/>
+                <relativesize width="0.993346007604563" height="0.2487597448618" centerx="0.499524714828897" centery="0.126506024096386" posx="0.00285171102661597" posy="0.00212615166548547"/>
+                <transform m11="1" m12="0" m13="0" m21="0" m22="1" m23="0" m31="0" m32="0" m33="1"/>
+                <pen style="1" width="0" miterlimit="2" cap="16" joinStyle="64">
+                    <brush color="#000000" style="1"/>
+                </pen>
+                <brush color="#ffffff" style="1"/>
+                <legend auto="true" title="" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="7.2" verticaldisplay="true" name="Legend">
+                    <position x="109.786673935049" y="205.139329540066"/>
+                    <rect x="0" y="0" width="98" height="50"/>
+                    <relativesize width="0.103066355539488" height="0.188323917137476" centerx="0.0869022107313102" centery="0.815967342900438" posx="0.0353690329615662" posy="0.721805384331699"/>
                     <transform m11="1" m12="0" m13="0" m21="0" m22="1" m23="0" m31="0" m32="0" m33="1"/>
                     <pen style="1" width="0" miterlimit="2" cap="16" joinStyle="64">
                         <brush color="#000000" style="1"/>
@@ -59,12 +147,86 @@
                 <plotaxis id="yaxis" visible="true" log="false" reversed="false" autobaseoffset="true" baseoffset="false" interpret="false" interpretation="1" display="4" majortickmode="5" minortickcount="5" autominortickcount="true" drawmajorticks="true" drawminorticks="true" drawmajorgridlines="true" drawminorgridlines="false" drawmajorgridlinecolor="#a0a0a4" drawminorgridlinecolor="#a0a0a4" drawmajorgridlinestyle="2" drawminorgridlinestyle="2" drawmajorgridlinewidth="1" drawminorgridlinewidth="1" significantdigits="9" rotation="0" zoommode="1">
                     <plotmarkers xaxis="false" linecolor="#000000" linestyle="1" linewidth="1" curvemode="32557808"/>
                 </plotaxis>
-                <plotlabel id="leftlabel" visible="true" overridetext="V" autolabel="true" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="16" fontcolor="#000000" fontuseglobal="true"/>
-                <plotlabel id="rightlabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="16" fontcolor="#000000" fontuseglobal="true"/>
-                <plotlabel id="toplabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="16" fontcolor="#000000" fontuseglobal="true"/>
-                <plotlabel id="bottomlabel" visible="true" overridetext="Time \[s\]" autolabel="true" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="16" fontcolor="#000000" fontuseglobal="true"/>
-                <plotlabel id="numberlabel" visible="true" overridetext="" autolabel="false" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="16" fontcolor="#000000" fontuseglobal="true"/>
-                <projectionrect x="0" y="-1.0373412515" width="0.002" height="2.074619043"/>
+                <plotlabel id="leftlabel" visible="true" overridetext="V" autolabel="true" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="rightlabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="toplabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="bottomlabel" visible="true" overridetext="Time \[s\]" autolabel="true" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="numberlabel" visible="true" overridetext="" autolabel="false" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <projectionrect x="0" y="-10.498464375" width="0.002" height="20.99686575"/>
+            </plot>
+            <plot tiedxzoom="false" tiedyzoom="false" leftlabelvisible="true" bottomlabelvisible="true" rightlabelvisible="true" toplabelvisible="true" globalfont="Noto Sans,12,-1,5,50,0,0,0,0,0" globalfontscale="12" globalfontcolor="#000000" showlegend="false" hidebottomaxislabel="false" hidetopaxislabel="false" hideleftaxislabel="false" hiderightaxislabel="false" initialPlotNum="2" name="Plot">
+                <position x="525.474" y="529.5483"/>
+                <rect x="-522.4758" y="-175.5284" width="1044.9516" height="351.0568"/>
+                <relativesize width="0.9933" height="0.2488" centerx="0.4995" centery="0.3753" posx="0.00285000000000011" posy="0.2509"/>
+                <transform m11="1" m12="0" m13="0" m21="0" m22="1" m23="0" m31="0" m32="0" m33="1"/>
+                <pen style="1" width="0" miterlimit="2" cap="16" joinStyle="64">
+                    <brush color="#000000" style="1"/>
+                </pen>
+                <brush color="#ffffff" style="1"/>
+                <legend auto="true" title="" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="12" verticaldisplay="true" name="Legend">
+                    <position x="-98.474" y="-16.5483"/>
+                    <rect x="-163.0138627575" y="-19.99642704" width="163" height="80"/>
+                    <relativesize width="0.171435419830356" height="0.301253818392148" centerx="0.280114629549356" centery="0.623157354509468" posx="0.194396919634178" posy="0.472530445313394"/>
+                    <transform m11="1" m12="0" m13="0" m21="0" m22="1" m23="0" m31="0" m32="0" m33="1"/>
+                    <pen style="1" width="0" miterlimit="2" cap="16" joinStyle="64">
+                        <brush color="#000000" style="1"/>
+                    </pen>
+                    <brush color="#ffffff" style="1"/>
+                    <relation tag="v(1) vs Time (C5)"/>
+                    <relation tag="v(2) vs Time (C6)"/>
+                </legend>
+                <cartesianrender name="Cartesian Plot" type="1">
+                    <relation tag="v(1) vs Time (C5)"/>
+                    <relation tag="v(2) vs Time (C6)"/>
+                </cartesianrender>
+                <plotaxis id="xaxis" visible="true" log="false" reversed="false" autobaseoffset="true" baseoffset="false" interpret="false" interpretation="1" display="4" majortickmode="5" minortickcount="5" autominortickcount="true" drawmajorticks="true" drawminorticks="true" drawmajorgridlines="true" drawminorgridlines="false" drawmajorgridlinecolor="#a0a0a4" drawminorgridlinecolor="#a0a0a4" drawmajorgridlinestyle="2" drawminorgridlinestyle="2" drawmajorgridlinewidth="1" drawminorgridlinewidth="1" significantdigits="9" rotation="0" zoommode="0">
+                    <plotmarkers xaxis="true" linecolor="#000000" linestyle="1" linewidth="1" curvemode="-64"/>
+                </plotaxis>
+                <plotaxis id="yaxis" visible="true" log="false" reversed="false" autobaseoffset="true" baseoffset="false" interpret="false" interpretation="1" display="4" majortickmode="5" minortickcount="5" autominortickcount="true" drawmajorticks="true" drawminorticks="true" drawmajorgridlines="true" drawminorgridlines="false" drawmajorgridlinecolor="#a0a0a4" drawminorgridlinecolor="#a0a0a4" drawmajorgridlinestyle="2" drawminorgridlinestyle="2" drawmajorgridlinewidth="1" drawminorgridlinewidth="1" significantdigits="9" rotation="0" zoommode="1">
+                    <plotmarkers xaxis="false" linecolor="#000000" linestyle="1" linewidth="1" curvemode="3"/>
+                </plotaxis>
+                <plotlabel id="leftlabel" visible="true" overridetext="V" autolabel="true" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="rightlabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="toplabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="bottomlabel" visible="true" overridetext="Time \[s\]" autolabel="true" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="numberlabel" visible="true" overridetext="" autolabel="false" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <projectionrect x="0" y="-10.494149425" width="0.002" height="20.98817385"/>
+            </plot>
+            <plot tiedxzoom="false" tiedyzoom="false" leftlabelvisible="true" bottomlabelvisible="true" rightlabelvisible="true" toplabelvisible="true" globalfont="Noto Sans,9,-1,5,50,0,0,0,0,0" globalfontscale="12" globalfontcolor="#000000" showlegend="false" hidebottomaxislabel="false" hidetopaxislabel="false" hideleftaxislabel="false" hiderightaxislabel="false" initialPlotNum="3" name="Plot">
+                <position x="3" y="705"/>
+                <rect x="0" y="0" width="1045" height="351"/>
+                <relativesize width="0.993346007604563" height="0.2487597448618" centerx="0.499524714828897" centery="0.624025513819986" posx="0.00285171102661597" posy="0.499645641389086"/>
+                <transform m11="1" m12="0" m13="0" m21="0" m22="1" m23="0" m31="0" m32="0" m33="1"/>
+                <pen style="1" width="0" miterlimit="2" cap="16" joinStyle="64">
+                    <brush color="#000000" style="1"/>
+                </pen>
+                <brush color="#ffffff" style="1"/>
+                <legend auto="true" title="" font="Noto Sans,9,-1,5,50,0,0,0,0,0" fontscale="12" verticaldisplay="false" name="Legend">
+                    <position x="47.5421875" y="39.825"/>
+                    <rect x="0" y="0" width="0" height="0"/>
+                    <relativesize width="0" height="0" centerx="-0.0300933381536136" centery="0.0991525423728813" posx="-0.0300933381536136" posy="0.0991525423728813"/>
+                    <transform m11="1" m12="0" m13="0" m21="0" m22="1" m23="0" m31="0" m32="0" m33="1"/>
+                    <pen style="1" width="0" miterlimit="2" cap="16" joinStyle="64">
+                        <brush color="#000000" style="1"/>
+                    </pen>
+                    <brush color="#ffffff" style="1"/>
+                </legend>
+                <cartesianrender name="Cartesian Plot" type="1">
+                    <relation tag="v(1) vs Time (C7)"/>
+                    <relation tag="v(2) vs Time (C8)"/>
+                </cartesianrender>
+                <plotaxis id="xaxis" visible="true" log="false" reversed="false" autobaseoffset="true" baseoffset="false" interpret="false" interpretation="1" display="4" majortickmode="5" minortickcount="5" autominortickcount="true" drawmajorticks="true" drawminorticks="true" drawmajorgridlines="true" drawminorgridlines="false" drawmajorgridlinecolor="#a0a0a4" drawminorgridlinecolor="#a0a0a4" drawmajorgridlinestyle="2" drawminorgridlinestyle="2" drawmajorgridlinewidth="1" drawminorgridlinewidth="1" significantdigits="9" rotation="0" zoommode="0">
+                    <plotmarkers xaxis="true" linecolor="#000000" linestyle="1" linewidth="1" curvemode="3"/>
+                </plotaxis>
+                <plotaxis id="yaxis" visible="true" log="false" reversed="false" autobaseoffset="true" baseoffset="false" interpret="false" interpretation="1" display="4" majortickmode="5" minortickcount="5" autominortickcount="true" drawmajorticks="true" drawminorticks="true" drawmajorgridlines="true" drawminorgridlines="false" drawmajorgridlinecolor="#a0a0a4" drawminorgridlinecolor="#a0a0a4" drawmajorgridlinestyle="2" drawminorgridlinestyle="2" drawmajorgridlinewidth="1" drawminorgridlinewidth="1" significantdigits="9" rotation="0" zoommode="1">
+                    <plotmarkers xaxis="false" linecolor="#000000" linestyle="1" linewidth="1" curvemode="40898976"/>
+                </plotaxis>
+                <plotlabel id="leftlabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,9,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="rightlabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,9,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="toplabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,9,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="bottomlabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,9,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="numberlabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,9,-1,5,50,0,0,0,0,0" fontscale="12" fontcolor="#000000" fontuseglobal="true"/>
+                <projectionrect x="0" y="-10.468365275" width="0.002" height="20.93642355"/>
             </plot>
         </view>
     </graphics>
