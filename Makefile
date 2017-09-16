@@ -40,16 +40,16 @@ diode:
 		--test test_dc_bridge_p_unloaded \
 		--test test_dc_bridge_p_loaded
 
-plot:
-	kst2 ${WAVES} -x 1 -y 3
 
-waves/stamp:
-	mkdir -p waves; touch waves/stamp
+bridge_rc: waves/stamp log/stamp
+	cargo test --no-fail-fast \
+		--test test_trans_ir_bridge_rc_load \
+		-- --nocapture | tee log/bridge_rc.log
 
-trans: waves/stamp
+trans: waves/stamp log/stamp
 	cargo test --no-fail-fast \
 		--test test_trans_ir_bridge_loaded \
-		-- --nocapture | tee trans.log
+		-- --nocapture | tee log/trans.log
 
 trans_plot: trans
 	kst2 kst/trans.kst
@@ -59,13 +59,25 @@ cap_dc:
 	cargo test --no-fail-fast \
 		--test test_irrc
 
-cap_lpf:
+cap_lpf: log/stamp waves/stamp
 	cargo test --no-fail-fast \
 		--test test_trans_irrc \
-		-- --nocapture | tee trans_lpf.log
+		-- --nocapture | tee log/trans_lpf.log
 
+cap_hpf: log/stamp waves/stamp
+	cargo test --no-fail-fast \
+		--test test_trans_irrc_hpf \
+		-- --nocapture | tee log/trans_hpf.log
+
+
+waves/stamp:
+	mkdir -p waves; touch waves/stamp
+
+log/stamp:
+	mkdir -p log; touch log/stamp
 
 clean:
 	cargo clean
 	\rm -rf *.log
+	\rm -rf log
 	\rm -rf waves
