@@ -1,0 +1,11 @@
+* RC high-pass filter
+
+I1 0 1 SIN(0 1 10e3)   ; current flows from n+ through to n-
+R1 1 0 1
+Clpf 1 2 0.032uF
+Rlpf 2 0 1k
+
+.control
+  tran 1u 2m
+  plot v(1), v(2)
+.endc
