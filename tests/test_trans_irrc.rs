@@ -30,12 +30,12 @@ fn build( freq: f32 ) -> Circuit {
         Element::R(Resistor{a: 1, b: 0, value: 1.0}),
     );
 
-    // Lowpass filter
+    // Lowpass filter - 5kHz cut-off
     ckt.elements.push(
-        Element::R(Resistor{a: 1, b: 2, value: 1.0e-3}),
+        Element::R(Resistor{a: 1, b: 2, value: 1.0e3}),
     );
     ckt.elements.push(
-        Element::C(Capacitor{a: 2, b: 0, value: 0.01e-6}),
+        Element::C(Capacitor{a: 2, b: 0, value: 0.032e-6}),
     );
     ckt
 }
