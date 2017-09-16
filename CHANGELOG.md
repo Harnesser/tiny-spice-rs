@@ -1,10 +1,14 @@
 # Changelog
 
-## [Unreleased] Transient Analysis
+
+## [0.5.0] Transient Analysis
 Added iteration count based transient analysis.
 
 ### Added
 - Iteration count based time marching algorithm form SPICE2
+- Sinusoidal current source
+- Write names, units & waveform data to a file - to be read with KST
+- Transient analysis works with the diode bridge circuit!
 
 ### Changed
 - Extracted the convergence test to a seperate function

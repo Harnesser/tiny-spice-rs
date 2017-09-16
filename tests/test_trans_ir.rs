@@ -12,7 +12,7 @@ fn test() {
 
     let mut eng = engine::Engine::new();
     let ckt = build();
-    let v = eng.transient_analysis(&ckt);
+    let v = eng.transient_analysis(&ckt, "waves/trans_ir.dat");
     println!("\n*INFO* Done");
 
     assert!(false);

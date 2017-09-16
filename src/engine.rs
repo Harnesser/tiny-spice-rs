@@ -105,6 +105,7 @@ impl Engine {
         // open waveform database
         let mut wavedb = WaveWriter::new(wavefile).unwrap();
         wavedb.header(self.c_nodes, self.c_vsrcs);
+        wavedb.dump_vector(t_now, &unknowns); // DC solution
 
         // timestep loop
         let mut error = false;
@@ -154,8 +155,8 @@ impl Engine {
                 // stamp independent sources
                 self.independent_source_stamp(&mut v, t_try);
 
-                // stamp nonlinear elements
-                // stamp(t_now, t_delta);
+                // stamp companion models of non-linear devices
+                self.nonlinear_stamp(&mut v, &unknowns);
 
                 // update things for next loop
                 unknowns_prev = unknowns.to_vec();
@@ -569,6 +570,7 @@ impl Engine {
                     println!("*INFO* {}", el);
 
                     // linearize
+                    println!("*DEBUG* {} {} {}", n.len(), d.p, d.n);
                     let v_d = n[d.p] - n[d.n];
                     let (g_eq, i_eq) = d.linearize(v_d);
 

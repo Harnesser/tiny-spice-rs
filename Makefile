@@ -48,7 +48,7 @@ waves/stamp:
 
 trans: waves/stamp
 	cargo test --no-fail-fast \
-		--test test_trans_ir_sine \
+		--test test_trans_ir_bridge_loaded \
 		-- --nocapture | tee trans.log
 
 trans_plot: trans
