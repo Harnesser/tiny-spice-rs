@@ -412,10 +412,10 @@ impl Engine {
                     let wiggle = v[r_ref][c_mod];
                     let new = val - (wiggle * ratio); 
                     v[r_mod][c_mod] = new;
-                    println!("\nr_ref = {}, r_mod = {}, c_mod = {}, ratio = {}",
-                             r_ref, r_mod, c_mod, ratio);
-                    println!("{} - {}*{} -> {}", val, wiggle, ratio, new);
-                    self.pp_matrix(&v);
+                    //println!("\nr_ref = {}, r_mod = {}, c_mod = {}, ratio = {}",
+                    //         r_ref, r_mod, c_mod, ratio);
+                    //println!("{} - {}*{} -> {}", val, wiggle, ratio, new);
+                    //self.pp_matrix(&v);
                 }
                 //println!(" ---------------------------------------------- ");
             }
@@ -570,7 +570,6 @@ impl Engine {
                     println!("*INFO* {}", el);
 
                     // linearize
-                    println!("*DEBUG* {} {} {}", n.len(), d.p, d.n);
                     let v_d = n[d.p] - n[d.n];
                     let (g_eq, i_eq) = d.linearize(v_d);
 

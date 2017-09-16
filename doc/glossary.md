@@ -9,6 +9,9 @@
 ## I
 * `IT1` -
 
+## L
+* LTE - Local Truncation Error
+
 ## M
 * MNA - Modified Nodal Analysis. Deal with voltage sources.
 

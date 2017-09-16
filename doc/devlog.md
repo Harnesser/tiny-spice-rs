@@ -1,5 +1,24 @@
 # Development Log
 
+## 2017-09-16
+Last night I got transient analysis working! I even tried it on the diode bridge
+circuit and it was a success!
+
+Interestingly, even with non-linear devices in there, the timestep maxes out on
+this. Maybe that's to be expected - I've nothing that holds energy in the circuit
+so I don't need integration and all that.
+
+The logfile produced for the diode-bridge transient simulation is 4.5M. This is
+huge.
+
+Where to next?
+* L & C models
+* Write out engine metrics
+* Propper logging to quiten output
+* MOSFET model?
+* The LTE timestep thing?
+
+
 ## 2017-09-14
 Think I've an implementation of the iteration-count time-marching loop. Albeit
 that I've just ran it on a static circuit, but at least I can see the timesteps
@@ -25,9 +44,9 @@ Where to I go next?
  - sweeping parameters
  - recording results
 * Transient Analysis
- - sinewave source
- - sweeping time
- - recording waveforms
+ - [DONE] sinewave source
+ - [DONE] sweeping time
+ - [DONE] recording waveforms
  - L & C models mean numerical integration routines
 
 
