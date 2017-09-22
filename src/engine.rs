@@ -22,6 +22,12 @@ pub type ConvergenceResult = Result<bool, ConvergenceError>;
 
 
 pub struct Engine {
+
+    // user-supplied control on the sim time
+    pub TSTART: f32,
+    pub TSTOP: f32,
+    pub TSTEP: f32,
+
     // Number of voltage nodes in the circuit
     c_nodes: usize,
 
@@ -47,6 +53,9 @@ impl Engine {
 
     pub fn new() -> Engine {
         Engine {
+            TSTART: 0.0,
+            TSTOP: 2e-3,
+            TSTEP: 1.0e-5,
             c_nodes: 0,
             c_vsrcs: 0,
             base_matrix: vec![vec![]],
@@ -56,12 +65,8 @@ impl Engine {
         }
     }
 
-    pub fn transient_analysis(&mut self, ckt: &circuit::Circuit, wavefile: &str) {
 
-        // user-supplied control on the sim time
-        const TSTART: f32 = 0.0;
-        const TSTOP: f32 = 2e-3;
-        const TSTEP: f32 = 0.1e-5;
+    pub fn transient_analysis(&mut self, ckt: &circuit::Circuit, wavefile: &str) {
 
         // Iteration limits
 
@@ -84,7 +89,7 @@ impl Engine {
         // 'Struggling' iteration count limit
         // If this count is reached before a solution is found, reduce the 
         // delta-time step and restart the solution attempt
-        const ITL4: usize = 20;
+        const ITL4: usize = 30;
 
 
         // Find the DC operating point
@@ -98,12 +103,13 @@ impl Engine {
         let mut unknowns_prev : Vec<f32> = vec![0.0; c_mna];
 
         // transient loop
-        let mut t_delta = TSTEP * FS;
+        let mut t_delta = self.TSTEP * FS;
         let mut t_now = 0.0;
 
         // announce
         println!("*************************************************************");
-        println!("Transient analysis: {} to {} by {}", TSTART, TSTOP, t_delta);
+        println!("Transient analysis: {} to {} by {}",
+                 self.TSTART, self.TSTOP, self.TSTEP);
 
         // open waveform database
         let mut wavedb = WaveWriter::new(wavefile).unwrap();
@@ -128,7 +134,7 @@ impl Engine {
             // t_delta? pass both?
             // !!!TODO!!!
 
-            if t_now >= TSTART && t_now != 0.0 {
+            if t_now >= self.TSTART && t_now != 0.0 {
                 println!("*DATA*: [{}] t={} : {:?}", c_step, t_now, unknowns);
                 wavedb.dump_vector(t_now, &unknowns);
             }
@@ -170,6 +176,9 @@ impl Engine {
                 // Solve
                 unknowns = self.solve(v);
 
+                if false {
+                    wavedb.dump_vector(t_now, &unknowns);
+                }
                 c_itl += 1;
                 c_iteration += 1;
 
@@ -216,7 +225,7 @@ impl Engine {
                 // reduce the t_delta
                 if !geared & (c_itl < ITL3) {
                     t_delta = t_delta * 2.0;
-                    let t_delta_max = TSTEP * RMAX;
+                    let t_delta_max = self.TSTEP * RMAX;
                     if t_delta > t_delta_max {
                         println!("*INFO* Downshifting maxed out");
                         t_delta = t_delta_max;
@@ -228,8 +237,8 @@ impl Engine {
 
             c_step += 1;
             t_now += t_delta;
-            if t_now > TSTOP {
-                t_now = TSTOP;
+            if t_now > self.TSTOP {
+                t_now = self.TSTOP;
                 is_final_timestep = true;
 
             } // solver
