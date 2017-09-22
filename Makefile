@@ -21,11 +21,11 @@ waves:
 
 test: test_rust test_grep
 
-test_rust:
-	cargo test --no-fail-fast --all | tee test.log
+test_rust: waves/stamp log/stamp
+	cargo test --no-fail-fast --all > log/test.log || echo 0
 
 test_grep:
-	grep "test result" test.log
+	grep "test result" log/test.log
 
 
 newton:
@@ -68,6 +68,9 @@ cap_hpf: log/stamp waves/stamp
 	cargo test --no-fail-fast \
 		--test test_trans_irrc_hpf \
 		-- --nocapture | tee log/trans_hpf.log
+
+blah:
+	egrep --color=always -i "Time|METRIC|shifting|<" log/trans.log | aha > log/interesting.html
 
 
 waves/stamp:
