@@ -7,16 +7,32 @@ mod common;
 use common::assert_nearly;
 
 #[test]
-fn test_trans_ir_sine_1kHz() {
+fn test_trans_ir_sine_1kHz_10us() {
     engine::banner();
 
     let mut eng = engine::Engine::new();
+    eng.TSTEP = 10e-6;
     let ckt = build(1e3);
-    let v = eng.transient_analysis(&ckt, "waves/trans_ird_sine_1kHz.dat");
+    let v = eng.transient_analysis(&ckt, "waves/trans_ird_sine_1kHz_10us.dat");
     println!("\n*INFO* Done");
 
     assert!(false);
 }
+
+
+#[test]
+fn test_trans_ir_sine_1kHz_1us() {
+    engine::banner();
+
+    let mut eng = engine::Engine::new();
+    eng.TSTEP = 1e-6;
+    let ckt = build(1e3);
+    let v = eng.transient_analysis(&ckt, "waves/trans_ird_sine_1kHz_1us.dat");
+    println!("\n*INFO* Done");
+
+    assert!(false);
+}
+
 
 
 fn build( freq: f32 ) -> Circuit {
