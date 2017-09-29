@@ -65,6 +65,23 @@ impl Engine {
         }
     }
 
+    // need to know which element to sweep
+    pub fn dc_sweep(&mut self, ckt: &circuit::Circuit, wavefile: &str) {
+       
+        self.elaborate(&ckt);
+
+        // announce
+        println!("*************************************************************");
+        println!("DC Sweep: {} to {} by {}", 1,1,1);
+
+        // open waveform database
+        let mut wavedb = WaveWriter::new(wavefile).unwrap();
+        wavedb.header(self.c_nodes, self.c_vsrcs);
+
+        // tweak the thing we're sweeping
+
+    }
+
 
     pub fn transient_analysis(&mut self, ckt: &circuit::Circuit, wavefile: &str) {
 
@@ -176,9 +193,12 @@ impl Engine {
                 // Solve
                 unknowns = self.solve(v);
 
-                if false {
+                // enable this to plot delta-time
+                if true {
                     wavedb.dump_vector(t_now, &unknowns);
                 }
+
+                // update loop counters
                 c_itl += 1;
                 c_iteration += 1;
 
