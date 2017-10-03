@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kst version="2.0">
+    <data>
+        <source reader="ASCII file" file="/home/harnesser/Projects/tiny-spice-rs/waves/diode_linearisation.dat" fileRelative="waves/diode_linearisation.dat">
+            <properties vector="INDEX" interpretation="1" delimiters="#" columntype="0" headerstart="2" fields="0" readfields="true" usedot="true" columnwidthisconst="false" readunits="true" units="1"/>
+        </source>
+    </data>
+    <variables>
+        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/diode_linearisation.dat" fileRelative="waves/diode_linearisation.dat" field="Vd" start="0" count="-1" skip="-1" doAve="false" initialVNum="1" initialXNum="1"/>
+        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/diode_linearisation.dat" fileRelative="waves/diode_linearisation.dat" field="G_eq" start="0" count="-1" skip="-1" doAve="false" initialVNum="2" initialXNum="13"/>
+        <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/diode_linearisation.dat" fileRelative="waves/diode_linearisation.dat" field="I_eq" start="0" count="-1" skip="-1" doAve="false" initialVNum="3" initialXNum="25"/>
+        <string value="2017-09-29 21:17:41" initialTNum="1"/>
+        <string value="2017-09-29 21:17:33" initialTNum="2"/>
+        <string value="diode_linearisation.dat" initialTNum="3"/>
+        <string value="/home/harnesser/Projects/tiny-spice-rs/waves" initialTNum="4"/>
+        <string value="V" initialTNum="5"/>
+        <string value="S" initialTNum="6"/>
+        <string value="A" initialTNum="7"/>
+        <string orphan="true" editable="true" value="2017-09-29 21:17:41" initialTNum="1"/>
+        <string orphan="true" editable="true" value="2017-09-29 21:17:33" initialTNum="2"/>
+        <string orphan="true" editable="true" value="diode_linearisation.dat" initialTNum="3"/>
+        <string orphan="true" editable="true" value="/home/harnesser/Projects/tiny-spice-rs/waves" initialTNum="4"/>
+        <string orphan="true" editable="true" value="V" initialTNum="5"/>
+        <string orphan="true" editable="true" value="S" initialTNum="6"/>
+        <string orphan="true" editable="true" value="A" initialTNum="7"/>
+        <string orphan="true" editable="true" value="2017-09-29 21:17:41" initialTNum="1"/>
+        <string orphan="true" editable="true" value="2017-09-29 21:17:33" initialTNum="2"/>
+        <string orphan="true" editable="true" value="diode_linearisation.dat" initialTNum="3"/>
+        <string orphan="true" editable="true" value="/home/harnesser/Projects/tiny-spice-rs/waves" initialTNum="4"/>
+        <string orphan="true" editable="true" value="V" initialTNum="5"/>
+        <string orphan="true" editable="true" value="S" initialTNum="6"/>
+        <string orphan="true" editable="true" value="A" initialTNum="7"/>
+        <string value="2017-09-29 23:33:49" initialTNum="8"/>
+        <string value="2017-09-29 23:33:49" initialTNum="9"/>
+        <string value="sweep_v_rd.dat" initialTNum="10"/>
+        <string value="/home/harnesser/Projects/tiny-spice-rs/waves" initialTNum="11"/>
+    </variables>
+    <objects/>
+    <relations>
+        <curve xvector="Vd (V1)" yvector="G\_eq (V2)" color="#0000ff" headcolor="#000000" haslines="true" linewidth="0" linestyle="0" haspoints="true" pointtype="0" pointdensity="0" hasbars="false" barstyle="0" ignoreautoscale="false" hashead="false" headtype="0" initialCNum="1"/>
+        <curve xvector="Vd (V1)" yvector="I\_eq (V3)" color="#008000" headcolor="#000000" haslines="true" linewidth="0" linestyle="0" haspoints="true" pointtype="1" pointdensity="0" hasbars="false" barstyle="0" ignoreautoscale="false" hashead="false" headtype="0" initialCNum="2"/>
+    </relations>
+    <graphics>
+        <view name="View &amp;1" width="1019" height="626">
+            <plot tiedxzoom="false" tiedyzoom="false" leftlabelvisible="true" bottomlabelvisible="true" rightlabelvisible="true" toplabelvisible="true" globalfont="Noto Sans,12,-1,5,50,0,0,0,0,0" globalfontscale="15.3" globalfontcolor="#000000" showlegend="false" hidebottomaxislabel="false" hidetopaxislabel="false" hideleftaxislabel="false" hiderightaxislabel="false" initialPlotNum="1" name="Plot">
+                <position x="509.694" y="158.2548"/>
+                <rect x="-507.654" y="-154.6809" width="1015.308" height="309.3618"/>
+                <relativesize width="0.9954" height="0.4934" centerx="0.4997" centery="0.2524" posx="0.00199999999999996" posy="0.00570000000000001"/>
+                <transform m11="1" m12="0" m13="0" m21="0" m22="1" m23="0" m31="0" m32="0" m33="1"/>
+                <pen style="1" width="0" miterlimit="2" cap="16" joinStyle="64">
+                    <brush color="#000000" style="1"/>
+                </pen>
+                <brush color="#ffffff" style="1"/>
+                <legend auto="true" title="" font="Noto Sans,9,-1,5,50,0,0,0,0,0" fontscale="12" verticaldisplay="false" name="Legend">
+                    <position x="-448.066165453884" y="-118.425654739898"/>
+                    <rect x="0" y="0" width="0" height="0"/>
+                    <relativesize width="0" height="0" centerx="-0.0601002596255798" centery="0.0957784165043587" posx="-0.0601002596255798" posy="0.0957784165043587"/>
+                    <transform m11="1" m12="0" m13="0" m21="0" m22="1" m23="0" m31="0" m32="0" m33="1"/>
+                    <pen style="1" width="0" miterlimit="2" cap="16" joinStyle="64">
+                        <brush color="#000000" style="1"/>
+                    </pen>
+                    <brush color="#ffffff" style="1"/>
+                </legend>
+                <cartesianrender name="Cartesian Plot" type="1">
+                    <relation tag="G\_eq vs Vd (C1)"/>
+                </cartesianrender>
+                <plotaxis id="xaxis" visible="true" log="false" reversed="false" autobaseoffset="true" baseoffset="false" interpret="false" interpretation="1" display="4" majortickmode="5" minortickcount="5" autominortickcount="true" drawmajorticks="true" drawminorticks="true" drawmajorgridlines="true" drawminorgridlines="false" drawmajorgridlinecolor="#a0a0a4" drawminorgridlinecolor="#a0a0a4" drawmajorgridlinestyle="2" drawminorgridlinestyle="2" drawmajorgridlinewidth="1" drawminorgridlinewidth="1" significantdigits="9" rotation="0" zoommode="0">
+                    <plotmarkers xaxis="true" linecolor="#000000" linestyle="1" linewidth="1" curvemode="0"/>
+                </plotaxis>
+                <plotaxis id="yaxis" visible="true" log="false" reversed="false" autobaseoffset="true" baseoffset="false" interpret="false" interpretation="1" display="4" majortickmode="5" minortickcount="5" autominortickcount="true" drawmajorticks="true" drawminorticks="true" drawmajorgridlines="true" drawminorgridlines="false" drawmajorgridlinecolor="#a0a0a4" drawminorgridlinecolor="#a0a0a4" drawmajorgridlinestyle="2" drawminorgridlinestyle="2" drawmajorgridlinewidth="1" drawminorgridlinewidth="1" significantdigits="9" rotation="0" zoommode="2">
+                    <plotmarkers xaxis="false" linecolor="#000000" linestyle="1" linewidth="1" curvemode="-1052689"/>
+                </plotaxis>
+                <plotlabel id="leftlabel" visible="true" overridetext="G\_eq \[S\]" autolabel="true" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="15.3" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="rightlabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="15.3" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="toplabel" visible="true" overridetext="" autolabel="true" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="15.3" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="bottomlabel" visible="true" overridetext="Vd \[V\]" autolabel="true" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="15.3" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="numberlabel" visible="true" overridetext="" autolabel="false" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="15.3" fontcolor="#000000" fontuseglobal="true"/>
+                <projectionrect x="-5" y="-2e-12" width="9.9500003" height="4e-12"/>
+            </plot>
+            <plot tiedxzoom="true" tiedyzoom="true" leftlabelvisible="true" bottomlabelvisible="true" rightlabelvisible="true" toplabelvisible="true" globalfont="Noto Sans [monotype],12,-1,5,50,0,0,0,0,0" globalfontscale="15.3" globalfontcolor="#000000" showlegend="false" hidebottomaxislabel="false" hidetopaxislabel="false" hideleftaxislabel="false" hiderightaxislabel="false" initialPlotNum="1" name="Plot">
+                <position x="509.694" y="467.6166"/>
+                <rect x="-507.654" y="-154.6809" width="1015.308" height="309.3618"/>
+                <relativesize width="0.9954" height="0.4934" centerx="0.4997" centery="0.7458" posx="0.00199999999999996" posy="0.4991"/>
+                <transform m11="1" m12="0" m13="0" m21="0" m22="1" m23="0" m31="0" m32="0" m33="1"/>
+                <pen style="1" width="0" miterlimit="2" cap="16" joinStyle="64">
+                    <brush color="#000000" style="1"/>
+                </pen>
+                <brush color="#ffffff" style="1"/>
+                <legend auto="true" title="" font="Noto Sans,9,-1,5,50,0,0,0,0,0" fontscale="12" verticaldisplay="false" name="Legend">
+                    <position x="-448.066165453884" y="-118.425654739898"/>
+                    <rect x="0" y="0" width="0" height="0"/>
+                    <relativesize width="0" height="0" centerx="-0.0601002596255798" centery="0.0957784165043587" posx="-0.0601002596255798" posy="0.0957784165043587"/>
+                    <transform m11="1" m12="0" m13="0" m21="0" m22="1" m23="0" m31="0" m32="0" m33="1"/>
+                    <pen style="1" width="0" miterlimit="2" cap="16" joinStyle="64">
+                        <brush color="#000000" style="1"/>
+                    </pen>
+                    <brush color="#ffffff" style="1"/>
+                </legend>
+                <cartesianrender name="Cartesian Plot" type="1">
+                    <relation tag="I\_eq vs Vd (C2)"/>
+                </cartesianrender>
+                <plotaxis id="xaxis" visible="true" log="false" reversed="false" autobaseoffset="true" baseoffset="false" interpret="false" interpretation="1" display="4" majortickmode="5" minortickcount="5" autominortickcount="true" drawmajorticks="true" drawminorticks="true" drawmajorgridlines="true" drawminorgridlines="false" drawmajorgridlinecolor="#a0a0a4" drawminorgridlinecolor="#a0a0a4" drawmajorgridlinestyle="2" drawminorgridlinestyle="2" drawmajorgridlinewidth="1" drawminorgridlinewidth="1" significantdigits="9" rotation="0" zoommode="0">
+                    <plotmarkers xaxis="true" linecolor="#000000" linestyle="1" linewidth="1" curvemode="3"/>
+                </plotaxis>
+                <plotaxis id="yaxis" visible="true" log="false" reversed="false" autobaseoffset="true" baseoffset="false" interpret="false" interpretation="1" display="4" majortickmode="5" minortickcount="5" autominortickcount="true" drawmajorticks="true" drawminorticks="true" drawmajorgridlines="true" drawminorgridlines="false" drawmajorgridlinecolor="#a0a0a4" drawminorgridlinecolor="#a0a0a4" drawmajorgridlinestyle="2" drawminorgridlinestyle="2" drawmajorgridlinewidth="1" drawminorgridlinewidth="1" significantdigits="9" rotation="0" zoommode="2">
+                    <plotmarkers xaxis="false" linecolor="#000000" linestyle="1" linewidth="1" curvemode="-789517"/>
+                </plotaxis>
+                <plotlabel id="leftlabel" visible="true" overridetext="I\_eq \[A\]" autolabel="true" font="Noto Sans [monotype],12,-1,5,50,0,0,0,0,0" fontscale="15.3" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="rightlabel" visible="true" overridetext="" autolabel="true" font="Noto Sans [monotype],12,-1,5,50,0,0,0,0,0" fontscale="15.3" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="toplabel" visible="true" overridetext="" autolabel="true" font="Noto Sans [monotype],12,-1,5,50,0,0,0,0,0" fontscale="15.3" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="bottomlabel" visible="true" overridetext="Vd \[V\]" autolabel="true" font="Noto Sans [monotype],12,-1,5,50,0,0,0,0,0" fontscale="15.3" fontcolor="#000000" fontuseglobal="true"/>
+                <plotlabel id="numberlabel" visible="true" overridetext="" autolabel="false" font="Noto Sans [monotype],12,-1,5,50,0,0,0,0,0" fontscale="15.3" fontcolor="#000000" fontuseglobal="true"/>
+                <projectionrect x="-5" y="-2e-09" width="9.9500003" height="4e-09"/>
+            </plot>
+        </view>
+    </graphics>
+</kst>
