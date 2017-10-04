@@ -1,4 +1,5 @@
 
+use analysis;
 use circuit;
 use circuit::NodeId;
 use wavewriter::WaveWriter;
@@ -110,7 +111,7 @@ impl Engine {
 
             self.stamp_voltage_source(&mut mna, &v_src, i_vsrc);
             
-            let unknowns = self.dc_solve(&mna);
+            let (unknowns, stats) = self.dc_solve(&mna);
             wavedb.dump_vector(v_sweep, &unknowns);
 
         }
@@ -118,7 +119,12 @@ impl Engine {
     }
 
 
-    pub fn transient_analysis(&mut self, ckt: &circuit::Circuit, wavefile: &str) {
+    pub fn transient_analysis(
+        &mut self,
+        ckt: &circuit::Circuit,
+        wavefile: &str) 
+    -> analysis::Statistics
+    {
 
         // Iteration limits
 
@@ -147,7 +153,7 @@ impl Engine {
         // Find the DC operating point
         // used as the initial values in the transient simulation
         // this will also build the circuit
-        let mut unknowns : Vec<f32> = self.dc_operating_point(&ckt);
+        let (mut unknowns, dc_op_stats) = self.dc_operating_point(&ckt);
         println!("*INFO*: DC : {:?}", &unknowns);
 
         // prep values
@@ -306,13 +312,18 @@ impl Engine {
         } // time
 
         println!("*INFO* Finished at time {}", t_now);
-
+        analysis::Statistics {
+            kind: analysis::Kind::Transient,
+            end: t_now,
+            iterations: dc_op_stats.iterations + c_iteration,
+        }
     }
 
 
     // assume circuit has been elaborated
-    fn dc_solve(&mut self, mna: &Vec<Vec<f32>>) -> Vec<f32> {
-
+    fn dc_solve(&mut self, mna: &Vec<Vec<f32>>)
+        -> (Vec<f32>, analysis::Statistics)
+    {
         const ITL1: usize = 50;
 
         // prep values for convergence checks
@@ -376,12 +387,20 @@ impl Engine {
             println!("*ERROR* Divergent");
         }
 
-        unknowns
+        let stats = analysis::Statistics {
+            kind: analysis::Kind::DC_Operating_Point,
+            end: 0.0,
+            iterations: c_iteration,
+        };
+            
+        (unknowns, stats)
     }
 
 
 
-    pub fn dc_operating_point(&mut self, ckt: &circuit::Circuit) -> Vec<f32> {
+    pub fn dc_operating_point(&mut self, ckt: &circuit::Circuit)
+        -> (Vec<f32>, analysis::Statistics)
+    {
 
         // build the circuit matrix
         self.elaborate(&ckt);

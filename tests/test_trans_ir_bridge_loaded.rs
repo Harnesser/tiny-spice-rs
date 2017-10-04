@@ -14,8 +14,9 @@ fn test_trans_ir_bridge_1kHz_10us() {
     eng.TSTEP = 10e-6;
     let ckt = build_old(1.0e3);
     //let ckt = build_old(0.24e3); // fails at or below this
-    let v = eng.transient_analysis(&ckt, "waves/trans_ir_bridge_1kHz_10us.dat");
+    let stats = eng.transient_analysis(&ckt, "waves/trans_ir_bridge_1kHz_10us.dat");
     println!("\n*INFO* Done");
+    println!("{}", stats);
 
     assert!(false);
 }
@@ -29,8 +30,9 @@ fn test_trans_ir_bridge_1kHz_1us() {
     eng.TSTEP = 1.0e-6;
     let ckt = build_old(1.0e3);
     //let ckt = build_old(2.1e3); // passes above this
-    let v = eng.transient_analysis(&ckt, "waves/trans_ir_bridge_1kHz_1us.dat");
+    let stats = eng.transient_analysis(&ckt, "waves/trans_ir_bridge_1kHz_1us.dat");
     println!("\n*INFO* Done");
+    println!("{}", stats);
 
     assert!(false);
 }
