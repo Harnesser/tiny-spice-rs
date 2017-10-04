@@ -40,6 +40,17 @@ diode:
 		--test test_dc_bridge_p_unloaded \
 		--test test_dc_bridge_p_loaded
 
+diode_lin: diode_lin_run
+	grep DATA log/diode.log | sed -e "s/DATA //" > waves/diode_linearisation.dat
+
+diode_lin_run:
+	cargo test curve_trace -- --nocapture > log/diode.log
+
+sweep_vrd:
+	cargo test --no-fail-fast \
+		--test test_sweep_v_rd \
+		-- --nocapture | tee log/sweep_v_rd.log
+
 
 bridge_rc: waves/stamp log/stamp
 	cargo test --no-fail-fast \

@@ -67,18 +67,53 @@ impl Engine {
 
     // need to know which element to sweep
     pub fn dc_sweep(&mut self, ckt: &circuit::Circuit, wavefile: &str) {
-       
+        const VSTART: f32 = -3.0;
+        const VSTOP: f32 = 5.0;
+        const VSTEPS: usize = 100;
+
+        let v_step = (VSTOP - VSTART) / VSTEPS as f32;
+
         self.elaborate(&ckt);
 
         // announce
         println!("*************************************************************");
-        println!("DC Sweep: {} to {} by {}", 1,1,1);
+        println!("DC Sweep: {} to {} by {}", VSTART, VSTOP, v_step);
 
         // open waveform database
         let mut wavedb = WaveWriter::new(wavefile).unwrap();
         wavedb.header(self.c_nodes, self.c_vsrcs);
 
+        // FUCK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // have to stamp this all the time
+        // FIXCasdfkj disf=
+        //0]
+        //
+
+        // FIXME very fragile - what if there's more than one voltage source in
+        // the design?
+        let mut i_vsrc : usize = self.c_nodes; // index, not amperage...
+
         // tweak the thing we're sweeping
+        for s in 0..VSTEPS {
+            let v_sweep = VSTART + (v_step * s as f32);
+            //let self.
+
+            let mut mna = self.base_matrix.clone();
+
+            // unstamp the voltage source
+            // FIXME - assume it's 0V
+            let v_src = circuit::VoltageSource{
+                p: 1,
+                n: 0,
+                value: v_sweep,
+            };
+
+            self.stamp_voltage_source(&mut mna, &v_src, i_vsrc);
+            
+            let unknowns = self.dc_solve(&mna);
+            wavedb.dump_vector(v_sweep, &unknowns);
+
+        }
 
     }
 
@@ -194,7 +229,7 @@ impl Engine {
                 unknowns = self.solve(v);
 
                 // enable this to plot delta-time
-                if true {
+                if true { // DELTATIME
                     wavedb.dump_vector(t_now, &unknowns);
                 }
 
@@ -274,13 +309,12 @@ impl Engine {
 
     }
 
-    pub fn dc_operating_point(&mut self, ckt: &circuit::Circuit) -> Vec<f32> {
+
+    // assume circuit has been elaborated
+    fn dc_solve(&mut self, mna: &Vec<Vec<f32>>) -> Vec<f32> {
 
         const ITL1: usize = 50;
 
-        // build the circuit matrix
-        self.elaborate(&ckt);
-       
         // prep values for convergence checks
         let c_mna = self.c_nodes + self.c_vsrcs;
         let mut unknowns_prev : Vec<f32> = vec![0.0; c_mna];
@@ -296,7 +330,7 @@ impl Engine {
             // copy the base matrix, cos we're going to change it a lot:
             // * stamp non-linear element companion models
             // * re-order during guassian elimination
-            let mut v = self.base_matrix.clone();
+            let mut v = mna.clone();
 
             // Stamp independent sources at time=0.0
             // !!!FIXME!!! - hoist out of loop?
@@ -343,6 +377,18 @@ impl Engine {
         }
 
         unknowns
+    }
+
+
+
+    pub fn dc_operating_point(&mut self, ckt: &circuit::Circuit) -> Vec<f32> {
+
+        // build the circuit matrix
+        self.elaborate(&ckt);
+
+        // cos borrowck
+        let mna = self.base_matrix.clone();
+        self.dc_solve(&mna)
     }
 
 
