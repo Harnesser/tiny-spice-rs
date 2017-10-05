@@ -87,31 +87,11 @@ blah:
 loop_halfbridge:
 	sh bin/loop.sh test_trans_irrd_sine loop
 
+loop_fullbridge:
+	sh bin/loop.sh test_trans_ir_bridge_loaded loop
 
-loop: loop_run
-	egrep --color=always -a2 "ANALYSIS|LOOPRESULT" log/loop.log
-
-loop_run: waves/loop/stamp
-	cargo test --release --no-fail-fast \
-		--test test_trans_ir_bridge_loaded_loop \
-		-- --nocapture --ignored > log/loop.log
-
-waves/loop/stamp:
-	mkdir -p waves/loop; touch waves/loop/stamp
-
-
-loop_lpf: loop_lpf_run
-	egrep --color=always -a2 "ANALYSIS|LOOPRESULT" log/loop_lpf.log
-
-loop_lpf_run: waves/loop_lpf/stamp
-	cargo test --release --no-fail-fast \
-		--test test_trans_irrc_lpf_loop \
-		-- --nocapture --ignored > log/loop_lpf.log
-
-waves/loop_lpf/stamp:
-	mkdir -p waves/loop_lpf; touch waves/loop_lpf/stamp
-
-
+loop_lpf:
+	sh bin/loop.sh test_trans_irrc lpf_loop
 
 
 waves/stamp:

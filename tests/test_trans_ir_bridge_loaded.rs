@@ -37,6 +37,38 @@ fn test_trans_ir_bridge_1kHz_1us() {
     assert!(false);
 }
 
+#[test]
+#[ignore]
+fn test_trans_ir_bridge_loaded_loop() {
+    engine::banner();
+
+    let timesteps = [10e-6, 5e-6, 2e-6, 1e-6];
+    let freqs = [3.0e3, 2.5e3, 2.0e3, 1.0e3, 0.5e3, 0.4e3, 0.3e3, 0.2e3, 0.1e3, 0.05e3];
+
+    let mut i = 0;
+    for timestep in timesteps.iter() {
+        for freq in freqs.iter() {
+
+            let mut eng = engine::Engine::new();
+            eng.TSTEP = *timestep;
+            eng.TSTOP = 2.0e-3;
+            let ckt = build_old(*freq);
+
+            let filename = format!("waves/test_trans_ir_bridge_loaded_loop/{:03}.dat", i);
+            let stats = eng.transient_analysis(&ckt, &filename);
+            println!("{}", stats);
+            if stats.end >= eng.TSTOP {
+                println!("LOOPRESULT {} {} GOOD\n\n", timestep, freq);
+            } else {
+                println!("LOOPRESULT {} {} BAD\n\n", timestep, freq);
+            }
+
+            i += 1;
+        }
+    }
+}
+
+
 #[allow(dead_code)]
 fn build(freq: f32) -> Circuit {
     let mut ckt = Circuit::new();
