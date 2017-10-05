@@ -12,7 +12,7 @@ fn test() {
 
     let mut eng = engine::Engine::new();
     let ckt = build();
-    let v = eng.dc_operating_point(&ckt);
+    let (v,_) = eng.dc_operating_point(&ckt);
     println!("\n*INFO* Done");
 
     assert_nearly(v[1], 5.0);
