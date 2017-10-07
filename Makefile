@@ -81,7 +81,11 @@ cap_hpf: log/stamp waves/stamp
 		-- --nocapture | tee log/trans_hpf.log
 
 blah:
-	egrep --color=always -i "Time|METRIC|shifting|<" log/trans.log | aha > log/interesting.html
+	egrep \
+		--color=always \
+		-i "Time|METRIC|shifting|<" \
+		log/trans.log \
+		| aha > log/interesting.html
 
 
 loop_halfbridge:

@@ -19,4 +19,11 @@ egrep \
 	log/${name}.log
 
 
+mkdir -p log/html
+egrep \
+	--color=always \
+	-i "Time|METRIC|shifting|<|LOOPRESULT" \
+	log/${name}.log \
+	| aha > log/html/${name}.html
+
 exit 0
