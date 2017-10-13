@@ -1,4 +1,4 @@
-use circuit::{NodeId, GMIN};
+use circuit::{NodeId};
 
 #[derive(Clone)]
 pub struct Capacitor {

@@ -4,7 +4,7 @@ use circuit;
 use circuit::NodeId;
 use wavewriter::WaveWriter;
 
-pub fn banner() {
+fn banner() {
 
     println!("********************************************");
     println!("***       Tiny-SPICE-Simulator           ***");
@@ -22,6 +22,7 @@ pub enum ConvergenceError {
 pub type ConvergenceResult = Result<bool, ConvergenceError>;
 
 
+#[allow(non_snake_case)]
 pub struct Engine {
 
     // user-supplied control on the sim time
@@ -53,6 +54,7 @@ pub struct Engine {
 impl Engine {
 
     pub fn new() -> Engine {
+        banner();
         Engine {
             TSTART: 0.0,
             TSTOP: 2e-3,
@@ -149,7 +151,6 @@ impl Engine {
         // delta-time step and restart the solution attempt
         const ITL4: usize = 30;
 
-
         // Find the DC operating point
         // used as the initial values in the transient simulation
         // this will also build the circuit
@@ -166,8 +167,12 @@ impl Engine {
 
         // announce
         println!("*************************************************************");
-        println!("Transient analysis: {} to {} by {}",
-                 self.TSTART, self.TSTOP, self.TSTEP);
+        println!("*CONFIG* TRANSIENT ANALYSIS");
+        println!("*CONFIG* TIME {} to {} by {}", self.TSTART, self.TSTOP, self.TSTEP);
+        println!("*CONFIG* ITL3 = {}; ITL4 = {}", ITL3, ITL4);
+        println!("*CONFIG* FS = {}; FT = {}", FS, FT);
+        println!("*CONFIG* RMIN ={}; RMAX = {}", RMIN, RMAX);
+        println!("*************************************************************");
 
         // open waveform database
         let mut wavedb = WaveWriter::new(wavefile).unwrap();
@@ -175,7 +180,6 @@ impl Engine {
         wavedb.dump_vector(t_now, &unknowns); // DC solution
 
         // timestep loop
-        let mut error = false;
         let mut is_final_timestep = false;
         let mut c_step = 0;
         let mut c_iteration: usize = 0;
@@ -185,12 +189,6 @@ impl Engine {
             // This comes from either:
             // * the initial calculation after DC on the initial iteration
             // * the prevous go round the loop for other iterations
-            let t_try = t_now + t_delta;
-
-            // stamp non-linear components, passing in the current time as
-            // some ... dunno sinewaves will take t_try, but maybe caps need
-            // t_delta? pass both?
-            // !!!TODO!!!
 
             if t_now >= self.TSTART && t_now != 0.0 {
                 println!("*DATA*: [{}] t={} : {:?}", c_step, t_now, unknowns);
@@ -212,10 +210,12 @@ impl Engine {
             let mut c_itl: usize = 0;
             let mut unknowns_solve : Vec<f32> = vec![0.0; c_mna];
             let mut geared = false;
+            let mut mse :f32 = 0.0;
 
             loop {
-                println!("*METRIC* {} {} {} {} {}",
-                         c_step, t_now, t_delta, c_iteration, c_itl);
+
+                println!("*METRIC* {} {} {} {} {} {}",
+                         c_step, t_now, t_delta, c_iteration, c_itl, mse);
 
                 // copy the base matrix, cos we're going to change it a lot:
                 // * stamp non-linear element companion models
@@ -233,11 +233,10 @@ impl Engine {
 
                 // Solve
                 unknowns = self.solve(v);
+                mse = self.mean_squared_error(&unknowns_solve, &unknowns);
 
                 // enable this to plot delta-time
-                if true { // DELTATIME
-                    wavedb.dump_vector(t_now, &unknowns);
-                }
+                wavedb.dump_vector(t_now, &unknowns);
 
                 // update loop counters
                 c_itl += 1;
@@ -388,7 +387,7 @@ impl Engine {
         }
 
         let stats = analysis::Statistics {
-            kind: analysis::Kind::DC_Operating_Point,
+            kind: analysis::Kind::DcOperatingPoint,
             end: 0.0,
             iterations: c_iteration,
         };
@@ -533,12 +532,10 @@ impl Engine {
                 //println!(" ---------------------------------------------- ");
             }
         }
-        println!("\n*INFO* Final Matrix");
-        self.pp_matrix(&v);
+        //println!("\n*INFO* Final Matrix");
+        //self.pp_matrix(&v);
       
         // TODO check result
-
-
 
         println!("\n*INFO* Back-substitution");
 
@@ -597,6 +594,18 @@ impl Engine {
         }
         r_biggest
     }
+
+    // mean squared error of the two vectors
+    fn mean_squared_error(&self, v1: &Vec<f32>, v2: &Vec<f32>) -> f32 {
+        let mut mse :f32 = 0.0;
+        let bits = v1.iter().zip(v2.iter());
+        for (x,y) in bits {
+            mse += ( x - y ).powi(2);
+        }
+        mse = mse / (v1.len() as f32);
+        mse
+    }
+
 
     fn pp_matrix(&self, m : &Vec<Vec<f32>> ) {
         for r in m {
@@ -700,8 +709,8 @@ impl Engine {
                 _ => { println!("*ERROR* - unrecognised storage element"); }
             }
         }
-        println!("*INFO* Energy storage stamped matrix");
-        self.pp_matrix(&m);
+        //println!("*INFO* Energy storage stamped matrix");
+        //self.pp_matrix(&m);
     }
 
 
@@ -712,11 +721,12 @@ impl Engine {
         for el in &self.nonlinear_elements {
             match *el {
                 circuit::Element::D(ref d) => {
-                    println!("*INFO* {}", el);
 
                     // linearize
                     let v_d = n[d.p] - n[d.n];
                     let (g_eq, i_eq) = d.linearize(v_d);
+
+                    println!("*INFO* {} {} {:?}", el, v_d, (g_eq, i_eq));
 
                     // stamp
                     self.stamp_current_source(m, &circuit::CurrentSource{
@@ -734,8 +744,8 @@ impl Engine {
                 _ => { println!("*ERROR* - unrecognised nonlinear element"); }
             }
         }
-        println!("*INFO* Non-linear stamped matrix");
-        self.pp_matrix(&m);
+        //println!("*INFO* Non-linear stamped matrix");
+        //self.pp_matrix(&m);
     }
 
 
@@ -762,8 +772,8 @@ impl Engine {
                 _ => { println!("*ERROR* - unrecognised independent source element"); }
             }
         }
-        println!("*INFO* Independent source stamped matrix");
-        self.pp_matrix(&m);
+        //println!("*INFO* Independent source stamped matrix");
+        //self.pp_matrix(&m);
     }
 
 

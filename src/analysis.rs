@@ -1,17 +1,17 @@
 use std::fmt;
 
 pub enum Kind {
-    DC_Operating_Point,
-    DC_Sweep,
+    DcOperatingPoint,
+    DcSweep,
     Transient,
 }
 
 impl fmt::Display for Kind {
     fn fmt (&self, f:&mut fmt::Formatter) -> fmt::Result {
         match *self {
-            ref Transient => write!(f, "Transient"),
-            ref DC_Sweep => write!(f, "DC Sweep"),
-            ref DC_Operating_Point => write!(f, "DC Operating Point"),
+            Kind::Transient => write!(f, "Transient"),
+            Kind::DcOperatingPoint => write!(f, "DC Operating Point"),
+            Kind::DcSweep => write!(f, "DC Sweep"),
         }
     }
 }

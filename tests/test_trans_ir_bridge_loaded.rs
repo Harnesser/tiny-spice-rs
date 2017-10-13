@@ -3,17 +3,13 @@ extern crate tiny_spice;
 use tiny_spice::circuit::*;
 use tiny_spice::engine;
 
-mod common;
-use common::assert_nearly;
-
 #[test]
+#[allow(non_snake_case)]
 fn test_trans_ir_bridge_1kHz_10us() {
-    engine::banner();
 
     let mut eng = engine::Engine::new();
     eng.TSTEP = 10e-6;
     let ckt = build_old(2.0, 1.0e3);
-    //let ckt = build_old(0.24e3); // fails at or below this
     let stats = eng.transient_analysis(&ckt, "waves/trans_ir_bridge_1kHz_10us.dat");
     println!("\n*INFO* Done");
     println!("{}", stats);
@@ -22,14 +18,12 @@ fn test_trans_ir_bridge_1kHz_10us() {
 
 
 #[test]
-#[ignore]
+#[allow(non_snake_case)]
 fn test_trans_ir_bridge_1kHz_1us() {
-    engine::banner();
 
     let mut eng = engine::Engine::new();
     eng.TSTEP = 1.0e-6;
     let ckt = build_old(2.0, 1.0e3);
-    //let ckt = build_old(2.1e3); // passes above this
     let stats = eng.transient_analysis(&ckt, "waves/trans_ir_bridge_1kHz_1us.dat");
     println!("\n*INFO* Done");
     println!("{}", stats);
@@ -38,8 +32,8 @@ fn test_trans_ir_bridge_1kHz_1us() {
 
 #[test]
 #[ignore]
+#[allow(non_snake_case)]
 fn test_trans_ir_bridge_loaded_loop() {
-    engine::banner();
 
     let timesteps = [10e-6, 5e-6, 2e-6, 1e-6];
     let amps = [-2.0, -1.0, -0.5, 0.5, 1.0, 2.0];
@@ -91,8 +85,8 @@ fn build(freq: f32) -> Circuit {
     //  (1) is top
     //  (2) is bottom
     ckt.elements.push( Element::D(Diode{p: 1, n: 3, i_sat: 1e-9, tdegc: 27.0}) );
-    ckt.elements.push( Element::D(Diode{p: 2, n: 1, i_sat: 1e-9, tdegc: 27.0}) );
-    ckt.elements.push( Element::D(Diode{p: 0, n: 3, i_sat: 1e-9, tdegc: 27.0}) );
+    //ckt.elements.push( Element::D(Diode{p: 2, n: 1, i_sat: 1e-9, tdegc: 27.0}) );
+    //ckt.elements.push( Element::D(Diode{p: 0, n: 3, i_sat: 1e-9, tdegc: 27.0}) );
     ckt.elements.push( Element::D(Diode{p: 2, n: 0, i_sat: 1e-9, tdegc: 27.0}) );
 
     // load
@@ -105,7 +99,7 @@ fn build(freq: f32) -> Circuit {
 #[allow(dead_code)]
 fn build_old(amp: f32, freq: f32) -> Circuit {
     let mut ckt = Circuit::new();
-
+    const I_SAT:f32 = 1e-9;
     // bridge input voltage
     //ckt.elements.push(Element::V(VoltageSource{p: 1, n: 2, value: 10.0}));
     ckt.elements.push(
@@ -121,10 +115,10 @@ fn build_old(amp: f32, freq: f32) -> Circuit {
     // Diode bridge
     //  (1) is top
     //  (2) is bottom
-    ckt.elements.push( Element::D(Diode{p: 1, n: 3, i_sat: 2e-9, tdegc: 27.0}) );
-    //ckt.elements.push( Element::D(Diode{p: 4, n: 1, i_sat: 2e-9, tdegc: 27.0}) );
-    //ckt.elements.push( Element::D(Diode{p: 2, n: 3, i_sat: 2e-9, tdegc: 27.0}) );
-    ckt.elements.push( Element::D(Diode{p: 4, n: 2, i_sat: 2e-9, tdegc: 27.0}) );
+    ckt.elements.push( Element::D(Diode{p: 1, n: 3, i_sat: I_SAT, tdegc: 27.0}) );
+    //ckt.elements.push( Element::D(Diode{p: 4, n: 1, i_sat: I_SAT, tdegc: 27.0}) );
+    //ckt.elements.push( Element::D(Diode{p: 2, n: 3, i_sat: I_SAT, tdegc: 27.0}) );
+    ckt.elements.push( Element::D(Diode{p: 4, n: 2, i_sat: I_SAT, tdegc: 27.0}) );
 
     // load
     ckt.elements.push( Element::R(Resistor{a: 3, b: 4, value: 1000.0}) );

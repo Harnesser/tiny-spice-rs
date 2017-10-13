@@ -5,7 +5,6 @@ use tiny_spice::engine;
 
 
 fn main() {
-    engine::banner();
 
     let mut eng = engine::Engine::new();
 
