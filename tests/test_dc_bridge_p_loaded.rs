@@ -8,7 +8,6 @@ use common::assert_nearly;
 
 #[test]
 fn test_v() {
-    engine::banner();
 
     let mut eng = engine::Engine::new();
     let ckt = build_v();
@@ -21,7 +20,6 @@ fn test_v() {
 
 #[test]
 fn test_vv() {
-    engine::banner();
 
     let mut eng = engine::Engine::new();
     let ckt = build_vv();

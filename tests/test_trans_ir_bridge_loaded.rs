@@ -18,6 +18,7 @@ fn test_trans_ir_bridge_1kHz_10us() {
 
 
 #[test]
+#[ignore]
 #[allow(non_snake_case)]
 fn test_trans_ir_bridge_1kHz_1us() {
 

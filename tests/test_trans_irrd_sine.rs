@@ -8,7 +8,6 @@ use common::assert_nearly;
 
 #[test]
 fn test_trans_irrd_sine_1kHz_10us() {
-    engine::banner();
 
     let mut eng = engine::Engine::new();
     eng.TSTEP = 10e-6;
@@ -22,7 +21,6 @@ fn test_trans_irrd_sine_1kHz_10us() {
 
 #[test]
 fn test_trans_irrd_sine_1kHz_1us() {
-    engine::banner();
 
     let mut eng = engine::Engine::new();
     eng.TSTEP = 1e-6;
@@ -37,7 +35,6 @@ fn test_trans_irrd_sine_1kHz_1us() {
 #[test]
 #[ignore]
 fn test_trans_irrd_sine_loop() {
-    engine::banner();
 
     let timesteps = [10e-6, 5e-6, 2e-6, 1e-6];
     let freqs = [3.0e3, 2.5e3, 2.0e3, 1.0e3, 0.5e3, 0.4e3, 0.3e3, 0.2e3, 0.1e3, 0.05e3];

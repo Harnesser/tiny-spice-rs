@@ -8,7 +8,6 @@ use common::assert_nearly;
 
 #[test]
 fn test_irrc_trans_hpf_1kHz() {
-    engine::banner();
 
     let mut eng = engine::Engine::new();
     eng.TSTEP = 1e-6;
@@ -21,7 +20,6 @@ fn test_irrc_trans_hpf_1kHz() {
 
 #[test]
 fn test_irrc_trans_hpf_2kHz() {
-    engine::banner();
 
     let mut eng = engine::Engine::new();
     eng.TSTEP = 1e-6;
@@ -34,7 +32,6 @@ fn test_irrc_trans_hpf_2kHz() {
 
 #[test]
 fn test_irrc_trans_hpf_5kHz() {
-    engine::banner();
 
     let mut eng = engine::Engine::new();
     eng.TSTEP = 1e-6;
@@ -47,7 +44,6 @@ fn test_irrc_trans_hpf_5kHz() {
 
 #[test]
 fn test_irrc_trans_hpf_10kHz() {
-    engine::banner();
 
     let mut eng = engine::Engine::new();
     eng.TSTEP = 1e-6;

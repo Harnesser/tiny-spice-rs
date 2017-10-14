@@ -5,7 +5,6 @@ use tiny_spice::engine;
 
 #[test]
 fn test_sweep_v_rd() {
-    engine::banner();
 
     let mut eng = engine::Engine::new();
     let ckt = build();

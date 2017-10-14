@@ -8,7 +8,6 @@ use common::assert_nearly;
 
 #[test]
 fn test() {
-    engine::banner();
 
     let mut eng = engine::Engine::new();
     let ckt = build();

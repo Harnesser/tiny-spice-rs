@@ -8,7 +8,6 @@ use common::assert_nearly;
 
 #[test]
 fn test_trans_ir_bridge_rc_1kHz() {
-    engine::banner();
 
     let mut eng = engine::Engine::new();
     let ckt = build(1e3);

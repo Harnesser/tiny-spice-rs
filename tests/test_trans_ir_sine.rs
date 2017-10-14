@@ -8,7 +8,6 @@ use common::assert_nearly;
 
 #[test]
 fn test_trans_ir_sine_10Hz() {
-    engine::banner();
 
     let mut eng = engine::Engine::new();
     let ckt = build(10.0);
@@ -21,7 +20,6 @@ fn test_trans_ir_sine_10Hz() {
 
 #[test]
 fn test_trans_ir_sine_1kHz() {
-    engine::banner();
 
     let mut eng = engine::Engine::new();
     let ckt = build(1e3);
