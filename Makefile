@@ -15,10 +15,6 @@ debug:
 clippy:
 	rustup run nightly cargo clippy
 
-
-waves:
-	gtkwave --dump waves.vcd --save plot.gtkw
-
 test: test_rust test_grep
 
 test_rust: waves/stamp log/stamp
@@ -60,7 +56,7 @@ bridge_rc: waves/stamp log/stamp
 trans: waves/stamp log/stamp
 	cargo test --no-fail-fast \
 		--test test_trans_ir_bridge_loaded \
-		-- --nocapture | tee log/trans.log
+		-- --nocapture > log/trans.log
 
 trans_plot: trans
 	kst2 kst/trans.kst
@@ -87,6 +83,8 @@ blah:
 		log/trans.log \
 		| aha > log/interesting.html
 
+
+# Run the _loop tests 
 
 loop_halfbridge:
 	sh bin/loop.sh test_trans_irrd_sine loop

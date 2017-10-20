@@ -70,7 +70,7 @@ mod tests {
     fn curve_trace() {
         const VMAX: f32 = 5.0;
         const POINTS: i32 = 100;
-        let diode = Diode{p:0, n:1, i_sat:1e-9, tdegc:27.0};
+        let diode = Diode{p:0, n:1, i_sat:1e-12, tdegc:27.0};
         println!("DATA pt Vd G_eq I_eq I_d");
         println!("DATA int V S A A");
         for pt in -POINTS..POINTS {

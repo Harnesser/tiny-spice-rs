@@ -4,6 +4,12 @@ use circuit;
 use circuit::NodeId;
 use wavewriter::WaveWriter;
 
+// The boyos 
+const RELTOL: f32 = 0.0001;
+const VNTOL: f32 = 1.0e-6;
+const ABSTOL: f32 = 1.0e-9;
+
+
 fn banner() {
 
     println!("********************************************");
@@ -136,8 +142,8 @@ impl Engine {
         // Timestamp adjustment factor on iteration failure
         const FT: f32 = 0.25;
 
-        // Smallest delta-time step allowed
-        const RMIN: f32 = 1e-9;
+        // Smallest delta-time step allowed = RMIN * TSTEP
+        const RMIN: f32 = 1e-3;
 
         // Largest delta-time step allowed factor
         const RMAX: f32 = 5.0;
@@ -163,15 +169,19 @@ impl Engine {
 
         // transient loop
         let mut t_delta = self.TSTEP * FS;
+        let t_delta_min = self.TSTEP * RMIN;
         let mut t_now = 0.0;
 
         // announce
         println!("*************************************************************");
         println!("*CONFIG* TRANSIENT ANALYSIS");
-        println!("*CONFIG* TIME {} to {} by {}", self.TSTART, self.TSTOP, self.TSTEP);
+        println!("*CONFIG* TIME {} to {} by {}",
+                 self.TSTART, self.TSTOP, self.TSTEP);
         println!("*CONFIG* ITL3 = {}; ITL4 = {}", ITL3, ITL4);
         println!("*CONFIG* FS = {}; FT = {}", FS, FT);
-        println!("*CONFIG* RMIN ={}; RMAX = {}", RMIN, RMAX);
+        println!("*CONFIG* RMIN = {}; RMAX = {}", RMIN, RMAX);
+        println!("*CONFIG* RELTOL = {}; VNTOL = {}; ABSTOL = {}",
+                 RELTOL, VNTOL, ABSTOL);
         println!("*************************************************************");
 
         // open waveform database
@@ -254,13 +264,13 @@ impl Engine {
                             if c_itl >= ITL4 {
                                 t_delta = t_delta * FT;
                                 // check if we're ok to continue iterating
-                                if t_delta < RMIN {
-                                    println!("*ERROR* Timestep too small");
+                                if t_delta < t_delta_min {
+                                    println!("*ERROR* Internal timestep too small");
                                     error = true;
                                     break;
                                 } else {
                                     // reset iteration count
-                                    println!("*INFO* Upshifting: {}", t_delta);
+                                    println!("*INFO* Upshifting -> new t_delta = {}", t_delta);
                                     geared = true;
                                     c_itl = 0;
                                 }
@@ -276,7 +286,6 @@ impl Engine {
                 unknowns_solve = unknowns.to_vec();
             }
 
-            println!("*INFO* Updating timestep");
             if converged {
                 // update things for next loop
                 unknowns_prev = unknowns.to_vec();
@@ -290,7 +299,7 @@ impl Engine {
                         println!("*INFO* Downshifting maxed out");
                         t_delta = t_delta_max;
                     } else {
-                        println!("*INFO* Downshifting: {}", t_delta);
+                        println!("*INFO* Downshifting -> new t_delta = {}", t_delta);
                     }
                 }
             }
@@ -780,11 +789,6 @@ impl Engine {
     // check for convergence by testing new and previous solutions against
     // RELTOL and the like
     pub fn convergence_check(&self, xv: &Vec<f32>, yv: &Vec<f32>) -> ConvergenceResult {
-
-        // 
-        const RELTOL: f32 = 0.0001;
-        const VNTOL: f32 = 1.0e-6;
-        const ABSTOL: f32 = 1.0e-9;
 
         let mut res = Ok(true);
         for (i,x) in xv.iter().enumerate() {
