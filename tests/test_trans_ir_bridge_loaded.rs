@@ -18,7 +18,7 @@ fn test_trans_ir_bridge_1kHz_10us() {
 
 
 #[test]
-//#[ignore]
+#[ignore]
 #[allow(non_snake_case)]
 fn test_trans_ir_bridge_1kHz_1us() {
 
@@ -99,8 +99,8 @@ fn build(amp: f32, freq: f32, isat: f32) -> Circuit {
     //  (1) is top
     //  (2) is bottom
     ckt.elements.push( Element::D(Diode{p: 1, n: 3, i_sat: isat, tdegc: 27.0}) );
-    ckt.elements.push( Element::D(Diode{p: 4, n: 1, i_sat: isat, tdegc: 27.0}) );
-    ckt.elements.push( Element::D(Diode{p: 2, n: 3, i_sat: isat, tdegc: 27.0}) );
+    //ckt.elements.push( Element::D(Diode{p: 4, n: 1, i_sat: isat, tdegc: 27.0}) );
+    //ckt.elements.push( Element::D(Diode{p: 2, n: 3, i_sat: isat, tdegc: 27.0}) );
     ckt.elements.push( Element::D(Diode{p: 4, n: 2, i_sat: isat, tdegc: 27.0}) );
 
     // load
