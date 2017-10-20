@@ -1,5 +1,44 @@
 # Development Log
 
+## 2017-10-14
+I spent the last month or so trying to come up with a fix for the diode model
+transient analysis problem. There was a bug in how I calculated G_Eq for the
+diode companion model. I've made some progress, but the diode model doesn't
+seem robust yet in transient analysis.
+
+In the course of this investigation, the engine has been updated to print more
+information about which RETOL etc it's using, and it spits out messages when it 
+changes the timestep. I also make all the analyses return a result datastructure
+so that the unit-tests can determine if the circuit time-stepped-to-small or not,
+which is useful for robustness testing.
+
+
+The circuit I used during the investigation was:
+* Current source and resistor - 20V
+* Diode bridge with 2 diodes commented out
+* 1k load resistor
+
+The diodes are in series with the resistor, one before the R, and one after. This
+turns out to be a harder circuit for the simulator to solve than the full diode
+bridge! The solver seems to be getting into a limit-cycle when solving for the
+case where the input falls and crosses 0V and the diodes start to go into reverse
+bias.
+
+At least I think the simulator finds the 2-diode circuit more difficult to deal
+with. What I really need to see is a full test suite - same circuit but varying
+all the VNTOL, RETOL, saturation current of the diodes, etc.
+
+I also need a SPICE file reader. And I need to decide when I'm finished.
+
+I'm tempted to write the SPICE file reader next, as this will help with gathering
+together circuits for the robustness testing. But this isn't trivial - I'll need
+to write a parser, I'll need symbol tables, and I'll probably be tempted to expand
+to control blocks and option blocks.
+
+For robustness testing, it's this or writing a bunch of testcases in Rust which'll
+all write to the same log file and stuff. I need to recompile every time there's
+a circuit change.
+
 ## 2017-09-16
 Had a go at simulating capacitors in transient.
 
@@ -29,7 +68,7 @@ huge.
 Where to next?
 * L & C models
 * Write out engine metrics
-* Propper logging to quiten output
+* Propper logging to quieten output
 * MOSFET model?
 * The LTE timestep thing?
 

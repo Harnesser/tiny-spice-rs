@@ -7,6 +7,14 @@ Deal with capacitors
 - Capacitor model for DC operating point analysis
 - Capacitor in transient analysis
 
+### Changed
+- Analysis functions return stats
+
+### Fixed
+- Convergence problems with diode networks
+
+
+
 ## [0.5.0] Transient Analysis
 Added iteration count based transient analysis.
 
