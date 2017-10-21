@@ -46,7 +46,7 @@ pub struct Engine {
     // base matrix - all the linear things
     base_matrix: Vec<Vec<f32>>,
 
-    // list of non-linear elements in the circuit
+    // list of nonlinear elements in the circuit
     nonlinear_elements: Vec<circuit::Element>,
 
     // list of independent sources
@@ -228,7 +228,7 @@ impl Engine {
                          c_step, t_now, t_delta, c_iteration, c_itl, mse);
 
                 // copy the base matrix, cos we're going to change it a lot:
-                // * stamp non-linear element companion models
+                // * stamp nonlinear element companion models
                 // * re-order during guassian elimination
                 let mut v = self.base_matrix.clone();
 
@@ -238,7 +238,7 @@ impl Engine {
                 // stamp elements that store energy
                 self.storage_stamp(&mut v, &unknowns_prev, t_delta);
 
-                // stamp companion models of non-linear devices
+                // stamp companion models of nonlinear devices
                 self.nonlinear_stamp(&mut v, &unknowns);
 
                 // Solve
@@ -347,7 +347,7 @@ impl Engine {
         while c_iteration < ITL1 {
 
             // copy the base matrix, cos we're going to change it a lot:
-            // * stamp non-linear element companion models
+            // * stamp nonlinear element companion models
             // * re-order during guassian elimination
             let mut v = mna.clone();
 
@@ -355,7 +355,7 @@ impl Engine {
             // !!!FIXME!!! - hoist out of loop?
             self.independent_source_stamp(&mut v, 0.0);
 
-            // stamp companion models of non-linear devices
+            // stamp companion models of nonlinear devices
             self.nonlinear_stamp(&mut v, &unknowns_prev);
 
             // Guassian elimination & back solve of the now linearized
@@ -723,10 +723,10 @@ impl Engine {
     }
 
 
-    // stamp a matrix with linearized companion models of all the non-linear
+    // stamp a matrix with linearized companion models of all the nonlinear
     // devices listed in the SPICE netlist
     fn nonlinear_stamp(&self, m: &mut Vec<Vec<f32>>, n: &Vec<f32> ) {
-        println!("*INFO* Stamping non-linear elements");
+        println!("*INFO* Stamping nonlinear elements");
         for el in &self.nonlinear_elements {
             match *el {
                 circuit::Element::D(ref d) => {
