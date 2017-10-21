@@ -51,7 +51,7 @@ do Gaussian Reduction and back-to-front solving on. The steps are:
   b. Vec of strings indexed by node id
 2. Build a matrix of the KCL equations for each node in the design.
 3. Gaussian Reduction
-4. Solve back-to-front, using Newton-Raphson on non-linear bits
+4. Solve back-to-front, using Newton-Raphson on nonlinear bits
 5. Print out node voltages
 
 I don't think I have to write equations for the ground node.

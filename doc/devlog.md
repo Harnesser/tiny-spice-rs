@@ -1,5 +1,9 @@
 # Development Log
 
+## 2027-10-21
+Found Nagel's SPICE2 paper.
+
+
 ## 2017-10-14
 I spent the last month or so trying to come up with a fix for the diode model
 transient analysis problem. There was a bug in how I calculated G_Eq for the
@@ -58,7 +62,7 @@ And I've noticed on the diode bridge sim:
 Got transient analysis working! I even tried it on the diode bridge
 circuit and it was a success!
 
-Interestingly, even with non-linear devices in there, the timestep maxes out on
+Interestingly, even with nonlinear devices in there, the timestep maxes out on
 this. Maybe that's to be expected - I've nothing that holds energy in the circuit
 so I don't need integration and all that.
 
@@ -118,7 +122,7 @@ Liverpool got blown out today. Feck.
 ## 2017-09-08
 I'm gonna stamp some diodes tonight.
 Gonna stamp some diodes.
-My moves are non-linear, but that's ok.
+My moves are nonlinear, but that's ok.
 Gonna stamp some diodes.
 
 The other option is to stamp everything once. And update the parameters at each
@@ -138,16 +142,16 @@ Things I have to solve:
  * [NO] stamp and unstamp
 * [DONE] Convergence testing: VNTOL, ABSTOL & RELTOL
 
-Next: figure out how non-linear devices live in an enumeration for linear
+Next: figure out how nonlinear devices live in an enumeration for linear
 devices.
 
 
 ## 2017-09-06
 Turns out that ODEs are not stored in the matrix:
-1. The non-linear circuit elements are linearised around an operating point 
+1. The nonlinear circuit elements are linearised around an operating point 
    using Newton-Raphson.
 2. Values are used to "stamp" the matrix with a linear companion model of the
-   non-linear element
+   nonlinear element
 3. Run Gaussian Elimination on this matrix to compute the unknowns
 4. Look for convergence, where v(n+1) ~= v(n) and stop.
 
@@ -181,13 +185,13 @@ I can go a few ways now:
 1. Update the Gaussian Elimination algorithm to match the better one on wikipedia
 2. Update the circuit matrix builder to MNA
   - This will help handle V sources without circuit transformations
-3. Start on non-linear solver
+3. Start on nonlinear solver
 4. Remove the [0] column and row from the matrix to save space. This means either
    changing the node index of GND to something other than 0, or littering the code
    with lots of `[i-1]`s.
 5. Do LC transient analysis.
 
-The non-linear solver is the most interesting bit, I think. Although LC transient
+The nonlinear solver is the most interesting bit, I think. Although LC transient
 is kinda interesting too...
 
 Fixed back-substitution.
@@ -205,7 +209,7 @@ Well, I need:
  a. Netlist representation
  b. Node equation builder
  c. Gaussian reduction algorithm
- d. Newton-Raphson for non-linear equations
+ d. Newton-Raphson for nonlinear equations
 
 2. Transient Simulation
  a. 
