@@ -88,7 +88,7 @@ fn build( amp: f32, freq: f32, isat: f32 ) -> Circuit {
         Element::R(Resistor{a: 1, b: 0, value: 10.0}),
     );
     ckt.elements.push(
-        Element::D(Diode{p: 1, n: 0, i_sat: isat, tdegc: 27.0}),
+        Element::D(Diode::new(1, 0, isat, 27.0)),
     );
     ckt
 }

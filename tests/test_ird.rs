@@ -27,7 +27,7 @@ fn build() -> circuit::Circuit {
         circuit::Element::R(circuit::Resistor{a: 1, b: 0, value: 10.0}),
     );
     ckt.elements.push(
-        circuit::Element::D(circuit::Diode{p: 1, n: 0, i_sat: 1e-9, tdegc: 27.0}),
+        circuit::Element::D(circuit::Diode::new(1, 0, 1e-9, 27.0)),
     );
     ckt
 }

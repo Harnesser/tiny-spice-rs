@@ -155,7 +155,7 @@ impl Engine {
         // 'Struggling' iteration count limit
         // If this count is reached before a solution is found, reduce the 
         // delta-time step and restart the solution attempt
-        const ITL4: usize = 30;
+        const ITL4: usize = 50;
 
         // Find the DC operating point
         // used as the initial values in the transient simulation
@@ -219,6 +219,7 @@ impl Engine {
             // solver iteration count
             let mut c_itl: usize = 0;
             let mut unknowns_solve : Vec<f32> = vec![0.0; c_mna];
+            let mut unknowns_solve_prev : Vec<f32> = vec![0.0; c_mna];
             let mut geared = false;
             let mut mse :f32 = 0.0;
 
@@ -239,14 +240,14 @@ impl Engine {
                 self.storage_stamp(&mut v, &unknowns_prev, t_delta);
 
                 // stamp companion models of nonlinear devices
-                self.nonlinear_stamp(&mut v, &unknowns);
+                self.nonlinear_stamp(&mut v, &unknowns, &unknowns_solve_prev);
 
                 // Solve
                 unknowns = self.solve(v);
                 mse = self.mean_squared_error(&unknowns_solve, &unknowns);
 
                 // enable this to plot delta-time
-                wavedb.dump_vector(t_now, &unknowns);
+                //wavedb.dump_vector(t_now, &unknowns);
 
                 // update loop counters
                 c_itl += 1;
@@ -283,6 +284,7 @@ impl Engine {
                         break;
                     },
                 }
+                unknowns_solve_prev = unknowns_solve.to_vec();
                 unknowns_solve = unknowns.to_vec();
             }
 
@@ -337,6 +339,7 @@ impl Engine {
         // prep values for convergence checks
         let c_mna = self.c_nodes + self.c_vsrcs;
         let mut unknowns_prev : Vec<f32> = vec![0.0; c_mna];
+        let mut unknowns_prev_prev : Vec<f32> = vec![0.0; c_mna];
         let mut unknowns : Vec<f32> = vec![];
 
         let mut converged = false;
@@ -356,7 +359,7 @@ impl Engine {
             self.independent_source_stamp(&mut v, 0.0);
 
             // stamp companion models of nonlinear devices
-            self.nonlinear_stamp(&mut v, &unknowns_prev);
+            self.nonlinear_stamp(&mut v, &unknowns_prev, &unknowns_prev_prev);
 
             // Guassian elimination & back solve of the now linearized
             // circuit matrix
@@ -384,6 +387,7 @@ impl Engine {
             }
 
             // leave
+            unknowns_prev_prev = unknowns_prev.clone();
             unknowns_prev = unknowns.clone();
             c_iteration += 1;
         }
@@ -725,7 +729,7 @@ impl Engine {
 
     // stamp a matrix with linearized companion models of all the nonlinear
     // devices listed in the SPICE netlist
-    fn nonlinear_stamp(&self, m: &mut Vec<Vec<f32>>, n: &Vec<f32> ) {
+    fn nonlinear_stamp(&self, m: &mut Vec<Vec<f32>>, n: &Vec<f32>, n_prev: &Vec<f32> ) {
         println!("*INFO* Stamping nonlinear elements");
         for el in &self.nonlinear_elements {
             match *el {
@@ -733,7 +737,8 @@ impl Engine {
 
                     // linearize
                     let v_d = n[d.p] - n[d.n];
-                    let (g_eq, i_eq) = d.linearize(v_d);
+                    let v_d_prev = n_prev[d.p] - n_prev[d.n];
+                    let (g_eq, i_eq) = d.linearize(v_d, v_d_prev);
 
                     println!("*INFO* {} {} {:?}", el, v_d, (g_eq, i_eq));
 

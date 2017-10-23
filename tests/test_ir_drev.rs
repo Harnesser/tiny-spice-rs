@@ -27,7 +27,7 @@ fn build() -> circuit::Circuit {
         circuit::Element::R(circuit::Resistor{a: 1, b: 0, value: 10.0}),
     );
     ckt.elements.push( // reversed-biased
-        circuit::Element::D(circuit::Diode{p: 0, n: 1, i_sat: 1e-9, tdegc: 27.0}),
+        circuit::Element::D(circuit::Diode::new(0, 1, 1e-9, 27.0)),
     );
     ckt
 }

@@ -6,29 +6,44 @@ pub struct Diode {
     pub n: NodeId,
     pub i_sat: f32,
     pub tdegc: f32,
+    v_thermal: f32,
+    v_crit: f32,
 }
 
 impl Diode {
 
+
+    pub fn new(p :NodeId, n :NodeId, i_sat :f32, tdegc: f32) -> Diode {
+        let mut d = Diode {
+            p: p,
+            n: n,
+            i_sat: i_sat,
+            tdegc: tdegc,
+            v_thermal: 0.0,
+            v_crit: 0.0,
+        };
+        d.update_v_thermal();
+        d.update_v_crit();
+        d
+    }
+
+
     // http://dev.hypertriton.com/edacious/trunk/doc/lec.pdf
     // page 4 of 14
-    pub fn linearize(&self, v_d: f32) -> (f32, f32) {
-
-        // thermal voltage. Should be ~26mV at room temperature
-        let v_thermal = BOLTZMANN * (363.0 + self.tdegc) / CHARGE;
-
-        // voltage alert
-        if v_d < -1000.0 || v_d > 0.81 {
-           println!("*WARNING* -1000 < v_d < 0.81 does not hold: {}", v_d);
+    pub fn linearize(&self, v_d: f32, v_d_prev: f32) -> (f32, f32) {
+       
+        // limit the excursion, following Colon via Nagel
+        let v_d_i :f32;
+        if v_d < self.v_crit {
+            v_d_i = v_d;
+        } else {
+            let part :f32 = (v_d - v_d_prev ) / self.v_thermal - 1.0;
+            v_d_i = v_d_prev + self.v_thermal * part.ln();  
         }
-
-        let mut v_d_i = v_d;
-        if v_d > 0.8 {
-            v_d_i = 0.8;
-        }
+        println!("*DIODE* V_d from {} V to {} V (v_crit={})", v_d, v_d_i, self.v_crit);
 
         // current through the diode, given the bias voltage
-        let exp_vd_over_vt =(v_d_i / v_thermal).exp();
+        let exp_vd_over_vt =(v_d_i / self.v_thermal).exp();
 
         let i_d = self.i_sat * ( exp_vd_over_vt - 1.0 );
 
@@ -39,7 +54,7 @@ impl Diode {
         if i_d.is_finite() {
 
             // Equivalent conductance, limited to help convergence
-            g_eq = (self.i_sat / v_thermal) * exp_vd_over_vt;
+            g_eq = (self.i_sat / self.v_thermal) * exp_vd_over_vt;
             if g_eq < GMIN {
                 g_eq = GMIN;
             }
@@ -60,6 +75,22 @@ impl Diode {
         }
         (g_eq, i_eq)
     }
+
+    /// thermal voltage. Should be ~26mV at room temperature
+    fn update_v_thermal(&mut self) {
+        self.v_thermal = BOLTZMANN * (363.0 + self.tdegc) / CHARGE;
+    }
+
+    /// critical voltage. Colon limiting method
+    /// See Nagel, section 5
+    fn update_v_crit(&mut self) {
+        // critical voltage for Colon
+        self.v_crit = 
+            self.v_thermal 
+            * ( self.v_thermal / ( (2.0 as f32).sqrt() * self.i_sat ) )
+            .ln();
+    }
+
 }
 
 #[cfg(test)]
@@ -70,12 +101,12 @@ mod tests {
     fn curve_trace() {
         const VMAX: f32 = 5.0;
         const POINTS: i32 = 100;
-        let diode = Diode{p:0, n:1, i_sat:1e-12, tdegc:27.0};
+        let diode = Diode::new(0, 1, 1e-12, 27.0);
         println!("DATA pt Vd G_eq I_eq I_d");
         println!("DATA int V S A A");
         for pt in -POINTS..POINTS {
             let v_d = pt as f32 * (VMAX/POINTS as f32);
-            let (g_eq, i_eq) = diode.linearize(v_d);
+            let (g_eq, i_eq) = diode.linearize(v_d, v_d);
             let i_d = (v_d * g_eq) + i_eq;
             println!("DATA {} {} {} {} {}", pt, v_d, g_eq, i_eq, i_d);
         }

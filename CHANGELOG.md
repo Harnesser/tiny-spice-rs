@@ -9,6 +9,8 @@ Deal with capacitors
 
 ### Changed
 - Analysis functions return stats
+- Use Colon & Nagel method to limit the diode overvoltaging
+- Diode model now uses ::new() method for instantiations
 
 ### Fixed
 - Convergence problems with diode networks

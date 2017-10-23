@@ -1,6 +1,15 @@
 # Development Log
 
-## 2027-10-21
+## 2017-10-23
+Colon didn't help. The V_crit is around the knee of the diode, so doesn't help
+with the cycles too much.
+
+## 2017-10-22
+Going to try that Colon thing I found in Nagel. For this though, I need to know
+the previous value of the voltage across the diode. Should I just add this to the
+structure or what?
+
+## 2017-10-21
 Found Nagel's SPICE2 paper.
 
 

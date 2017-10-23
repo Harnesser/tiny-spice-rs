@@ -29,10 +29,10 @@ fn build() -> Circuit {
     // Diode bridge
     //  (1) is top
     //  (2) is bottom
-    ckt.elements.push( Element::D(Diode{p: 1, n: 3, i_sat: 1e-9, tdegc: 27.0}) );
-    ckt.elements.push( Element::D(Diode{p: 4, n: 1, i_sat: 1e-9, tdegc: 27.0}) );
-    ckt.elements.push( Element::D(Diode{p: 2, n: 3, i_sat: 1e-9, tdegc: 27.0}) );
-    ckt.elements.push( Element::D(Diode{p: 4, n: 2, i_sat: 1e-9, tdegc: 27.0}) );
+    ckt.elements.push( Element::D(Diode::new(1, 3, 1e-9, 27.0)) );
+    ckt.elements.push( Element::D(Diode::new(4, 1, 1e-9, 27.0)) );
+    ckt.elements.push( Element::D(Diode::new(2, 3, 1e-9, 27.0)) );
+    ckt.elements.push( Element::D(Diode::new(4, 2, 1e-9, 27.0)) );
 
     // load
     // (none)

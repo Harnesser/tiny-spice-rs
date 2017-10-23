@@ -41,7 +41,7 @@ fn build() -> Circuit {
         Element::V(VoltageSource{p: 1, n: 3, value: 0.0}),
     );
     ckt.elements.push(
-        Element::D(Diode{p: 3, n: 0, i_sat: 1e-9, tdegc: 27.0}),
+        Element::D(Diode::new(3, 0, 1e-9, 27.0)),
     );
     ckt
 }

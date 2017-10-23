@@ -20,7 +20,7 @@ fn build() -> Circuit {
 
     ckt.elements.push(Element::V(VoltageSource{p: 1, n: 0, value: 0.0}) );
     ckt.elements.push(Element::R(Resistor{a: 1, b: 2, value: 1e3}) );
-    ckt.elements.push(Element::D(Diode{p: 2, n: 0, i_sat: 1e-9, tdegc: 27.0}) );
+    ckt.elements.push(Element::D(Diode::new(2, 0, 1e-9, 27.0)) );
     ckt
 }
 
