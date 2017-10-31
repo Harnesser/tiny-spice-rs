@@ -28,7 +28,7 @@ newton:
 	cargo test --no-fail-fast --test newton
 
 diode:
-	cargo test --no-fail-fast \
+	cargo test \
 		--test test_ird \
 		--test test_ir_drev \
 		--test test_v_d_vs_d \

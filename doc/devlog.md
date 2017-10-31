@@ -1,5 +1,16 @@
 # Development Log
 
+## 2017-10-31
+More messing with the Colon/Nagel thing. Use `Cell` to remember the previous
+values of things without making the entire `Diode` structure mutable and 
+infecting the simulation engine.
+
+## 2017-10-24
+Some light internet searching. Maybe I have to try GMIN-stepping and
+source-stepping algorithms?
+
+Could I ask someone at work? One of the Daves? Marie?
+
 ## 2017-10-23
 Colon didn't help. The V_crit is around the knee of the diode, so doesn't help
 with the cycles too much.
