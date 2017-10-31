@@ -1,3 +1,4 @@
+use std::cell::Cell;
 use circuit::{NodeId, BOLTZMANN, CHARGE, GMIN};
 
 #[derive(Clone)]
@@ -8,10 +9,12 @@ pub struct Diode {
     pub tdegc: f32,
     v_thermal: f32,
     v_crit: f32,
+    v_d_prev: Cell<f32>,
+    i_d_prev: Cell<f32>,
+    g_eq_prev: Cell<f32>,
 }
 
 impl Diode {
-
 
     pub fn new(p :NodeId, n :NodeId, i_sat :f32, tdegc: f32) -> Diode {
         let mut d = Diode {
@@ -21,6 +24,9 @@ impl Diode {
             tdegc: tdegc,
             v_thermal: 0.0,
             v_crit: 0.0,
+            v_d_prev: Cell::new(0.0),
+            i_d_prev: Cell::new(0.0),
+            g_eq_prev: Cell::new(GMIN),
         };
         d.update_v_thermal();
         d.update_v_crit();
@@ -30,17 +36,29 @@ impl Diode {
 
     // http://dev.hypertriton.com/edacious/trunk/doc/lec.pdf
     // page 4 of 14
-    pub fn linearize(&self, v_d: f32, v_d_prev: f32) -> (f32, f32) {
+    pub fn linearize(&self, v_hat: f32, _: f32) -> (f32, f32) {
        
         // limit the excursion, following Colon via Nagel
         let v_d_i :f32;
-        if v_d < self.v_crit {
-            v_d_i = v_d;
+        if v_hat < self.v_crit {
+            v_d_i = v_hat;
         } else {
-            let part :f32 = (v_d - v_d_prev ) / self.v_thermal - 1.0;
-            v_d_i = v_d_prev + self.v_thermal * part.ln();  
+            // grab stuff from cells
+            let v_d_prev = self.v_d_prev.get();
+            let i_d_prev = self.i_d_prev.get();
+            let g_eq_prev = self.g_eq_prev.get();
+
+            // y = mx + c
+            let c = i_d_prev - v_d_prev * g_eq_prev;
+            let i_hat = g_eq_prev * v_hat + c;
+
+            let part :f32 = (v_hat - v_d_prev ) / self.v_thermal - 1.0;
+            v_d_i = v_d_prev + self.v_thermal * part.ln();
+
+            println!("*DIODE* v_d {}, v_d_prev {}", v_hat, v_d_prev);
+            println!("*DIODE* part {}, v_d_i {}", part, v_d_i);
         }
-        println!("*DIODE* V_d from {} V to {} V (v_crit={})", v_d, v_d_i, self.v_crit);
+        println!("*DIODE* V_d from {} V to {} V (v_crit={})", v_hat, v_d_i, self.v_crit);
 
         // current through the diode, given the bias voltage
         let exp_vd_over_vt =(v_d_i / self.v_thermal).exp();
@@ -63,9 +81,7 @@ impl Diode {
             i_eq = i_d - (g_eq * v_d_i);
 
         } else {
-            println!("*WARNING* Possibly bad I_d {}", i_d);
-            g_eq = GMIN;
-            i_eq = 0.0;
+            panic!("*FATAL* Possibly bad I_d {}", i_d);
         }
 
         // check that the companion model variables reasonable before
@@ -73,6 +89,10 @@ impl Diode {
         if !g_eq.is_finite() || !i_eq.is_finite() {
             println!("*ERROR* - banjaxed");
         }
+
+        self.v_d_prev.set(v_d_i);
+        self.i_d_prev.set(i_d);
+        self.g_eq_prev.set(g_eq);
         (g_eq, i_eq)
     }
 
