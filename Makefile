@@ -21,7 +21,7 @@ test_rust: waves/stamp log/stamp
 	cargo test --no-fail-fast --all > log/test.log || echo 0
 
 test_grep:
-	grep "test result" log/test.log
+	grep "\.\.\." log/test.log
 
 
 newton:
