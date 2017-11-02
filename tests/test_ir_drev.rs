@@ -7,7 +7,7 @@ mod common;
 use common::assert_nearly;
 
 #[test]
-fn test() {
+fn test_ird_rev() {
 
     let mut eng = engine::Engine::new();
     let ckt = build();

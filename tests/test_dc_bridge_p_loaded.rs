@@ -7,7 +7,7 @@ mod common;
 use common::assert_nearly;
 
 #[test]
-fn test_v() {
+fn test_dc_bridge_loaded_2v0() {
 
     let mut eng = engine::Engine::new();
     let ckt = build_v();
@@ -19,7 +19,7 @@ fn test_v() {
 }
 
 #[test]
-fn test_vv() {
+fn test_dc_bridge_loaded_gnd() {
 
     let mut eng = engine::Engine::new();
     let ckt = build_vv();

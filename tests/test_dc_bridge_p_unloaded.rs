@@ -7,15 +7,21 @@ mod common;
 use common::assert_nearly;
 
 #[test]
-fn test() {
+#[allow(non_snake_case)]
+fn test_diode_bridge_unloaded_10V() {
 
     let mut eng = engine::Engine::new();
     let ckt = build();
     let (v,_) = eng.dc_operating_point(&ckt);
     println!("\n*INFO* Done");
 
-    assert_nearly(v[3], 9.809084);
-    assert_nearly(v[4], 0.190917);
+    // before
+    //assert_nearly(v[3], 9.809084);
+    //assert_nearly(v[4], 0.190917);
+
+    // after
+    assert_nearly(v[3], 9.976717);
+    assert_nearly(v[4], 0.023283);
 }
 
 
