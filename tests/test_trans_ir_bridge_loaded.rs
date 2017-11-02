@@ -81,7 +81,7 @@ fn test_trans_ir_bridge_loaded_loop() {
 }
 
 
-fn build(amp: f32, freq: f32, isat: f32) -> Circuit {
+fn build(amp: f64, freq: f64, isat: f64) -> Circuit {
     let mut ckt = Circuit::new();
 
     // bridge input voltage

@@ -11,6 +11,7 @@ Deal with capacitors
 - Analysis functions return stats
 - Use Colon & Nagel method to limit the diode overvoltaging
 - Diode model now uses ::new() method for instantiations
+- `f32`s now `f64`s. This helps convergence A LOT
 
 ### Fixed
 - Convergence problems with diode networks

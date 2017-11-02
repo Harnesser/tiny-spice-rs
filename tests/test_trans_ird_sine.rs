@@ -78,7 +78,7 @@ fn test_trans_ir_sine_loop() {
 }
 
 
-fn build( amp: f32, freq: f32, isat: f32 ) -> Circuit {
+fn build( amp: f64, freq: f64, isat: f64 ) -> Circuit {
     let i_offset = 0.0;
     let mut ckt = Circuit::new();
     ckt.elements.push(

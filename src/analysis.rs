@@ -20,7 +20,7 @@ impl fmt::Display for Kind {
 
 pub struct Statistics {
     pub kind: Kind,
-    pub end: f32,
+    pub end: f64,
     pub iterations: usize,
 }
 

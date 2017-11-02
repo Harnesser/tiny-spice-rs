@@ -5,18 +5,18 @@ use circuit::{NodeId, BOLTZMANN, CHARGE, GMIN};
 pub struct Diode {
     pub p: NodeId,
     pub n: NodeId,
-    pub i_sat: f32,
-    pub tdegc: f32,
-    v_thermal: f32,
-    v_crit: f32,
-    v_d_prev: Cell<f32>,
-    i_d_prev: Cell<f32>,
-    g_eq_prev: Cell<f32>,
+    pub i_sat: f64,
+    pub tdegc: f64,
+    v_thermal: f64,
+    v_crit: f64,
+    v_d_prev: Cell<f64>,
+    i_d_prev: Cell<f64>,
+    g_eq_prev: Cell<f64>,
 }
 
 impl Diode {
 
-    pub fn new(p :NodeId, n :NodeId, i_sat :f32, tdegc: f32) -> Diode {
+    pub fn new(p :NodeId, n :NodeId, i_sat :f64, tdegc: f64) -> Diode {
         let mut d = Diode {
             p: p,
             n: n,
@@ -36,13 +36,13 @@ impl Diode {
 
     // http://dev.hypertriton.com/edacious/trunk/doc/lec.pdf
     // page 4 of 14
-    pub fn linearize(&self, v_hat: f32, _: f32) -> (f32, f32) {
+    pub fn linearize(&self, v_hat: f64, _: f64) -> (f64, f64) {
        
         // limit the excursion, following Colon via Nagel
         let v_d_prev = self.v_d_prev.get();
         let v_delta = v_hat - v_d_prev;
 
-        let v_d_i :f32;
+        let v_d_i :f64;
         if v_hat < self.v_crit {
             v_d_i = v_hat;
         } else if v_delta.abs() <= 2.0 * self.v_thermal {
@@ -51,7 +51,7 @@ impl Diode {
             v_d_i = self.v_thermal * (v_hat / self.v_thermal).ln();
         } else {
 
-            let arg :f32 = 1.0 + (v_delta / self.v_thermal);
+            let arg :f64 = 1.0 + (v_delta / self.v_thermal);
             if arg <= 0.0 {
                 v_d_i  = self.v_crit;
             } else {
@@ -69,8 +69,8 @@ impl Diode {
 
         // calculate the diode companion model parameters
         // companion model is a current source in parallel with a resistor
-        let mut g_eq: f32;
-        let i_eq: f32;
+        let mut g_eq: f64;
+        let i_eq: f64;
         if i_d.is_finite() {
 
             // Equivalent conductance, limited to help convergence
@@ -109,7 +109,7 @@ impl Diode {
         // critical voltage for Colon
         self.v_crit = 
             self.v_thermal 
-            * ( self.v_thermal / ( (2.0 as f32).sqrt() * self.i_sat ) )
+            * ( self.v_thermal / ( (2.0 as f64).sqrt() * self.i_sat ) )
             .ln();
     }
 
@@ -121,13 +121,13 @@ mod tests {
 
     #[test]
     fn curve_trace() {
-        const VMAX: f32 = 5.0;
+        const VMAX: f64 = 5.0;
         const POINTS: i32 = 100;
         let diode = Diode::new(0, 1, 1e-12, 27.0);
         println!("DATA pt Vd G_eq I_eq I_d");
         println!("DATA int V S A A");
         for pt in -POINTS..POINTS {
-            let v_d = pt as f32 * (VMAX/POINTS as f32);
+            let v_d = pt as f64 * (VMAX/POINTS as f64);
             let (g_eq, i_eq) = diode.linearize(v_d, v_d);
             let i_d = (v_d * g_eq) + i_eq;
             println!("DATA {} {} {} {} {}", pt, v_d, g_eq, i_eq, i_d);

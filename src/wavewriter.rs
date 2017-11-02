@@ -63,7 +63,7 @@ impl WaveWriter {
     }
 
 
-    pub fn dump_vector(&mut self, time: f32, vars: &Vec<f32>) {
+    pub fn dump_vector(&mut self, time: f64, vars: &Vec<f64>) {
         if let Some(ref mut file) = self.file {
             let mut line = format!("{}", time);
 

@@ -65,7 +65,7 @@ fn test_trans_irrd_sine_loop() {
 
 
 
-fn build( freq: f32 ) -> Circuit {
+fn build( freq: f64 ) -> Circuit {
     let mut ckt = Circuit::new();
     ckt.elements.push(
         Element::Isin(CurrentSourceSine{p: 0, n: 1, vo: 0.0, va: 0.3, freq: freq}),

@@ -6,15 +6,15 @@ pub use capacitor::Capacitor;
 
 pub type NodeId = usize;
 
-pub const BOLTZMANN : f32 = 1.3806488e-23;
-pub const CHARGE : f32 = 1.603e-19;
-pub const GMIN : f32 = 1.0e-12;
+pub const BOLTZMANN : f64 = 1.3806488e-23;
+pub const CHARGE : f64 = 1.603e-19;
+pub const GMIN : f64 = 1.0e-12;
 
 #[allow(dead_code)]
 pub struct Resistor {
     pub a: NodeId,
     pub b: NodeId,
-    pub value: f32, // Ohms
+    pub value: f64, // Ohms
 }
 
 
@@ -22,14 +22,14 @@ pub struct Resistor {
 pub struct CurrentSource {
     pub p: NodeId,
     pub n: NodeId,
-    pub value: f32, // Amperes
+    pub value: f64, // Amperes
 }
 
 #[allow(dead_code)]
 pub struct VoltageSource {
     pub p: NodeId,
     pub n: NodeId,
-    pub value: f32, // Volts
+    pub value: f64, // Volts
 }
 
 #[allow(dead_code)]

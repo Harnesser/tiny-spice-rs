@@ -5,9 +5,9 @@ use circuit::NodeId;
 use wavewriter::WaveWriter;
 
 // The boyos 
-const RELTOL: f32 = 0.0001;
-const VNTOL: f32 = 1.0e-6;
-const ABSTOL: f32 = 1.0e-9;
+const RELTOL: f64 = 0.0001;
+const VNTOL: f64 = 1.0e-6;
+const ABSTOL: f64 = 1.0e-9;
 
 
 fn banner() {
@@ -32,9 +32,9 @@ pub type ConvergenceResult = Result<bool, ConvergenceError>;
 pub struct Engine {
 
     // user-supplied control on the sim time
-    pub TSTART: f32,
-    pub TSTOP: f32,
-    pub TSTEP: f32,
+    pub TSTART: f64,
+    pub TSTOP: f64,
+    pub TSTEP: f64,
 
     // Number of voltage nodes in the circuit
     c_nodes: usize,
@@ -44,7 +44,7 @@ pub struct Engine {
     c_vsrcs: usize,
 
     // base matrix - all the linear things
-    base_matrix: Vec<Vec<f32>>,
+    base_matrix: Vec<Vec<f64>>,
 
     // list of nonlinear elements in the circuit
     nonlinear_elements: Vec<circuit::Element>,
@@ -76,11 +76,11 @@ impl Engine {
 
     // need to know which element to sweep
     pub fn dc_sweep(&mut self, ckt: &circuit::Circuit, wavefile: &str) {
-        const VSTART: f32 = -3.0;
-        const VSTOP: f32 = 5.0;
+        const VSTART: f64 = -3.0;
+        const VSTOP: f64 = 5.0;
         const VSTEPS: usize = 100;
 
-        let v_step = (VSTOP - VSTART) / VSTEPS as f32;
+        let v_step = (VSTOP - VSTART) / VSTEPS as f64;
 
         self.elaborate(&ckt);
 
@@ -104,7 +104,7 @@ impl Engine {
 
         // tweak the thing we're sweeping
         for s in 0..VSTEPS {
-            let v_sweep = VSTART + (v_step * s as f32);
+            let v_sweep = VSTART + (v_step * s as f64);
             //let self.
 
             let mut mna = self.base_matrix.clone();
@@ -137,16 +137,16 @@ impl Engine {
         // Iteration limits
 
         // Initial timestep factor
-        const FS: f32 = 0.25;
+        const FS: f64 = 0.25;
 
         // Timestamp adjustment factor on iteration failure
-        const FT: f32 = 0.25;
+        const FT: f64 = 0.25;
 
         // Smallest delta-time step allowed = RMIN * TSTEP
-        const RMIN: f32 = 1e-3;
+        const RMIN: f64 = 1e-3;
 
         // Largest delta-time step allowed factor
-        const RMAX: f32 = 5.0;
+        const RMAX: f64 = 5.0;
 
         // 'Easy' iteration count limit
         // If we solve in fewer iterations, increase delta-time
@@ -165,7 +165,7 @@ impl Engine {
 
         // prep values
         let c_mna = self.c_nodes + self.c_vsrcs;
-        let mut unknowns_prev : Vec<f32> = vec![0.0; c_mna];
+        let mut unknowns_prev : Vec<f64> = vec![0.0; c_mna];
 
         // transient loop
         let mut t_delta = self.TSTEP * FS;
@@ -218,10 +218,10 @@ impl Engine {
 
             // solver iteration count
             let mut c_itl: usize = 0;
-            let mut unknowns_solve : Vec<f32> = vec![0.0; c_mna];
-            let mut unknowns_solve_prev : Vec<f32> = vec![0.0; c_mna];
+            let mut unknowns_solve : Vec<f64> = vec![0.0; c_mna];
+            let mut unknowns_solve_prev : Vec<f64> = vec![0.0; c_mna];
             let mut geared = false;
-            let mut mse :f32 = 0.0;
+            let mut mse :f64 = 0.0;
 
             loop {
 
@@ -331,16 +331,16 @@ impl Engine {
 
 
     // assume circuit has been elaborated
-    fn dc_solve(&mut self, mna: &Vec<Vec<f32>>)
-        -> (Vec<f32>, analysis::Statistics)
+    fn dc_solve(&mut self, mna: &Vec<Vec<f64>>)
+        -> (Vec<f64>, analysis::Statistics)
     {
         const ITL1: usize = 50;
 
         // prep values for convergence checks
         let c_mna = self.c_nodes + self.c_vsrcs;
-        let mut unknowns_prev : Vec<f32> = vec![0.0; c_mna];
-        let mut unknowns_prev_prev : Vec<f32> = vec![0.0; c_mna];
-        let mut unknowns : Vec<f32> = vec![];
+        let mut unknowns_prev : Vec<f64> = vec![0.0; c_mna];
+        let mut unknowns_prev_prev : Vec<f64> = vec![0.0; c_mna];
+        let mut unknowns : Vec<f64> = vec![];
 
         let mut converged = false;
 
@@ -411,7 +411,7 @@ impl Engine {
 
 
     pub fn dc_operating_point(&mut self, ckt: &circuit::Circuit)
-        -> (Vec<f32>, analysis::Statistics)
+        -> (Vec<f64>, analysis::Statistics)
     {
 
         // build the circuit matrix
@@ -499,7 +499,7 @@ impl Engine {
     }
 
     // Solve the system of linear equations
-    fn solve(&self, mut v: Vec<Vec<f32>>) -> Vec<f32> {
+    fn solve(&self, mut v: Vec<Vec<f64>>) -> Vec<f64> {
 
         let c_mna = self.c_nodes + self.c_vsrcs;
         let ia = c_mna; // index for ampere vector
@@ -594,8 +594,8 @@ impl Engine {
 
     }
 
-    fn index_of_next_abs( &self, m: &Vec<Vec<f32>>, k: usize ) -> usize {
-        let mut biggest: f32 = 0.0;
+    fn index_of_next_abs( &self, m: &Vec<Vec<f64>>, k: usize ) -> usize {
+        let mut biggest: f64 = 0.0;
         let mut r_biggest: usize = k;
         let c_rows = m.len();
         for r in k..c_rows {
@@ -609,18 +609,18 @@ impl Engine {
     }
 
     // mean squared error of the two vectors
-    fn mean_squared_error(&self, v1: &Vec<f32>, v2: &Vec<f32>) -> f32 {
-        let mut mse :f32 = 0.0;
+    fn mean_squared_error(&self, v1: &Vec<f64>, v2: &Vec<f64>) -> f64 {
+        let mut mse :f64 = 0.0;
         let bits = v1.iter().zip(v2.iter());
         for (x,y) in bits {
             mse += ( x - y ).powi(2);
         }
-        mse = mse / (v1.len() as f32);
+        mse = mse / (v1.len() as f64);
         mse
     }
 
 
-    fn pp_matrix(&self, m : &Vec<Vec<f32>> ) {
+    fn pp_matrix(&self, m : &Vec<Vec<f64>> ) {
         for r in m {
             for val in r {
                 print!("{:.3}   ", val);
@@ -630,7 +630,7 @@ impl Engine {
     }
 
 
-    fn stamp_current_source(&self, m: &mut Vec<Vec<f32>>, isrc: &circuit::CurrentSource) {
+    fn stamp_current_source(&self, m: &mut Vec<Vec<f64>>, isrc: &circuit::CurrentSource) {
         println!("  [ELEMENT] Current source: {}A into node {} and out of node {}",
                 isrc.value, isrc.p, isrc.n);
         let ia = self.c_nodes + self.c_vsrcs; // index for ampere vector
@@ -646,7 +646,7 @@ impl Engine {
     #[allow(unused_parens)]
     fn stamp_voltage_source(
         &self,
-        m: &mut Vec<Vec<f32>>,
+        m: &mut Vec<Vec<f64>>,
         vsrc: &circuit::VoltageSource,
         i_vsrc: NodeId,
     ) {
@@ -673,7 +673,7 @@ impl Engine {
 
 
 
-    fn stamp_resistor(&self, m: &mut Vec<Vec<f32>>, r: &circuit::Resistor) {
+    fn stamp_resistor(&self, m: &mut Vec<Vec<f64>>, r: &circuit::Resistor) {
         println!("  [ELEMENT] Resistor {} Ohms between node {} and node {}",
                 r.value, r.a, r.b);
         let over = 1.0 / r.value;
@@ -696,7 +696,7 @@ impl Engine {
     }
 
 
-    fn storage_stamp(&self, m: &mut Vec<Vec<f32>>, n: &Vec<f32>, t: f32) {
+    fn storage_stamp(&self, m: &mut Vec<Vec<f64>>, n: &Vec<f64>, t: f64) {
         println!("*INFO* Stamping storage elements");
         for el in &self.storage_elements {
             match *el {
@@ -729,7 +729,7 @@ impl Engine {
 
     // stamp a matrix with linearized companion models of all the nonlinear
     // devices listed in the SPICE netlist
-    fn nonlinear_stamp(&self, m: &mut Vec<Vec<f32>>, n: &Vec<f32>, n_prev: &Vec<f32> ) {
+    fn nonlinear_stamp(&self, m: &mut Vec<Vec<f64>>, n: &Vec<f64>, n_prev: &Vec<f64> ) {
         println!("*INFO* Stamping nonlinear elements");
         for el in &self.nonlinear_elements {
             match *el {
@@ -764,7 +764,7 @@ impl Engine {
 
 
     // stamp independent sources
-    fn independent_source_stamp(&self, m: &mut Vec<Vec<f32>>, t_now: f32) {
+    fn independent_source_stamp(&self, m: &mut Vec<Vec<f64>>, t_now: f64) {
         println!("*INFO* Stamping independent source elements");
         println!("*INFO*  {} of them", &self.independent_sources.len());
         for el in &self.independent_sources {
@@ -793,7 +793,7 @@ impl Engine {
 
     // check for convergence by testing new and previous solutions against
     // RELTOL and the like
-    pub fn convergence_check(&self, xv: &Vec<f32>, yv: &Vec<f32>) -> ConvergenceResult {
+    pub fn convergence_check(&self, xv: &Vec<f64>, yv: &Vec<f64>) -> ConvergenceResult {
 
         let mut res = Ok(true);
         for (i,x) in xv.iter().enumerate() {
@@ -802,7 +802,7 @@ impl Engine {
                 res = Err(ConvergenceError::Divergent);
                 break;
             }
-            let limit: f32;
+            let limit: f64;
             if i < self.c_nodes {
                 limit = x.abs() * RELTOL + VNTOL;
             } else {

@@ -30,7 +30,7 @@ fn test_trans_ir_sine_1kHz() {
 }
 
 
-fn build( freq: f32 ) -> Circuit {
+fn build( freq: f64 ) -> Circuit {
     let mut ckt = Circuit::new();
     ckt.elements.push(
         Element::Isin(CurrentSourceSine{p: 0, n: 1, vo: 3.0, va: 1.0, freq: freq}),

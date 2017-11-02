@@ -55,7 +55,7 @@ fn test_irrc_trans_hpf_10kHz() {
 }
 
 
-fn build( freq: f32 ) -> Circuit {
+fn build( freq: f64 ) -> Circuit {
     let mut ckt = Circuit::new();
 
     // 10V Voltage Source
