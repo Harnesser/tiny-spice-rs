@@ -39,24 +39,26 @@ impl Diode {
     pub fn linearize(&self, v_hat: f32, _: f32) -> (f32, f32) {
        
         // limit the excursion, following Colon via Nagel
+        let v_d_prev = self.v_d_prev.get();
+        let v_delta = v_hat - v_d_prev;
+
         let v_d_i :f32;
         if v_hat < self.v_crit {
             v_d_i = v_hat;
+        } else if v_delta.abs() <= 2.0 * self.v_thermal {
+            v_d_i = v_hat;
+        } else if v_d_prev <= 0.0 {
+            v_d_i = self.v_thermal * (v_hat / self.v_thermal).ln();
         } else {
-            // grab stuff from cells
-            let v_d_prev = self.v_d_prev.get();
-            let i_d_prev = self.i_d_prev.get();
-            let g_eq_prev = self.g_eq_prev.get();
 
-            // y = mx + c
-            let c = i_d_prev - v_d_prev * g_eq_prev;
-            let i_hat = g_eq_prev * v_hat + c;
-
-            let part :f32 = (v_hat - v_d_prev ) / self.v_thermal - 1.0;
-            v_d_i = v_d_prev + self.v_thermal * part.ln();
-
+            let arg :f32 = 1.0 + (v_delta / self.v_thermal);
+            if arg <= 0.0 {
+                v_d_i  = self.v_crit;
+            } else {
+                v_d_i = v_d_prev + self.v_thermal * arg.ln();
+            }
             println!("*DIODE* v_d {}, v_d_prev {}", v_hat, v_d_prev);
-            println!("*DIODE* part {}, v_d_i {}", part, v_d_i);
+            println!("*DIODE* arg {}, v_d_i {}", arg, v_d_i);
         }
         println!("*DIODE* V_d from {} V to {} V (v_crit={})", v_hat, v_d_i, self.v_crit);
 
