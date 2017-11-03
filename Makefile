@@ -21,7 +21,8 @@ test_rust: waves/stamp log/stamp
 	cargo test --no-fail-fast --all > log/test.log || echo 0
 
 test_grep:
-	grep "\.\.\." log/test.log
+	grep "\.\.\." log/test.log > doc/test_summary.txt; \
+	cat doc/test_summary.txt
 
 
 newton:
@@ -88,9 +89,19 @@ blah:
 
 loop_halfbridge:
 	sh bin/loop.sh test_trans_irrd_sine loop
+loop_halfbridge_plot:
+	python3 bin/r8n waves/test_trans_irrd_sine_loop -expr "3"
 
 loop_fullbridge:
 	sh bin/loop.sh test_trans_ir_bridge_loaded loop
+loop_fullbridge_plot:
+	python3 bin/r8n waves/test_trans_ir_bridge_loaded_loop -expr "4-5"
+
+
+loop_rcbridge:
+	sh bin/loop.sh test_trans_ir_bridge_rc_load loop
+loop_rcbridge_plot:
+	python3 bin/r8n waves/test_trans_ir_bridge_rc_load_loop -expr "4-5"
 
 loop_lpf:
 	sh bin/loop.sh test_trans_irrc lpf_loop

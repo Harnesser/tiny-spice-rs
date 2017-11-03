@@ -4,4 +4,5 @@ target
 *.~lock*
 waves
 log
+__pycache__
 
