@@ -23,8 +23,8 @@ def _parse_expr(expr):
 	"""
 	bits_untrimmed = expr.split('-')
 	bits = [b.strip() for b in bits_untrimmed]
-	if len(bits) == 3:
-		return ('-', int(bits[0]), int(bits[2]))
+	if len(bits) == 2:
+		return ('-', int(bits[0]), int(bits[1]))
 	else:
 		return ('=', int(bits[0]))
 
@@ -33,7 +33,6 @@ def load(filename, expr=1):
 	wv = Waveform()
 
 	op = _parse_expr(expr)
-
 	hDAT = open(filename, 'r')
 
 	# 1st line is names

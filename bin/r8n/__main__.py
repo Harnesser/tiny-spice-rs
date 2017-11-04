@@ -73,13 +73,31 @@ filenames.sort()
 
 # initialise plot
 # (nothing)
+colours = [
+        'black',
+        'red',
+        'blue',
+        'darkgreen',
+        'orange',
+        'purple',
+        'pink',
+        ]
+
+colours = [
+        '#0033FF',
+        '#339933',
+        '#Ff9900',
+        '#CC0000',
+        ]
 
 # plot all the data
 for i in range( len(filenames) ):
 #for i in range( 10 ):
     filename = filenames[i]
     wv = waveforms.load( os.path.join(dirname, filename), expr=expr )
-    plt.plot(wv.x, wv.y)
+    colour = colours[i%len(colours)]
+    plt.plot(wv.x, wv.y, color=colour)
+    plt.plot(wv.x[-1], wv.y[-1], 'o', color=colour)
 
 # show
 plt.show()
