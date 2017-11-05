@@ -7,28 +7,30 @@ mod common;
 use common::assert_nearly;
 
 #[test]
+#[allow(non_snake_case)]
 fn test_trans_irrd_sine_1kHz_10us() {
 
     let mut eng = engine::Engine::new();
     eng.TSTEP = 10e-6;
     let ckt = build(1e3);
-    let _ = eng.transient_analysis(&ckt, "waves/trans_irrd_sine_1kHz_10us.dat");
+    let stats = eng.transient_analysis(&ckt, "waves/trans_irrd_sine_1kHz_10us.dat");
     println!("\n*INFO* Done");
 
-    assert!(false);
+    assert!(stats.end >= eng.TSTOP);
 }
 
 
 #[test]
+#[allow(non_snake_case)]
 fn test_trans_irrd_sine_1kHz_1us() {
 
     let mut eng = engine::Engine::new();
     eng.TSTEP = 1e-6;
     let ckt = build(1e3);
-    let _ = eng.transient_analysis(&ckt, "waves/trans_irrd_sine_1kHz_1us.dat");
+    let stats = eng.transient_analysis(&ckt, "waves/trans_irrd_sine_1kHz_1us.dat");
     println!("\n*INFO* Done");
 
-    assert!(false);
+    assert!(stats.end >= eng.TSTOP);
 }
 
 
