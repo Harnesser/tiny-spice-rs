@@ -4,7 +4,6 @@ use tiny_spice::circuit::*;
 use tiny_spice::engine;
 
 #[test]
-#[ignore]
 #[allow(non_snake_case)]
 fn test_trans_ir_bridge_rc_1kHz() {
 
