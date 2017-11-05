@@ -9,6 +9,14 @@ pub struct Capacitor {
 
 impl Capacitor {
 
+    pub fn new(a: NodeId, b: NodeId, value: f64) -> Capacitor {
+        Capacitor {
+            a: a,
+            b: b,
+            value: value,
+        }
+    }
+
     pub fn linearize(&self, v: f64, t: f64) -> (f64, f64) {
         let g_eq = self.value / t;
         let i_eq = g_eq * v;
