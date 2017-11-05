@@ -36,18 +36,17 @@ fn test_trans_ir_bridge_1kHz_1us() {
 #[allow(non_snake_case)]
 fn test_trans_ir_bridge_loaded_loop() {
 
-
     let timesteps = [10e-6, 5e-6, 2e-6, 1e-6];
     let amps = [-2.0, -1.0, -0.5, 0.5, 1.0, 2.0];
     let freqs = [3.0e3, 2.5e3, 2.0e3, 1.0e3, 0.5e3, 0.4e3, 0.3e3, 0.2e3, 0.1e3, 0.05e3];
     let isats = [1e-9, 1e-12, 1e-13];
-
 /*
     let timesteps = [10e-6, 1e-6];
     let amps = [-2.0, 2.0];
     let freqs = [10.0e3, 0.1e3];
     let isats = [1e-9, 1e-13];
 */
+
     let mut i = 0;
     let mut fails = 0;
     for timestep in timesteps.iter() {
