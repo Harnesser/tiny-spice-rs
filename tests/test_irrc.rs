@@ -14,7 +14,7 @@ fn test_irrc_dc() {
     let (v,_) = eng.dc_operating_point(&ckt);
     println!("\n*INFO* Done");
 
-    assert_nearly(v[2], 10.00144);
+    assert_nearly(v[2], 9.999999);
 }
 
 
