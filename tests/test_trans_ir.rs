@@ -4,17 +4,16 @@ use tiny_spice::circuit;
 use tiny_spice::engine;
 
 mod common;
-use common::assert_nearly;
 
 #[test]
-fn test() {
+fn trans_ir() {
 
     let mut eng = engine::Engine::new();
     let ckt = build();
-    let v = eng.transient_analysis(&ckt, "waves/trans_ir.dat");
+    let stats = eng.transient_analysis(&ckt, "waves/trans_ir.dat");
     println!("\n*INFO* Done");
-
-    assert!(false);
+    
+    assert!(stats.end >= eng.TSTOP);
 }
 
 

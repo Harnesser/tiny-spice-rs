@@ -4,7 +4,6 @@ use tiny_spice::circuit::*;
 use tiny_spice::engine;
 
 mod common;
-use common::assert_nearly;
 
 #[test]
 #[allow(non_snake_case)]

@@ -1,11 +1,12 @@
 # Changelog
 
-## [UNRELEASED] Capacitors
+
+## [0.6.0] Capacitors
 Deal with capacitors
 
 ### Added
 - Capacitor model for DC operating point analysis
-- Capacitor in transient analysis
+- Integration method - backward euler built into cap linearisation
 
 ### Changed
 - Analysis functions return stats

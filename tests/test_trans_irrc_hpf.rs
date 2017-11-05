@@ -4,9 +4,9 @@ use tiny_spice::circuit::*;
 use tiny_spice::engine;
 
 mod common;
-use common::assert_nearly;
 
 #[test]
+#[allow(non_snake_case)]
 fn test_irrc_trans_hpf_1kHz() {
 
     let mut eng = engine::Engine::new();
@@ -19,6 +19,7 @@ fn test_irrc_trans_hpf_1kHz() {
 }
 
 #[test]
+#[allow(non_snake_case)]
 fn test_irrc_trans_hpf_2kHz() {
 
     let mut eng = engine::Engine::new();
@@ -31,6 +32,7 @@ fn test_irrc_trans_hpf_2kHz() {
 }
 
 #[test]
+#[allow(non_snake_case)]
 fn test_irrc_trans_hpf_5kHz() {
 
     let mut eng = engine::Engine::new();
@@ -43,6 +45,7 @@ fn test_irrc_trans_hpf_5kHz() {
 }
 
 #[test]
+#[allow(non_snake_case)]
 fn test_irrc_trans_hpf_10kHz() {
 
     let mut eng = engine::Engine::new();
