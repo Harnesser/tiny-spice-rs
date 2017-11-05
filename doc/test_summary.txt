@@ -26,10 +26,10 @@ test test_irrc_trans_10kHz ... ok
 test test_irrc_trans_2kHz ... ok
 test test_irrc_trans_lpf_loop ... ignored
 test test_irrc_trans_5kHz ... ok
-test test_irrc_trans_hpf_1kHz ... FAILED
-test test_irrc_trans_hpf_10kHz ... FAILED
-test test_irrc_trans_hpf_2kHz ... FAILED
-test test_irrc_trans_hpf_5kHz ... FAILED
+test test_irrc_trans_hpf_1kHz ... ok
+test test_irrc_trans_hpf_10kHz ... ok
+test test_irrc_trans_hpf_2kHz ... ok
+test test_irrc_trans_hpf_5kHz ... ok
 test test_trans_irrd_sine_1kHz_10us ... FAILED
 test test_trans_irrd_sine_loop ... ignored
 test test_trans_irrd_sine_1kHz_1us ... FAILED

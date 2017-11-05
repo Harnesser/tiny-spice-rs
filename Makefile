@@ -105,6 +105,8 @@ loop_rcbridge_plot:
 
 loop_lpf:
 	sh bin/loop.sh test_trans_irrc lpf_loop
+loop_lpf_plot:
+	python3 bin/r8n waves/test_trans_irrc_lpf_loop -expr "3"
 
 
 waves/stamp:
