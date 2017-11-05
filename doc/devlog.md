@@ -1,5 +1,13 @@
 # Development Log
 
+## 2017-11-05
+Initial musings on a SPICE deck reader.
+
+
+## 2017-11-04
+Adding a small cap across the diodes seems to make everything happy.
+
+Fixed up a bunch of testcases and stamped version [TAG 0.6.0]
 
 ## 2017-11-03
 Created a program to plot all the results from the loops I've got going.

@@ -15,6 +15,9 @@ debug:
 clippy:
 	rustup run nightly cargo clippy
 
+spice_t: 
+	rm -rf ./spice; rustc --test src/spice.rs; ./spice --nocapture
+
 test: test_rust test_grep
 
 test_rust: waves/stamp log/stamp

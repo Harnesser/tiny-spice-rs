@@ -22,4 +22,6 @@ How SPICE compatible do I want this to be?
 
 Plot? v(<node>) or v(<node>, <node>) i(<node>, <pin>) #branch?
  
+Do I bring in a dependency, or just write a recursive descent?
+
 

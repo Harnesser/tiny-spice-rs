@@ -12,3 +12,5 @@ pub mod capacitor;
 
 pub mod wavewriter;
 
+pub mod spice;
+
