@@ -1,0 +1,29 @@
+
+digraph "value" {
+
+node [shape = doubleoctagon]; int frac power eng unit;
+node [shape = ellipse];
+
+start -> sign [label = "digit"];
+start -> int [label = "\"+\" or \"-\""];
+
+sign -> int [label = "digit"];
+
+int -> int [label = "digit"];
+int -> point [label = "\".\""];
+point -> frac [label = "digit"];
+frac -> frac [label = "digit"];
+
+int -> exp [label = "\"e\""];
+frac -> exp [label = "\"e\""];
+
+exp -> power [label = "digit"];
+exp -> exp_sign [label = "\"+\" or \"-\""];
+exp_sign -> power [label = "digit"];
+
+power -> power [label = "digit"];
+
+power -> eng [label = "[meg|k|m|u|n|p|f]"];
+
+eng -> unit [label = "[A|V|s|F]"];
+}
