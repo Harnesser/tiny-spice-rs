@@ -14,8 +14,8 @@
         <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_ir_bridge_1kHz_rc_load.dat" fileRelative="waves/trans_ir_bridge_1kHz_rc_load.dat" field="v(1)" start="0" count="-1" skip="-1" doAve="false" initialVNum="6" initialXNum="61"/>
         <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_ir_bridge_1kHz_rc_load.dat" fileRelative="waves/trans_ir_bridge_1kHz_rc_load.dat" field="v(3)" start="0" count="-1" skip="-1" doAve="false" initialVNum="7" initialXNum="73"/>
         <datavector file="/home/harnesser/Projects/tiny-spice-rs/waves/trans_ir_bridge_1kHz_rc_load.dat" fileRelative="waves/trans_ir_bridge_1kHz_rc_load.dat" field="v(4)" start="0" count="-1" skip="-1" doAve="false" initialVNum="8" initialXNum="85"/>
-        <string value="2017-10-19 01:08:30" initialTNum="1"/>
-        <string value="2017-10-19 01:08:30" initialTNum="2"/>
+        <string value="2017-11-03 22:45:27" initialTNum="1"/>
+        <string value="2017-11-03 22:45:27" initialTNum="2"/>
         <string value="trans_ir_bridge_1kHz_rc_load.dat" initialTNum="3"/>
         <string value="/home/harnesser/Projects/tiny-spice-rs/waves" initialTNum="4"/>
         <string value="s" initialTNum="5"/>
@@ -26,6 +26,18 @@
         <string value="V" initialTNum="10"/>
         <string value="V" initialTNum="11"/>
         <string value="V" initialTNum="12"/>
+        <string orphan="true" editable="true" value="2017-10-19 01:08:30" initialTNum="1"/>
+        <string orphan="true" editable="true" value="2017-10-19 01:08:30" initialTNum="2"/>
+        <string orphan="true" editable="true" value="trans_ir_bridge_1kHz_rc_load.dat" initialTNum="3"/>
+        <string orphan="true" editable="true" value="/home/harnesser/Projects/tiny-spice-rs/waves" initialTNum="4"/>
+        <string orphan="true" editable="true" value="s" initialTNum="5"/>
+        <string orphan="true" editable="true" value="V" initialTNum="6"/>
+        <string orphan="true" editable="true" value="V" initialTNum="7"/>
+        <string orphan="true" editable="true" value="V" initialTNum="8"/>
+        <string orphan="true" editable="true" value="A" initialTNum="9"/>
+        <string orphan="true" editable="true" value="V" initialTNum="10"/>
+        <string orphan="true" editable="true" value="V" initialTNum="11"/>
+        <string orphan="true" editable="true" value="V" initialTNum="12"/>
         <string orphan="true" editable="true" value="2017-09-16 18:06:17" initialTNum="1"/>
         <string orphan="true" editable="true" value="2017-09-16 18:06:17" initialTNum="2"/>
         <string orphan="true" editable="true" value="trans_ir_bridge_1kHz_rc_load.dat" initialTNum="3"/>
@@ -90,9 +102,9 @@
                 </pen>
                 <brush color="#ffffff" style="1"/>
                 <legend auto="true" title="" font="Noto Sans,12,-1,5,50,0,0,0,0,0" fontscale="12" verticaldisplay="true" name="Legend">
-                    <position x="352.863991794639" y="42.6087533156499"/>
+                    <position x="372.232743944393" y="405.60875331565"/>
                     <rect x="-291.519253125" y="-16.506525" width="150" height="108"/>
-                    <relativesize width="0.150195467177435" height="0.20002947678703" centerx="0.0862225753345349" centery="0.123355637803979" posx="0.0111248417458174" posy="0.0233408994104642"/>
+                    <relativesize width="0.149170914563503" height="0.20002947678703" centerx="0.111717569441417" centery="0.795676934782609" posx="0.0371321121596656" posy="0.695662196389094"/>
                     <transform m11="1" m12="0" m13="0" m21="0" m22="1" m23="0" m31="0" m32="0" m33="1"/>
                     <pen style="1" width="0" miterlimit="2" cap="16" joinStyle="64">
                         <brush color="#000000" style="1"/>
@@ -120,7 +132,7 @@
                 <plotlabel id="toplabel" visible="true" overridetext="" autolabel="true" font="Noto Sans [monotype],12,-1,5,50,0,0,0,0,0" fontscale="10" fontcolor="#000000" fontuseglobal="true"/>
                 <plotlabel id="bottomlabel" visible="true" overridetext="Time \[s\]" autolabel="true" font="Noto Sans [monotype],12,-1,5,50,0,0,0,0,0" fontscale="10" fontcolor="#000000" fontuseglobal="true"/>
                 <plotlabel id="numberlabel" visible="true" overridetext="" autolabel="false" font="Noto Sans [monotype],12,-1,5,50,0,0,0,0,0" fontscale="10" fontcolor="#000000" fontuseglobal="true"/>
-                <projectionrect x="0" y="-0.01056421066775" width="3.3776791e-06" height="0.4427537670255"/>
+                <projectionrect x="0" y="-20.7306059874731" width="0.001611171875" height="41.4610410913584"/>
             </plot>
         </view>
     </graphics>
