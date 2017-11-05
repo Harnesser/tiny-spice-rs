@@ -21,7 +21,7 @@ test_rust: waves/stamp log/stamp
 	cargo test --no-fail-fast --all > log/test.log || echo 0
 
 test_grep:
-	grep "\.\.\." log/test.log > doc/test_summary.txt; \
+	grep "\.\.\." log/test.log | sort > doc/test_summary.txt; \
 	cat doc/test_summary.txt
 
 
