@@ -4,6 +4,7 @@ use tiny_spice::circuit::*;
 use tiny_spice::engine;
 
 #[test]
+#[ignore]
 #[allow(non_snake_case)]
 fn test_trans_ir_bridge_rc_1kHz() {
 
@@ -11,6 +12,19 @@ fn test_trans_ir_bridge_rc_1kHz() {
     eng.TSTEP = 1.0e-6;
     let ckt = build(2.0, 1e3, 1e-6);
     let stats = eng.transient_analysis(&ckt, "waves/trans_ir_bridge_1kHz_rc_load.dat");
+    println!("\n*INFO* Done");
+    println!("{}", stats);
+    assert!(stats.end >= eng.TSTOP);
+}
+
+
+#[test]
+fn test_trans_ir_bridge_rc_failure_003() {
+
+    let mut eng = engine::Engine::new();
+    eng.TSTEP = 0.000001;
+    let ckt = build(-2.0, 3.0e3, 0.000001);
+    let stats = eng.transient_analysis(&ckt, "waves/trans_ir_bridge_rc_failure_003.dat");
     println!("\n*INFO* Done");
     println!("{}", stats);
     assert!(stats.end >= eng.TSTOP);
@@ -93,6 +107,12 @@ fn build(amp: f64, freq: f64, cap: f64) -> Circuit {
     ckt.elements.push( Element::D(Diode::new(4, 1, isat, 27.0)) );
     ckt.elements.push( Element::D(Diode::new(2, 3, isat, 27.0)) );
     ckt.elements.push( Element::D(Diode::new(4, 2, isat, 27.0)) );
+
+    let c_diode = 1e-12;
+    ckt.elements.push( Element::C(Capacitor::new(1, 3, c_diode)) );
+    ckt.elements.push( Element::C(Capacitor::new(4, 1, c_diode)) );
+    ckt.elements.push( Element::C(Capacitor::new(2, 3, c_diode)) );
+    ckt.elements.push( Element::C(Capacitor::new(4, 2, c_diode)) );
 
     // load
     ckt.elements.push( Element::R(Resistor{a: 3, b: 4, value: 1000.0}) );
