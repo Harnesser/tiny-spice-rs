@@ -4,26 +4,33 @@ digraph "value" {
 node [shape = doubleoctagon]; int frac power eng unit;
 node [shape = ellipse];
 
-start -> sign [label = "digit"];
-start -> int [label = "\"+\" or \"-\""];
+eng_bits [label = "engineering\nnotation:\n[meg|k|m|u|n|p|f]", shape = none];
+{rank = same; eng_bits -> eng [style=invisible];}
 
-sign -> int [label = "digit"];
+start -> int [label = "digit"];
+start -> sign [label = "\"+\" or \"-\"", weight=10];
+
+sign -> int [label = "digit", weight=10];
 
 int -> int [label = "digit"];
-int -> point [label = "\".\""];
-point -> frac [label = "digit"];
+int -> point [label = "\".\"", weight=10];
+int -> eng [label = "eng."];
+
+point -> frac [label = "digit", weight=10];
 frac -> frac [label = "digit"];
 
 int -> exp [label = "\"e\""];
-frac -> exp [label = "\"e\""];
+frac -> exp [label = "\"e\"", weight=10];
+frac -> eng [label = "eng."];
 
 exp -> power [label = "digit"];
-exp -> exp_sign [label = "\"+\" or \"-\""];
-exp_sign -> power [label = "digit"];
+exp -> exp_sign [label = "\"+\" or \"-\"", weight=10];
+exp_sign -> power [label = "digit", weight=10];
 
 power -> power [label = "digit"];
 
-power -> eng [label = "[meg|k|m|u|n|p|f]"];
+power -> eng [label = "eng.", weight=10];
 
-eng -> unit [label = "[A|V|s|F]"];
+eng -> unit [label = "[A|V|s|F]", weight=10];
+
 }

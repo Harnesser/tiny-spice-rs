@@ -118,6 +118,9 @@ waves/stamp:
 log/stamp:
 	mkdir -p log; touch log/stamp
 
+dot:
+	dot doc/value.dot -Tsvg > doc/value.svg
+
 clean:
 	cargo clean
 	\rm -rf *.log
