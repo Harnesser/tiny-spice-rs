@@ -1,0 +1,9 @@
+Some tests on the SPICE deck reader
+
+
+R 1 0 1k
+R 2 8 1
+C 5 6 0.32uF
+V 1 999999999999 0.1uV
+I 9999999 0 1000kA
+R 3 4 0.2134

@@ -1,4 +1,5 @@
 test diode::tests::curve_trace ... ok
+test spice::tests::simple_read ... ok
 test test_dc_bridge_loaded_2v0 ... ok
 test test_dc_bridge_loaded_gnd ... ok
 test test_dc_ird ... ok
