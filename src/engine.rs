@@ -12,11 +12,11 @@ const ABSTOL: f64 = 1.0e-9;
 
 fn banner() {
 
-    println!("********************************************");
-    println!("***       Tiny-SPICE-Simulator           ***");
-    println!("***        (c) CrapCorp 2017             ***");
-    println!("*** Patent Pending, All rights reserved  ***");
-    println!("********************************************");
+    println!("**********************************************");
+    println!("***        Tiny-SPICE-Simulator            ***");
+    println!("***        (c) CrapCadCorp 2017            ***");
+    println!("*** No Patents Pending, No rights reserved ***");
+    println!("**********************************************");
 
 }
 
