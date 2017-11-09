@@ -1,9 +1,6 @@
 ARGS:=
 WAVES:=
 
-go:
-	cargo run bringup
-
 run:
 	cargo run ${ARGS} | tee sim.log
 

@@ -14,60 +14,80 @@
 use std::fs::File;
 use std::io::{BufReader, BufRead};
 
-pub fn read(filename :&str) {
+use circuit::{Circuit};
 
-    let input = File::open(filename).unwrap();
-    let buf = BufReader::new(input);
-    let mut lines_iter = buf.lines();
+pub struct Reader {
+    ckt: Circuit,
+}
 
-    // first line is a comment and is ignored
-    lines_iter.next();
+impl Reader {
 
-    for line_wr in lines_iter {
-        let line = line_wr.unwrap();
-        let bits :Vec<&str> = line.split_whitespace().collect();
+    pub fn new() -> Reader {
+        Reader {
+            ckt: Circuit::new()
+        }
+    }
 
-        // jump blank lines
-        if bits.len() == 0 {
-            continue;
+    pub fn read(&mut self, filename :&str) {
+
+        let input = File::open(filename).unwrap();
+        let buf = BufReader::new(input);
+        let mut lines_iter = buf.lines();
+
+        // first line is a comment and is ignored
+        lines_iter.next();
+
+        for line_wr in lines_iter {
+            let line = line_wr.unwrap();
+            let bits :Vec<&str> = line.split_whitespace().collect();
+
+            // jump blank lines
+            if bits.len() == 0 {
+                continue;
+            }
+
+            // find out what we're looking at
+            if bits[0].starts_with('I') {
+                println!("\nfound current source");
+                let ident = extract_identifier(&bits[0]);
+                let node1 = extract_node(&bits[1]);
+                let node2 = extract_node(&bits[2]);
+                let value = Some(0.0); // extract_value(&bits[3]);
+                println!("::: {} {} {} {}", ident, node1, node2, value.unwrap());
+            } else if bits[0].starts_with('V') {
+                println!("\nfound voltage source");
+                let ident = extract_identifier(&bits[0]);
+                let node1 = extract_node(&bits[1]);
+                let node2 = extract_node(&bits[2]);
+                let value = extract_value(&bits[3]);
+                println!("::: {} {} {} {}", ident, node1, node2, value.unwrap());
+            } else if bits[0].starts_with('R') {
+                println!("\nfound resistance: {:?}", bits);
+                let ident = extract_identifier(&bits[0]);
+                let node1 = extract_node(&bits[1]);
+                let node2 = extract_node(&bits[2]);
+                let value = extract_value(&bits[3]);
+                println!("::: {} {} {} {}", ident, node1, node2, value.unwrap());
+            } else if bits[0].starts_with('C') {
+                println!("\nfound capacitance");
+                let ident = extract_identifier(&bits[0]);
+                let node1 = extract_node(&bits[1]);
+                let node2 = extract_node(&bits[2]);
+                let value = extract_value(&bits[3]);
+                println!("::: {} {} {} {}", ident, node1, node2, value.unwrap());
+            }
+
+            //for bit in bits {
+            //    println!("->{}", bit);
+            //}
+
+            println!("{}", line);
         }
 
-        // find out what we're looking at
-        if bits[0].starts_with('I') {
-            println!("\nfound current source");
-            let ident = extract_identifier(&bits[0]);
-            let node1 = extract_node(&bits[1]);
-            let node2 = extract_node(&bits[2]);
-            let value = Some(0.0); // extract_value(&bits[3]);
-            println!("::: {} {} {} {}", ident, node1, node2, value.unwrap());
-        } else if bits[0].starts_with('V') {
-            println!("\nfound voltage source");
-            let ident = extract_identifier(&bits[0]);
-            let node1 = extract_node(&bits[1]);
-            let node2 = extract_node(&bits[2]);
-            let value = extract_value(&bits[3]);
-            println!("::: {} {} {} {}", ident, node1, node2, value.unwrap());
-        } else if bits[0].starts_with('R') {
-            println!("\nfound resistance: {:?}", bits);
-            let ident = extract_identifier(&bits[0]);
-            let node1 = extract_node(&bits[1]);
-            let node2 = extract_node(&bits[2]);
-            let value = extract_value(&bits[3]);
-            println!("::: {} {} {} {}", ident, node1, node2, value.unwrap());
-        } else if bits[0].starts_with('C') {
-            println!("\nfound capacitance");
-            let ident = extract_identifier(&bits[0]);
-            let node1 = extract_node(&bits[1]);
-            let node2 = extract_node(&bits[2]);
-            let value = extract_value(&bits[3]);
-            println!("::: {} {} {} {}", ident, node1, node2, value.unwrap());
-        }
+    }
 
-        //for bit in bits {
-        //    println!("->{}", bit);
-        //}
-
-        println!("{}", line);
+    pub fn circuit(&self) -> &Circuit {
+        &self.ckt
     }
 
 }
@@ -101,11 +121,11 @@ enum ValueState {
 // * 10.0meg [not implemented]
 // * 10mA
 // * 10.0megV [not implemented]
-// * 10.0e-6
-// * 10.0e-6V
+// * 10.0e-6 [not implemented]
+// * 10.0e-6V [not implemented]
 //
-// Supported engineering: meg k m u n p f
-// Supported units: A V F s
+// Supported engineering: k m u n p (future: meg f)
+// Supported units: NONE (future:  A V F s)
 fn extract_value(text: &str) -> Option<f64> {
     let mut value: Option<f64> = None;
     let mut float_str = "".to_string();
@@ -232,6 +252,7 @@ mod tests {
 
     #[test]
     fn simple_read() {
-        read("./ngspice/test_reader.spi");
+        let mut rdr = Reader::new();
+        rdr.read("./ngspice/test_reader.spi");
     }
 }
