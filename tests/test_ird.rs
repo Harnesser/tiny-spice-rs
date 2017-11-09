@@ -10,7 +10,7 @@ use common::assert_nearly;
 fn test_dc_ird() {
 
     let mut eng = engine::Engine::new();
-    let ckt = build();
+    let ckt = build(1e-9);
     let (v,_) = eng.dc_operating_point(&ckt);
     println!("\n*INFO* Done");
 
@@ -18,7 +18,20 @@ fn test_dc_ird() {
 }
 
 
-fn build() -> circuit::Circuit {
+#[test]
+#[allow(non_snake_case)]
+fn test_dc_ird_isat_1pA() {
+
+    let mut eng = engine::Engine::new();
+    let ckt = build(1e-12);
+    let (v,_) = eng.dc_operating_point(&ckt);
+    println!("\n*INFO* Done");
+
+    assert_nearly(v[1], 0.73217);
+}
+
+
+fn build(isat: f64) -> circuit::Circuit {
     let mut ckt = circuit::Circuit::new();
     ckt.elements.push(
         circuit::Element::I(circuit::CurrentSource{p: 0, n: 1, value: 3.0}),
@@ -27,7 +40,7 @@ fn build() -> circuit::Circuit {
         circuit::Element::R(circuit::Resistor{a: 1, b: 0, value: 10.0}),
     );
     ckt.elements.push(
-        circuit::Element::D(circuit::Diode::new(1, 0, 1e-9, 27.0)),
+        circuit::Element::D(circuit::Diode::new(1, 0, isat, 27.0)),
     );
     ckt
 }
