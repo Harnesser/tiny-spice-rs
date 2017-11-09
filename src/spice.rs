@@ -48,40 +48,34 @@ impl Reader {
 
             // find out what we're looking at
             if bits[0].starts_with('I') {
-                println!("\nfound current source");
                 let ident = extract_identifier(&bits[0]);
                 let node1 = extract_node(&bits[1]);
                 let node2 = extract_node(&bits[2]);
-                let value = Some(0.0); // extract_value(&bits[3]);
-                println!("::: {} {} {} {}", ident, node1, node2, value.unwrap());
+                let value = extract_value(&bits[3]);
+                self.ckt.add_i(node1, node2, value.unwrap());
             } else if bits[0].starts_with('V') {
-                println!("\nfound voltage source");
                 let ident = extract_identifier(&bits[0]);
                 let node1 = extract_node(&bits[1]);
                 let node2 = extract_node(&bits[2]);
                 let value = extract_value(&bits[3]);
-                println!("::: {} {} {} {}", ident, node1, node2, value.unwrap());
             } else if bits[0].starts_with('R') {
-                println!("\nfound resistance: {:?}", bits);
                 let ident = extract_identifier(&bits[0]);
                 let node1 = extract_node(&bits[1]);
                 let node2 = extract_node(&bits[2]);
                 let value = extract_value(&bits[3]);
-                println!("::: {} {} {} {}", ident, node1, node2, value.unwrap());
+                self.ckt.add_r(node1, node2, value.unwrap());
             } else if bits[0].starts_with('C') {
-                println!("\nfound capacitance");
                 let ident = extract_identifier(&bits[0]);
                 let node1 = extract_node(&bits[1]);
                 let node2 = extract_node(&bits[2]);
                 let value = extract_value(&bits[3]);
-                println!("::: {} {} {} {}", ident, node1, node2, value.unwrap());
             }
 
             //for bit in bits {
             //    println!("->{}", bit);
             //}
 
-            println!("{}", line);
+            //println!("{}", line);
         }
 
     }
@@ -97,9 +91,9 @@ fn extract_identifier(text: &str) -> String {
     text.to_string()
 }
 
-fn extract_node(text: &str) -> u32 {
-    let mut node: u32 = 0;
-    match text.parse::<u32>() {
+fn extract_node(text: &str) -> usize {
+    let mut node: usize = 0;
+    match text.parse::<usize>() {
         Ok(n) => node = n,
         Err(_) => println!("*ERROR* bad node name"),
     }
@@ -134,7 +128,7 @@ fn extract_value(text: &str) -> Option<f64> {
     let mut nxt;
     let mut eng_mult :f64 = 1.0;
 
-    println!("VALUE: '{}'", text);
+    //println!("VALUE: '{}'", text);
     let mut text_iter = text.chars();
 
     fn eval( txt :&str, mult: f64) -> Option<f64> {
@@ -229,7 +223,7 @@ fn extract_value(text: &str) -> Option<f64> {
             },
         }
 
-        println!(" -> {:?} '{}'", nxt, float_str);
+        //println!(" -> {:?} '{}'", nxt, float_str);
         state = nxt;
     }
 

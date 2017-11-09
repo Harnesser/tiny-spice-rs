@@ -180,5 +180,19 @@ impl Circuit {
         c_vsrc
     } 
 
+    /// Add DC current source
+    pub fn add_i(&mut self, p: NodeId, n: NodeId, value: f64) {
+        self.elements.push(
+            Element::I(CurrentSource{p: p, n: n, value: value})
+        );
+    }
+
+    /// Add resistor
+    pub fn add_r(&mut self, a: NodeId, b: NodeId, value: f64) {
+        self.elements.push(
+            Element::R(Resistor{a: a, b: b, value: value})
+        );
+    }
+
 
 }
