@@ -187,6 +187,13 @@ impl Circuit {
         );
     }
 
+    /// Add DC voltage source
+    pub fn add_v(&mut self, p: NodeId, n: NodeId, value: f64) {
+        self.elements.push(
+            Element::V(VoltageSource{p: p, n: n, value: value})
+        );
+    }
+
     /// Add resistor
     pub fn add_r(&mut self, a: NodeId, b: NodeId, value: f64) {
         self.elements.push(
@@ -194,5 +201,16 @@ impl Circuit {
         );
     }
 
+    /// Add capacitor
+    pub fn add_c(&mut self, a: NodeId, b: NodeId, value: f64) {
+        self.elements.push(
+            Element::C(Capacitor{a: a, b: b, value: value})
+        );
+    }
+
+    /// Add diode
+    pub fn add_d(&mut self, d:Diode) {
+        self.elements.push(Element::D(d));
+    }
 
 }

@@ -14,7 +14,7 @@
 use std::fs::File;
 use std::io::{BufReader, BufRead};
 
-use circuit::{Circuit};
+use circuit::{Circuit, Diode};
 
 pub struct Reader {
     ckt: Circuit,
@@ -48,27 +48,29 @@ impl Reader {
 
             // find out what we're looking at
             if bits[0].starts_with('I') {
-                let ident = extract_identifier(&bits[0]);
-                let node1 = extract_node(&bits[1]);
-                let node2 = extract_node(&bits[2]);
                 let value = extract_value(&bits[3]);
                 self.ckt.add_i(node1, node2, value.unwrap());
             } else if bits[0].starts_with('V') {
-                let ident = extract_identifier(&bits[0]);
+                let _ = extract_identifier(&bits[0]);
                 let node1 = extract_node(&bits[1]);
                 let node2 = extract_node(&bits[2]);
                 let value = extract_value(&bits[3]);
+                self.ckt.add_v(node1, node2, value.unwrap());
             } else if bits[0].starts_with('R') {
-                let ident = extract_identifier(&bits[0]);
+                let _ = extract_identifier(&bits[0]);
                 let node1 = extract_node(&bits[1]);
                 let node2 = extract_node(&bits[2]);
                 let value = extract_value(&bits[3]);
                 self.ckt.add_r(node1, node2, value.unwrap());
             } else if bits[0].starts_with('C') {
-                let ident = extract_identifier(&bits[0]);
+                let _ = extract_identifier(&bits[0]);
                 let node1 = extract_node(&bits[1]);
                 let node2 = extract_node(&bits[2]);
                 let value = extract_value(&bits[3]);
+                self.ckt.add_c(node1, node2, value.unwrap());
+            } else if bits[0].starts_with('D') {
+                let d = self.extract_diode(&bits);
+                self.ckt.add_d(d);
             }
 
             //for bit in bits {
@@ -78,6 +80,21 @@ impl Reader {
             //println!("{}", line);
         }
 
+    }
+
+    fn extract_diode(&self, bits: &Vec<&str>) -> Diode {
+        println!("!!!! Diode !!!!");
+        let mut i_sat = 1e-9;
+        let mut tdegc = 27.0;
+        let _ = extract_identifier(&bits[0]);
+        let node1 = extract_node(&bits[1]);
+        let node2 = extract_node(&bits[2]);
+        //let value = extract_value(&bits[3]);
+
+        if (i_sat < 0.0) || (i_sat > 1e-6) {
+            println!("*WARN* check diode saturation current. It seems weird");
+        }
+        Diode::new(node1, node2, i_sat, tdegc)
     }
 
     pub fn circuit(&self) -> &Circuit {
@@ -142,7 +159,7 @@ fn extract_value(text: &str) -> Option<f64> {
         } else {
             break 'things;
         }
-        println!(" {:?} '{}'", state, c);
+        //println!(" {:?} '{}'", state, c);
         match state {
 
             ValueState::START => {
