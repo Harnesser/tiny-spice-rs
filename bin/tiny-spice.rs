@@ -35,8 +35,15 @@ fn main() {
     // tmp analysis
     let mut eng = engine::Engine::new();
     //eng.transient_analysis(&circuit, "waves/tmp.dat");
-    eng.dc_operating_point(&circuit);
+    if let Some(stats) = eng.go(&circuit) {
+        println!("\n*INFO* Done");
+    } else {
+        println!("\n*ERROR* Bad, bad bad...");
+    }
 
-    println!("\n*INFO* Done");
+
+    eng.set_transient(3e-3, 1e-6, 0.0);
+    eng.set_wavefile("waves/asdfasdf.dat");
+    eng.go(&circuit);
 }
 

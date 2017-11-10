@@ -8,12 +8,14 @@ use tiny_spice::engine;
 fn test_trans_ir_bridge_1kHz_10us() {
 
     let mut eng = engine::Engine::new();
-    eng.TSTEP = 10e-6;
+    eng.set_transient(2.0e-3, 10e-6, 0.0);
+    eng.set_wavefile("waves/trans_ir_bridge_1kHz_10us.dat");
+
     let ckt = build(2.0, 1.0e3, 1e-9);
-    let stats = eng.transient_analysis(&ckt, "waves/trans_ir_bridge_1kHz_10us.dat");
+    let stats = eng.go(&ckt).unwrap();
     println!("\n*INFO* Done");
     println!("{}", stats);
-    assert!(stats.end >= eng.TSTOP);
+    assert!(stats.end >= eng.cfg.TSTOP);
 }
 
 
@@ -23,12 +25,14 @@ fn test_trans_ir_bridge_1kHz_10us() {
 fn test_trans_ir_bridge_1kHz_1us() {
 
     let mut eng = engine::Engine::new();
-    eng.TSTEP = 1.0e-6;
+    eng.set_transient(2.0e-3, 1e-6, 0.0);
+    eng.set_wavefile("waves/trans_ir_bridge_1kHz_1us.dat");
+
     let ckt = build(2.0, 1.0e3, 1e-9);
-    let stats = eng.transient_analysis(&ckt, "waves/trans_ir_bridge_1kHz_1us.dat");
+    let stats = eng.go(&ckt).unwrap();
     println!("\n*INFO* Done");
     println!("{}", stats);
-    assert!(stats.end >= eng.TSTOP);
+    assert!(stats.end >= eng.cfg.TSTOP);
 }
 
 #[test]
@@ -54,17 +58,17 @@ fn test_trans_ir_bridge_loaded_loop() {
             for amp in amps.iter() {
                 for isat in isats.iter() {
                     let mut eng = engine::Engine::new();
-                    eng.TSTEP = *timestep;
-                    eng.TSTOP = 2.0e-3;
+                    eng.set_transient(2.0e-3, *timestep, 0.0);
 
                     let specs = format!("{:03} {} {} {} {}", i, timestep, amp, freq, isat);
                     println!("LOOP-SPEC {}", specs);
                     let ckt = build(*amp, *freq, *isat);
 
                     let filename = format!("waves/test_trans_ir_bridge_loaded_loop/{:03}.dat", i);
-                    let stats = eng.transient_analysis(&ckt, &filename);
+                    eng.set_wavefile(&filename);
+                    let stats = eng.go(&ckt).unwrap();
                     println!("{}", stats);
-                    if stats.end >= eng.TSTOP {
+                    if stats.end >= eng.cfg.TSTOP {
                         println!("LOOP-RESULT {} GOOD\n\n", specs);
                     } else {
                         println!("LOOP-RESULT {} BAD\n\n", specs);

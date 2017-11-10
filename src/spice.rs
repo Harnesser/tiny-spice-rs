@@ -48,6 +48,9 @@ impl Reader {
 
             // find out what we're looking at
             if bits[0].starts_with('I') {
+                let _ = extract_identifier(&bits[0]);
+                let node1 = extract_node(&bits[1]);
+                let node2 = extract_node(&bits[2]);
                 let value = extract_value(&bits[3]);
                 self.ckt.add_i(node1, node2, value.unwrap());
             } else if bits[0].starts_with('V') {
@@ -83,7 +86,6 @@ impl Reader {
     }
 
     fn extract_diode(&self, bits: &Vec<&str>) -> Diode {
-        println!("!!!! Diode !!!!");
         let mut i_sat = 1e-9;
         let mut tdegc = 27.0;
         let _ = extract_identifier(&bits[0]);

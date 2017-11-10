@@ -4,12 +4,6 @@ use circuit;
 use circuit::NodeId;
 use wavewriter::WaveWriter;
 
-// The boyos 
-const RELTOL: f64 = 0.0001;
-const VNTOL: f64 = 1.0e-6;
-const ABSTOL: f64 = 1.0e-9;
-
-
 fn banner() {
 
     println!("**********************************************");
@@ -31,10 +25,8 @@ pub type ConvergenceResult = Result<bool, ConvergenceError>;
 #[allow(non_snake_case)]
 pub struct Engine {
 
-    // user-supplied control on the sim time
-    pub TSTART: f64,
-    pub TSTOP: f64,
-    pub TSTEP: f64,
+    // circuit analysis configuration
+    pub cfg: analysis::Configuration,
 
     // Number of voltage nodes in the circuit
     c_nodes: usize,
@@ -55,6 +47,9 @@ pub struct Engine {
     // list of elements with energy storage (caps & inductors)
     storage_elements: Vec<circuit::Element>,
 
+    // DC operating point
+    dc_op: Vec<f64>,
+
 }
 
 impl Engine {
@@ -62,17 +57,57 @@ impl Engine {
     pub fn new() -> Engine {
         banner();
         Engine {
-            TSTART: 0.0,
-            TSTOP: 2e-3,
-            TSTEP: 1.0e-5,
+            cfg: analysis::Configuration::new(),
             c_nodes: 0,
             c_vsrcs: 0,
             base_matrix: vec![vec![]],
             nonlinear_elements: vec![],
             independent_sources: vec![],
             storage_elements: vec![],
+            dc_op: vec![],
         }
     }
+
+    // run the analysis that the engine is configured for
+    pub fn go(&mut self, ckt: &circuit::Circuit) -> Option<analysis::Statistics> {
+        match self.cfg.kind {
+            analysis::Kind::DcOperatingPoint => Some(self.dc_operating_point(ckt)),
+            analysis::Kind::Transient => Some(self.transient_analysis(ckt)),
+            _ => {
+                println!("*ERROR* unsupported circuit analysis type");
+                None
+            }
+        }
+    }
+
+    // Grab the DC operating point values
+    pub fn dc(self) -> Option<Vec<f64>> {
+        if self.dc_op.len() > 0 {
+            Some(self.dc_op.clone())
+        } else {
+            None
+        }
+    }
+
+    // Configure the simulation engine for a transient analysis
+    pub fn set_transient(&mut self, tstop: f64, tstep: f64, tstart: f64) {
+        self.cfg.kind = analysis::Kind::Transient;
+        self.cfg.TSTOP = tstop;
+        self.cfg.TSTEP = tstep;
+        self.cfg.TSTART = tstart;
+    }
+
+    // Configure the simulation engine for a DC operating point analysis
+    pub fn set_dc_operating_point(&mut self) {
+        self.cfg.kind = analysis::Kind::DcOperatingPoint;
+    }
+
+
+    // name file for writing waveforms to
+    pub fn set_wavefile(&mut self, filename: &str) {
+        self.cfg.wavefile = filename.to_string();
+    }
+
 
     // need to know which element to sweep
     pub fn dc_sweep(&mut self, ckt: &circuit::Circuit, wavefile: &str) {
@@ -119,48 +154,24 @@ impl Engine {
 
             self.stamp_voltage_source(&mut mna, &v_src, i_vsrc);
             
-            let (unknowns, stats) = self.dc_solve(&mna);
-            wavedb.dump_vector(v_sweep, &unknowns);
+            let stats = self.dc_solve(&mna);
+            wavedb.dump_vector(v_sweep, &self.dc_op);
 
         }
 
     }
 
 
-    pub fn transient_analysis(
-        &mut self,
-        ckt: &circuit::Circuit,
-        wavefile: &str) 
+    pub fn transient_analysis(&mut self, ckt: &circuit::Circuit) 
     -> analysis::Statistics
     {
-
-        // Iteration limits
-
-        // Initial timestep factor
-        const FS: f64 = 0.25;
-
-        // Timestamp adjustment factor on iteration failure
-        const FT: f64 = 0.25;
-
-        // Smallest delta-time step allowed = RMIN * TSTEP
-        const RMIN: f64 = 1e-3;
-
-        // Largest delta-time step allowed factor
-        const RMAX: f64 = 5.0;
-
-        // 'Easy' iteration count limit
-        // If we solve in fewer iterations, increase delta-time
-        const ITL3: usize = 6;
-
-        // 'Struggling' iteration count limit
-        // If this count is reached before a solution is found, reduce the 
-        // delta-time step and restart the solution attempt
-        const ITL4: usize = 50;
 
         // Find the DC operating point
         // used as the initial values in the transient simulation
         // this will also build the circuit
-        let (mut unknowns, dc_op_stats) = self.dc_operating_point(&ckt);
+        let dc_op_stats = self.dc_operating_point(&ckt);
+        let mut unknowns = self.dc_op.clone();
+
         println!("*INFO*: DC : {:?}", &unknowns);
 
         // prep values
@@ -168,24 +179,27 @@ impl Engine {
         let mut unknowns_prev : Vec<f64> = vec![0.0; c_mna];
 
         // transient loop
-        let mut t_delta = self.TSTEP * FS;
-        let t_delta_min = self.TSTEP * RMIN;
+        let mut t_delta = self.cfg.TSTEP * self.cfg.FS;
+        let t_delta_min = self.cfg.TSTEP * self.cfg.RMIN;
         let mut t_now = 0.0;
 
         // announce
         println!("*************************************************************");
         println!("*CONFIG* TRANSIENT ANALYSIS");
         println!("*CONFIG* TIME {} to {} by {}",
-                 self.TSTART, self.TSTOP, self.TSTEP);
-        println!("*CONFIG* ITL3 = {}; ITL4 = {}", ITL3, ITL4);
-        println!("*CONFIG* FS = {}; FT = {}", FS, FT);
-        println!("*CONFIG* RMIN = {}; RMAX = {}", RMIN, RMAX);
+                 self.cfg.TSTART, self.cfg.TSTOP, self.cfg.TSTEP);
+        println!("*CONFIG* ITL3 = {}; ITL4 = {}",
+                 self.cfg.ITL3, self.cfg.ITL4);
+        println!("*CONFIG* FS = {}; FT = {}",
+                 self.cfg.FS, self.cfg.FT);
+        println!("*CONFIG* RMIN = {}; RMAX = {}",
+                 self.cfg.RMIN, self.cfg.RMAX);
         println!("*CONFIG* RELTOL = {}; VNTOL = {}; ABSTOL = {}",
-                 RELTOL, VNTOL, ABSTOL);
+                 self.cfg.RELTOL, self.cfg.VNTOL, self.cfg.ABSTOL);
         println!("*************************************************************");
 
         // open waveform database
-        let mut wavedb = WaveWriter::new(wavefile).unwrap();
+        let mut wavedb = WaveWriter::new(&self.cfg.wavefile).unwrap();
         wavedb.header(self.c_nodes, self.c_vsrcs);
         wavedb.dump_vector(t_now, &unknowns); // DC solution
 
@@ -200,7 +214,7 @@ impl Engine {
             // * the initial calculation after DC on the initial iteration
             // * the prevous go round the loop for other iterations
 
-            if t_now >= self.TSTART && t_now != 0.0 {
+            if t_now >= self.cfg.TSTART && t_now != 0.0 {
                 println!("*DATA*: [{}] t={} : {:?}", c_step, t_now, unknowns);
                 wavedb.dump_vector(t_now, &unknowns);
             }
@@ -262,8 +276,8 @@ impl Engine {
                             break;
                         } else {
                             // adjust timestep if we can
-                            if c_itl >= ITL4 {
-                                t_delta = t_delta * FT;
+                            if c_itl >= self.cfg.ITL4 {
+                                t_delta = t_delta * self.cfg.FT;
                                 // check if we're ok to continue iterating
                                 if t_delta < t_delta_min {
                                     println!("*ERROR* Internal timestep too small");
@@ -294,9 +308,9 @@ impl Engine {
 
                 // solver found it too easy, maybe there's not a lot going on
                 // reduce the t_delta
-                if !geared & (c_itl < ITL3) {
+                if !geared & (c_itl < self.cfg.ITL3) {
                     t_delta = t_delta * 2.0;
-                    let t_delta_max = self.TSTEP * RMAX;
+                    let t_delta_max = self.cfg.TSTEP * self.cfg.RMAX;
                     if t_delta > t_delta_max {
                         println!("*INFO* Downshifting maxed out");
                         t_delta = t_delta_max;
@@ -308,8 +322,8 @@ impl Engine {
 
             c_step += 1;
             t_now += t_delta;
-            if t_now > self.TSTOP {
-                t_now = self.TSTOP;
+            if t_now > self.cfg.TSTOP {
+                t_now = self.cfg.TSTOP;
                 is_final_timestep = true;
 
             } // solver
@@ -332,9 +346,8 @@ impl Engine {
 
     // assume circuit has been elaborated
     fn dc_solve(&mut self, mna: &Vec<Vec<f64>>)
-        -> (Vec<f64>, analysis::Statistics)
+        -> analysis::Statistics
     {
-        const ITL1: usize = 50;
 
         // prep values for convergence checks
         let c_mna = self.c_nodes + self.c_vsrcs;
@@ -347,7 +360,7 @@ impl Engine {
         // Newton-Raphson loop
         let mut c_iteration: usize = 0;
 
-        while c_iteration < ITL1 {
+        while c_iteration < self.cfg.ITL1 {
 
             // copy the base matrix, cos we're going to change it a lot:
             // * stamp nonlinear element companion models
@@ -404,14 +417,15 @@ impl Engine {
             end: 0.0,
             iterations: c_iteration,
         };
-            
-        (unknowns, stats)
+
+        self.dc_op = unknowns.clone();
+        stats
     }
 
 
 
     pub fn dc_operating_point(&mut self, ckt: &circuit::Circuit)
-        -> (Vec<f64>, analysis::Statistics)
+        -> analysis::Statistics
     {
 
         // build the circuit matrix
@@ -804,9 +818,9 @@ impl Engine {
             }
             let limit: f64;
             if i < self.c_nodes {
-                limit = x.abs() * RELTOL + VNTOL;
+                limit = x.abs() * self.cfg.RELTOL + self.cfg.VNTOL;
             } else {
-                limit = x.abs() * RELTOL + ABSTOL;
+                limit = x.abs() * self.cfg.RELTOL + self.cfg.ABSTOL;
             }
             let this = (x - yv[i]).abs();
             println!(" {} < {} = {}", this, limit, (this < limit));
