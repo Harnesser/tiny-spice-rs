@@ -25,9 +25,6 @@ pub type ConvergenceResult = Result<bool, ConvergenceError>;
 #[allow(non_snake_case)]
 pub struct Engine {
 
-    // circuit analysis configuration
-    pub cfg: analysis::Configuration,
-
     // Number of voltage nodes in the circuit
     c_nodes: usize,
 
@@ -57,7 +54,6 @@ impl Engine {
     pub fn new() -> Engine {
         banner();
         Engine {
-            cfg: analysis::Configuration::new(),
             c_nodes: 0,
             c_vsrcs: 0,
             base_matrix: vec![vec![]],
@@ -69,10 +65,14 @@ impl Engine {
     }
 
     // run the analysis that the engine is configured for
-    pub fn go(&mut self, ckt: &circuit::Circuit) -> Option<analysis::Statistics> {
-        match self.cfg.kind {
-            analysis::Kind::DcOperatingPoint => Some(self.dc_operating_point(ckt)),
-            analysis::Kind::Transient => Some(self.transient_analysis(ckt)),
+    pub fn go(
+        &mut self,
+        ckt: &circuit::Circuit,
+        cfg: &analysis::Configuration,
+    ) -> Option<analysis::Statistics> {
+        match cfg.kind {
+            analysis::Kind::DcOperatingPoint => Some(self.dc_operating_point(ckt, cfg)),
+            analysis::Kind::Transient => Some(self.transient_analysis(ckt, cfg)),
             _ => {
                 println!("*ERROR* unsupported circuit analysis type");
                 None
@@ -89,28 +89,13 @@ impl Engine {
         }
     }
 
-    // Configure the simulation engine for a transient analysis
-    pub fn set_transient(&mut self, tstop: f64, tstep: f64, tstart: f64) {
-        self.cfg.kind = analysis::Kind::Transient;
-        self.cfg.TSTOP = tstop;
-        self.cfg.TSTEP = tstep;
-        self.cfg.TSTART = tstart;
-    }
-
-    // Configure the simulation engine for a DC operating point analysis
-    pub fn set_dc_operating_point(&mut self) {
-        self.cfg.kind = analysis::Kind::DcOperatingPoint;
-    }
-
-
-    // name file for writing waveforms to
-    pub fn set_wavefile(&mut self, filename: &str) {
-        self.cfg.wavefile = filename.to_string();
-    }
-
 
     // need to know which element to sweep
-    pub fn dc_sweep(&mut self, ckt: &circuit::Circuit, wavefile: &str) {
+    pub fn dc_sweep(
+        &mut self,
+        ckt: &circuit::Circuit,
+        cfg: &analysis::Configuration,
+    ) {
         const VSTART: f64 = -3.0;
         const VSTOP: f64 = 5.0;
         const VSTEPS: usize = 100;
@@ -124,7 +109,7 @@ impl Engine {
         println!("DC Sweep: {} to {} by {}", VSTART, VSTOP, v_step);
 
         // open waveform database
-        let mut wavedb = WaveWriter::new(wavefile).unwrap();
+        let mut wavedb = WaveWriter::new(&cfg.wavefile).unwrap();
         wavedb.header(self.c_nodes, self.c_vsrcs);
 
         // FUCK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -154,7 +139,7 @@ impl Engine {
 
             self.stamp_voltage_source(&mut mna, &v_src, i_vsrc);
             
-            let stats = self.dc_solve(&mna);
+            let stats = self.dc_solve(&mna, &cfg);
             wavedb.dump_vector(v_sweep, &self.dc_op);
 
         }
@@ -162,14 +147,18 @@ impl Engine {
     }
 
 
-    pub fn transient_analysis(&mut self, ckt: &circuit::Circuit) 
+    pub fn transient_analysis(
+        &mut self,
+        ckt: &circuit::Circuit,
+        cfg: &analysis::Configuration,
+    ) 
     -> analysis::Statistics
     {
 
         // Find the DC operating point
         // used as the initial values in the transient simulation
         // this will also build the circuit
-        let dc_op_stats = self.dc_operating_point(&ckt);
+        let dc_op_stats = self.dc_operating_point(&ckt, &cfg);
         let mut unknowns = self.dc_op.clone();
 
         println!("*INFO*: DC : {:?}", &unknowns);
@@ -179,27 +168,27 @@ impl Engine {
         let mut unknowns_prev : Vec<f64> = vec![0.0; c_mna];
 
         // transient loop
-        let mut t_delta = self.cfg.TSTEP * self.cfg.FS;
-        let t_delta_min = self.cfg.TSTEP * self.cfg.RMIN;
+        let mut t_delta = cfg.TSTEP * cfg.FS;
+        let t_delta_min = cfg.TSTEP * cfg.RMIN;
         let mut t_now = 0.0;
 
         // announce
         println!("*************************************************************");
         println!("*CONFIG* TRANSIENT ANALYSIS");
         println!("*CONFIG* TIME {} to {} by {}",
-                 self.cfg.TSTART, self.cfg.TSTOP, self.cfg.TSTEP);
+                 cfg.TSTART, cfg.TSTOP, cfg.TSTEP);
         println!("*CONFIG* ITL3 = {}; ITL4 = {}",
-                 self.cfg.ITL3, self.cfg.ITL4);
+                 cfg.ITL3, cfg.ITL4);
         println!("*CONFIG* FS = {}; FT = {}",
-                 self.cfg.FS, self.cfg.FT);
+                 cfg.FS, cfg.FT);
         println!("*CONFIG* RMIN = {}; RMAX = {}",
-                 self.cfg.RMIN, self.cfg.RMAX);
+                 cfg.RMIN, cfg.RMAX);
         println!("*CONFIG* RELTOL = {}; VNTOL = {}; ABSTOL = {}",
-                 self.cfg.RELTOL, self.cfg.VNTOL, self.cfg.ABSTOL);
+                 cfg.RELTOL, cfg.VNTOL, cfg.ABSTOL);
         println!("*************************************************************");
 
         // open waveform database
-        let mut wavedb = WaveWriter::new(&self.cfg.wavefile).unwrap();
+        let mut wavedb = WaveWriter::new(&cfg.wavefile).unwrap();
         wavedb.header(self.c_nodes, self.c_vsrcs);
         wavedb.dump_vector(t_now, &unknowns); // DC solution
 
@@ -214,7 +203,7 @@ impl Engine {
             // * the initial calculation after DC on the initial iteration
             // * the prevous go round the loop for other iterations
 
-            if t_now >= self.cfg.TSTART && t_now != 0.0 {
+            if t_now >= cfg.TSTART && t_now != 0.0 {
                 println!("*DATA*: [{}] t={} : {:?}", c_step, t_now, unknowns);
                 wavedb.dump_vector(t_now, &unknowns);
             }
@@ -268,7 +257,7 @@ impl Engine {
                 c_iteration += 1;
 
                 // Convergence check
-                match self.convergence_check(&unknowns, &unknowns_solve) {
+                match self.convergence_check(&unknowns, &unknowns_solve, &cfg) {
                     Ok(cnvg) => {
                         if cnvg {
                             println!("*INFO* Timestep converged after {} iterations", c_itl);
@@ -276,8 +265,8 @@ impl Engine {
                             break;
                         } else {
                             // adjust timestep if we can
-                            if c_itl >= self.cfg.ITL4 {
-                                t_delta = t_delta * self.cfg.FT;
+                            if c_itl >= cfg.ITL4 {
+                                t_delta = t_delta * cfg.FT;
                                 // check if we're ok to continue iterating
                                 if t_delta < t_delta_min {
                                     println!("*ERROR* Internal timestep too small");
@@ -308,9 +297,9 @@ impl Engine {
 
                 // solver found it too easy, maybe there's not a lot going on
                 // reduce the t_delta
-                if !geared & (c_itl < self.cfg.ITL3) {
+                if !geared & (c_itl < cfg.ITL3) {
                     t_delta = t_delta * 2.0;
-                    let t_delta_max = self.cfg.TSTEP * self.cfg.RMAX;
+                    let t_delta_max = cfg.TSTEP * cfg.RMAX;
                     if t_delta > t_delta_max {
                         println!("*INFO* Downshifting maxed out");
                         t_delta = t_delta_max;
@@ -322,8 +311,8 @@ impl Engine {
 
             c_step += 1;
             t_now += t_delta;
-            if t_now > self.cfg.TSTOP {
-                t_now = self.cfg.TSTOP;
+            if t_now > cfg.TSTOP {
+                t_now = cfg.TSTOP;
                 is_final_timestep = true;
 
             } // solver
@@ -345,7 +334,11 @@ impl Engine {
 
 
     // assume circuit has been elaborated
-    fn dc_solve(&mut self, mna: &Vec<Vec<f64>>)
+    fn dc_solve(
+        &mut self,
+        mna: &Vec<Vec<f64>>,
+        cfg: &analysis::Configuration,
+    )
         -> analysis::Statistics
     {
 
@@ -360,7 +353,7 @@ impl Engine {
         // Newton-Raphson loop
         let mut c_iteration: usize = 0;
 
-        while c_iteration < self.cfg.ITL1 {
+        while c_iteration < cfg.ITL1 {
 
             // copy the base matrix, cos we're going to change it a lot:
             // * stamp nonlinear element companion models
@@ -385,7 +378,7 @@ impl Engine {
             println!("{:?}", unknowns_prev);
 
             if c_iteration > 0 {
-                match self.convergence_check(&unknowns, &unknowns_prev) {
+                match self.convergence_check(&unknowns, &unknowns_prev, &cfg) {
                     Ok(cnvd) => {
                         if cnvd {
                             converged = true;
@@ -424,7 +417,11 @@ impl Engine {
 
 
 
-    pub fn dc_operating_point(&mut self, ckt: &circuit::Circuit)
+    pub fn dc_operating_point(
+        &mut self,
+        ckt: &circuit::Circuit,
+        cfg: &analysis::Configuration,
+    )
         -> analysis::Statistics
     {
 
@@ -433,7 +430,7 @@ impl Engine {
 
         // cos borrowck
         let mna = self.base_matrix.clone();
-        self.dc_solve(&mna)
+        self.dc_solve(&mna, &cfg)
     }
 
 
@@ -807,7 +804,12 @@ impl Engine {
 
     // check for convergence by testing new and previous solutions against
     // RELTOL and the like
-    pub fn convergence_check(&self, xv: &Vec<f64>, yv: &Vec<f64>) -> ConvergenceResult {
+    pub fn convergence_check(
+        &self,
+        xv: &Vec<f64>,
+        yv: &Vec<f64>,
+        cfg: &analysis::Configuration,
+    ) -> ConvergenceResult {
 
         let mut res = Ok(true);
         for (i,x) in xv.iter().enumerate() {
@@ -818,9 +820,9 @@ impl Engine {
             }
             let limit: f64;
             if i < self.c_nodes {
-                limit = x.abs() * self.cfg.RELTOL + self.cfg.VNTOL;
+                limit = x.abs() * cfg.RELTOL + cfg.VNTOL;
             } else {
-                limit = x.abs() * self.cfg.RELTOL + self.cfg.ABSTOL;
+                limit = x.abs() * cfg.RELTOL + cfg.ABSTOL;
             }
             let this = (x - yv[i]).abs();
             println!(" {} < {} = {}", this, limit, (this < limit));

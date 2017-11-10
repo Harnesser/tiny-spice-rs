@@ -1,5 +1,6 @@
 use std::fmt;
 
+#[derive(Clone)]
 pub enum Kind {
     DcOperatingPoint,
     DcSweep,
@@ -34,6 +35,7 @@ impl fmt::Display for Statistics {
 
 /// Analysis datastructure holding all of the options such as
 /// RELTOL, ITL4, etc.
+#[derive(Clone)]
 #[allow(non_snake_case)]
 pub struct Configuration {
 
@@ -129,6 +131,27 @@ impl Configuration {
 
         }
     }
+
+
+    // Configure the simulation engine for a transient analysis
+    pub fn set_transient(&mut self, tstop: f64, tstep: f64, tstart: f64) {
+        self.kind = Kind::Transient;
+        self.TSTOP = tstop;
+        self.TSTEP = tstep;
+        self.TSTART = tstart;
+    }
+
+    // Configure the simulation engine for a DC operating point analysis
+    pub fn set_dc_operating_point(&mut self) {
+        self.kind = Kind::DcOperatingPoint;
+    }
+
+    // name file for writing waveforms to
+    pub fn set_wavefile(&mut self, filename: &str) {
+        self.wavefile = filename.to_string();
+    }
+
+
 
 }
 

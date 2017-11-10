@@ -18,7 +18,8 @@ fn main() {
     let mut reader = spice::Reader::new();
     reader.read(&args[1]);
 
-    let circuit = reader.circuit();
+    let ckt = reader.circuit();
+    let mut cfg = reader.configuration();
 
     /*
     let commands = reader.commands();
@@ -34,16 +35,15 @@ fn main() {
 
     // tmp analysis
     let mut eng = engine::Engine::new();
-    //eng.transient_analysis(&circuit, "waves/tmp.dat");
-    if let Some(stats) = eng.go(&circuit) {
+    if let Some(stats) = eng.go(&ckt, &cfg) {
         println!("\n*INFO* Done");
     } else {
         println!("\n*ERROR* Bad, bad bad...");
     }
 
-
-    eng.set_transient(3e-3, 1e-6, 0.0);
-    eng.set_wavefile("waves/asdfasdf.dat");
-    eng.go(&circuit);
+    let mut cfg2 = cfg.clone();
+    cfg2.set_transient(3e-3, 1e-6, 0.0);
+    cfg2.set_wavefile("waves/asdfasdf.dat");
+    eng.go(&ckt, &cfg2);
 }
 

@@ -15,16 +15,19 @@ use std::fs::File;
 use std::io::{BufReader, BufRead};
 
 use circuit::{Circuit, Diode};
+use analysis::{Configuration, Kind};
 
 pub struct Reader {
     ckt: Circuit,
+    cfg: Configuration,
 }
 
 impl Reader {
 
     pub fn new() -> Reader {
         Reader {
-            ckt: Circuit::new()
+            ckt: Circuit::new(),
+            cfg: Configuration::new(),
         }
     }
 
@@ -101,6 +104,10 @@ impl Reader {
 
     pub fn circuit(&self) -> &Circuit {
         &self.ckt
+    }
+
+    pub fn configuration(&self) -> &Configuration {
+        &self.cfg
     }
 
 }
