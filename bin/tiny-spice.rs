@@ -41,9 +41,11 @@ fn main() {
         println!("\n*ERROR* Bad, bad bad...");
     }
 
-    let mut cfg2 = cfg.clone();
-    cfg2.set_transient(3e-3, 1e-6, 0.0);
-    cfg2.set_wavefile("waves/asdfasdf.dat");
-    eng.go(&ckt, &cfg2);
+    if false {
+        let mut cfg2 = cfg.clone();
+        cfg2.set_transient(3e-3, 1e-6, 0.0);
+        cfg2.set_wavefile("waves/asdfasdf.dat");
+        eng.go(&ckt, &cfg2);
+    }
 }
 

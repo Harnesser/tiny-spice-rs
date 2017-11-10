@@ -70,13 +70,17 @@ impl Engine {
         ckt: &circuit::Circuit,
         cfg: &analysis::Configuration,
     ) -> Option<analysis::Statistics> {
-        match cfg.kind {
-            analysis::Kind::DcOperatingPoint => Some(self.dc_operating_point(ckt, cfg)),
-            analysis::Kind::Transient => Some(self.transient_analysis(ckt, cfg)),
-            _ => {
-                println!("*ERROR* unsupported circuit analysis type");
-                None
+        if let Some(ref a) = cfg.kind {
+            match *a {
+                analysis::Kind::DcOperatingPoint => Some(self.dc_operating_point(ckt, cfg)),
+                analysis::Kind::Transient => Some(self.transient_analysis(ckt, cfg)),
+                _ => {
+                    println!("*ERROR* unsupported circuit analysis type");
+                    None
+                }
             }
+        } else {
+            None
         }
     }
 

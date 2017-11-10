@@ -40,7 +40,7 @@ impl fmt::Display for Statistics {
 pub struct Configuration {
 
     /// What kind of analysis to run: DC op, transient, etc,
-    pub kind: Kind,
+    pub kind: Option<Kind>,
 
     /// Minimum conductance between nodes in the design
     pub GMIN: f64,
@@ -101,7 +101,7 @@ impl Configuration {
     /// all options.
     pub fn new() -> Configuration {
         Configuration {
-            kind: Kind::DcOperatingPoint,
+            kind: None,
 
             // General
             GMIN : 1.0e-12,
@@ -135,7 +135,7 @@ impl Configuration {
 
     // Configure the simulation engine for a transient analysis
     pub fn set_transient(&mut self, tstop: f64, tstep: f64, tstart: f64) {
-        self.kind = Kind::Transient;
+        self.kind = Some(Kind::Transient);
         self.TSTOP = tstop;
         self.TSTEP = tstep;
         self.TSTART = tstart;
@@ -143,7 +143,7 @@ impl Configuration {
 
     // Configure the simulation engine for a DC operating point analysis
     pub fn set_dc_operating_point(&mut self) {
-        self.kind = Kind::DcOperatingPoint;
+        self.kind = Some(Kind::DcOperatingPoint);
     }
 
     // name file for writing waveforms to

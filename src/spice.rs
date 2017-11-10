@@ -36,6 +36,7 @@ impl Reader {
         let input = File::open(filename).unwrap();
         let buf = BufReader::new(input);
         let mut lines_iter = buf.lines();
+        let mut in_control_block = false;
 
         // first line is a comment and is ignored
         lines_iter.next();
@@ -49,34 +50,66 @@ impl Reader {
                 continue;
             }
 
-            // find out what we're looking at
-            if bits[0].starts_with('I') {
-                let _ = extract_identifier(&bits[0]);
-                let node1 = extract_node(&bits[1]);
-                let node2 = extract_node(&bits[2]);
-                let value = extract_value(&bits[3]);
-                self.ckt.add_i(node1, node2, value.unwrap());
-            } else if bits[0].starts_with('V') {
-                let _ = extract_identifier(&bits[0]);
-                let node1 = extract_node(&bits[1]);
-                let node2 = extract_node(&bits[2]);
-                let value = extract_value(&bits[3]);
-                self.ckt.add_v(node1, node2, value.unwrap());
-            } else if bits[0].starts_with('R') {
-                let _ = extract_identifier(&bits[0]);
-                let node1 = extract_node(&bits[1]);
-                let node2 = extract_node(&bits[2]);
-                let value = extract_value(&bits[3]);
-                self.ckt.add_r(node1, node2, value.unwrap());
-            } else if bits[0].starts_with('C') {
-                let _ = extract_identifier(&bits[0]);
-                let node1 = extract_node(&bits[1]);
-                let node2 = extract_node(&bits[2]);
-                let value = extract_value(&bits[3]);
-                self.ckt.add_c(node1, node2, value.unwrap());
-            } else if bits[0].starts_with('D') {
-                let d = self.extract_diode(&bits);
-                self.ckt.add_d(d);
+            // skip comment lines
+            if bits[0].starts_with('*') {
+                continue;
+            }
+
+            // let's go
+            if in_control_block {
+                println!("*INFO* Reading control '{}'", bits[0]);
+                if bits[0] == "op" {
+                    self.cfg.kind = Some(Kind::DcOperatingPoint);
+                } else if bits[0] == "tran" {
+                    // step stop <start>
+                    if bits.len() < 3 {
+                        println!("*ERROR* not enough trans info");
+                    }
+                    self.cfg.TSTEP = extract_value(&bits[1]).unwrap();
+                    self.cfg.TSTOP = extract_value(&bits[2]).unwrap();
+                    if bits.len() > 3 {
+                        self.cfg.TSTART = extract_value(&bits[3]).unwrap();
+                    }
+                }
+            } else {
+
+                // find out what we're looking at
+                if bits[0].starts_with('I') {
+                    let _ = extract_identifier(&bits[0]);
+                    let node1 = extract_node(&bits[1]);
+                    let node2 = extract_node(&bits[2]);
+                    let value = extract_value(&bits[3]);
+                    self.ckt.add_i(node1, node2, value.unwrap());
+                } else if bits[0].starts_with('V') {
+                    let _ = extract_identifier(&bits[0]);
+                    let node1 = extract_node(&bits[1]);
+                    let node2 = extract_node(&bits[2]);
+                    let value = extract_value(&bits[3]);
+                    self.ckt.add_v(node1, node2, value.unwrap());
+                } else if bits[0].starts_with('R') {
+                    let _ = extract_identifier(&bits[0]);
+                    let node1 = extract_node(&bits[1]);
+                    let node2 = extract_node(&bits[2]);
+                    let value = extract_value(&bits[3]);
+                    self.ckt.add_r(node1, node2, value.unwrap());
+                } else if bits[0].starts_with('C') {
+                    let _ = extract_identifier(&bits[0]);
+                    let node1 = extract_node(&bits[1]);
+                    let node2 = extract_node(&bits[2]);
+                    let value = extract_value(&bits[3]);
+                    self.ckt.add_c(node1, node2, value.unwrap());
+                } else if bits[0].starts_with('D') {
+                    let d = self.extract_diode(&bits);
+                    self.ckt.add_d(d);
+                } else if bits[0].starts_with('.') {
+                    if bits[0] == ".control" {
+                        in_control_block = true;
+                    } else if bits[0] == ".endc" {
+                        in_control_block = false;
+                    } else if bits[0] == ".option" {
+                        self.extract_option(&bits);
+                    }
+                }
             }
 
             //for bit in bits {
@@ -100,6 +133,16 @@ impl Reader {
             println!("*WARN* check diode saturation current. It seems weird");
         }
         Diode::new(node1, node2, i_sat, tdegc)
+    }
+
+    // only support one parameter per .option line
+    fn extract_option(&mut self, bits: &Vec<&str>) {
+        if bits[2] != "=" {
+            println!("*ERROR* shite....");
+        }
+        if bits[1] == "ABSTOL" {
+            self.cfg.ABSTOL = extract_value(&bits[3]).unwrap();
+        }
     }
 
     pub fn circuit(&self) -> &Circuit {
