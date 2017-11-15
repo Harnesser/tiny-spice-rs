@@ -187,6 +187,11 @@ impl Circuit {
         );
     }
 
+    /// Add AC current source
+    pub fn add_i_sin(&mut self, i_sin: CurrentSourceSine) {
+        self.elements.push(Element::Isin(i_sin));
+    }
+
     /// Add DC voltage source
     pub fn add_v(&mut self, p: NodeId, n: NodeId, value: f64) {
         self.elements.push(

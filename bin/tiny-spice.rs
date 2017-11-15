@@ -19,7 +19,7 @@ fn main() {
     reader.read(&args[1]);
 
     let ckt = reader.circuit();
-    let mut cfg = reader.configuration();
+    let cfg = reader.configuration();
 
     /*
     let commands = reader.commands();

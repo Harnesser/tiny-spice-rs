@@ -14,7 +14,7 @@
 use std::fs::File;
 use std::io::{BufReader, BufRead};
 
-use circuit::{Circuit, Diode};
+use circuit::{Circuit, Diode, CurrentSourceSine};
 use analysis::{Configuration, Kind};
 
 pub struct Reader {
@@ -43,16 +43,25 @@ impl Reader {
 
         for line_wr in lines_iter {
             let line = line_wr.unwrap();
-            let bits :Vec<&str> = line.split_whitespace().collect();
+            let all_bits :Vec<&str> = line.split_whitespace().collect();
 
             // jump blank lines
-            if bits.len() == 0 {
+            if all_bits.len() == 0 {
                 continue;
             }
 
             // skip comment lines
-            if bits[0].starts_with('*') {
+            if all_bits[0].starts_with('*') {
                 continue;
+            }
+
+            // strip comments off the end
+            let mut bits: Vec<&str> = vec![];
+            for b in all_bits {
+                if b == ";" {
+                    break;
+                }
+                bits.push(b);
             }
 
             // let's go
@@ -61,6 +70,9 @@ impl Reader {
                 if bits[0] == "op" {
                     self.cfg.kind = Some(Kind::DcOperatingPoint);
                 } else if bits[0] == "tran" {
+                    // !!!FIXME!!! intentionally hobbled until SIN parsing fixed
+                    //self.cfg.kind = Some(Kind::Transient);
+                    // !!!FIXME!!! intentionally hobbled until SIN parsing fixed
                     // step stop <start>
                     if bits.len() < 3 {
                         println!("*ERROR* not enough trans info");
@@ -78,14 +90,26 @@ impl Reader {
                     let _ = extract_identifier(&bits[0]);
                     let node1 = extract_node(&bits[1]);
                     let node2 = extract_node(&bits[2]);
-                    let value = extract_value(&bits[3]);
-                    self.ckt.add_i(node1, node2, value.unwrap());
+                    if bits.len() == 4 {
+                        println!("*INFO* Idc");
+                        let value = extract_value(&bits[3]);
+                        self.ckt.add_i(node1, node2, value.unwrap());
+                    } else if bits[3].starts_with("SIN") {
+                        println!("*INFO* Isin");
+                        let src = self.extract_i_sine(&bits);
+                        self.ckt.add_i_sin(src);
+                    }
                 } else if bits[0].starts_with('V') {
                     let _ = extract_identifier(&bits[0]);
                     let node1 = extract_node(&bits[1]);
                     let node2 = extract_node(&bits[2]);
-                    let value = extract_value(&bits[3]);
-                    self.ckt.add_v(node1, node2, value.unwrap());
+                    if bits.len() == 4 {
+                        println!("*INFO* Vdc");
+                        let value = extract_value(&bits[3]);
+                        self.ckt.add_v(node1, node2, value.unwrap());
+                    } else if bits[3] == "SIN(" {
+                        println!("*INFO* Vsin");
+                    }
                 } else if bits[0].starts_with('R') {
                     let _ = extract_identifier(&bits[0]);
                     let node1 = extract_node(&bits[1]);
@@ -145,10 +169,51 @@ impl Reader {
         }
     }
 
+    // extract the stuff from SIN()
+    fn extract_i_sine(&mut self, bits: &Vec<&str>) -> CurrentSourceSine {
+        let _ = extract_identifier(&bits[0]);
+        let node1 = extract_node(&bits[1]);
+        let node2 = extract_node(&bits[2]);
+
+        // ugly stuff...
+        // push all the remaining bits of the SPICE line into 1 string
+        let mut line = "".to_string();
+        for b in bits[3..].iter() {
+            line += *b;
+            line.push(' ');
+        }
+
+        // then when we remove "SIN" "(" and ")" we should be left with
+        // some numbers that we can extract
+        line = line.replace("SIN", "");
+        line = line.replace("(", "");
+        line = line.replace(")", "");
+
+        let all_bits :Vec<&str> = line.split_whitespace().collect();
+        if all_bits.len() != 3 {
+            println!("*ERROR* not enough parameters to SIN()");
+        }
+        let offset = extract_value(all_bits[0]).unwrap();
+        let amplitude = extract_value(all_bits[1]).unwrap();
+        let frequency = extract_value(all_bits[2]).unwrap();
+        println!("*INFO* ISIN {} {} {}", offset, amplitude, frequency);
+
+        CurrentSourceSine {
+            p: node1,
+            n: node2,
+            vo: offset,
+            va: amplitude,
+            freq: frequency,
+        }
+    }
+
+
+    // Return reference to the completed circuit datastructure
     pub fn circuit(&self) -> &Circuit {
         &self.ckt
     }
 
+    // Return reference to the completed configuration object
     pub fn configuration(&self) -> &Configuration {
         &self.cfg
     }

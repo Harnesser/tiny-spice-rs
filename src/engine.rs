@@ -7,8 +7,8 @@ use wavewriter::WaveWriter;
 fn banner() {
 
     println!("**********************************************");
-    println!("***        Tiny-SPICE-Simulator            ***");
-    println!("***        (c) CrapCadCorp 2017            ***");
+    println!("***          Tiny-SPICE-Simulator          ***");
+    println!("***          (c) CrapCadCorp 2017          ***");
     println!("*** No Patents Pending, No rights reserved ***");
     println!("**********************************************");
 
@@ -80,6 +80,7 @@ impl Engine {
                 }
             }
         } else {
+            println!("*ERROR* analysis type is not set");
             None
         }
     }
