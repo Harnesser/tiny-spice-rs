@@ -1,5 +1,13 @@
 # Development Log
 
+## 2017-11-07
+Started `tiny-spice.rs` which is the toplevel binary to tie everything
+together. I'm trying to write this and the SPICE file reader at the 
+same time so I can figure out what the interface should be.
+
+## 2017-11-06
+Implemented thing to read values like 1 or 1.0 or 1.0u.
+
 ## 2017-11-05
 Initial musings on a SPICE deck reader.
 
