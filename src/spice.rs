@@ -70,9 +70,8 @@ impl Reader {
                 if bits[0] == "op" {
                     self.cfg.kind = Some(Kind::DcOperatingPoint);
                 } else if bits[0] == "tran" {
-                    // !!!FIXME!!! intentionally hobbled until SIN parsing fixed
-                    //self.cfg.kind = Some(Kind::Transient);
-                    // !!!FIXME!!! intentionally hobbled until SIN parsing fixed
+                    // !!!HOBBLE!!! intentionally hobbled until SIN parsing fixed
+                    self.cfg.kind = Some(Kind::Transient);
                     // step stop <start>
                     if bits.len() < 3 {
                         println!("*ERROR* not enough trans info");
@@ -239,6 +238,8 @@ enum ValueState {
     START,
     INT,
     FRAC,
+    EXPSTART, // '+' | '-' | digit
+    EXP, // digit
     UNIT,
 }
 
@@ -291,6 +292,7 @@ fn extract_value(text: &str) -> Option<f64> {
                 match c {
                     '0' ... '9' => { float_str.push(c); nxt = ValueState::INT },
                     '.' => { float_str.push(c); nxt = ValueState::FRAC },
+                    'e' => { float_str.push(c); nxt = ValueState::EXPSTART },
                     'k' => {
                         eng_mult = 1e3;
                         value = eval(&float_str, eng_mult);
@@ -323,6 +325,7 @@ fn extract_value(text: &str) -> Option<f64> {
             ValueState::FRAC => {
                 match c {
                     '0' ... '9' => { float_str.push(c); nxt = ValueState::FRAC },
+                    'e' => { float_str.push(c); nxt = ValueState::EXPSTART },
                     'k' => {
                         eng_mult = 1e3;
                         value = eval(&float_str, eng_mult);
@@ -352,6 +355,21 @@ fn extract_value(text: &str) -> Option<f64> {
                 }
             },
 
+            ValueState::EXPSTART => {
+                match c {
+                    '+' | '-' => { float_str.push(c); nxt = ValueState::EXP },
+                    '0' ... '9' => { float_str.push(c); nxt = ValueState::EXP },
+                    _ => break 'things
+                }
+            },
+
+            ValueState::EXP => {
+                match c {
+                    '0' ... '9' => { float_str.push(c); nxt = ValueState::EXP },
+                    _ => break 'things
+                }
+            },
+
             ValueState::UNIT => {
                 break 'things
             },
@@ -364,7 +382,7 @@ fn extract_value(text: &str) -> Option<f64> {
     // if we've broken out of the loop at a point where the gathered
     // string might be a valid number, calculate it.
     match state {
-        ValueState::INT | ValueState::FRAC => {
+        ValueState::INT | ValueState::FRAC | ValueState::EXP => {
             value = eval(&float_str, eng_mult)
         },
         _ => {}
