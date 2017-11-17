@@ -2,6 +2,7 @@ extern crate tiny_spice;
 
 use tiny_spice::circuit::*;
 use tiny_spice::engine;
+use tiny_spice::analysis;
 
 mod common;
 
@@ -10,12 +11,16 @@ mod common;
 fn test_irrc_trans_1kHz() {
 
     let mut eng = engine::Engine::new();
-    eng.TSTEP = 1e-6;
+    let mut cfg = analysis::Configuration::new();
+
+    cfg.set_transient(2.0e-3, 1e-6, 0.0);
+    cfg.set_wavefile("waves/trans_irrc_1kHz.dat");
+
     let ckt = build(1.0e3);
-    let stats = eng.transient_analysis(&ckt, "waves/trans_irrc_1kHz.dat");
+    let stats = eng.transient_analysis(&ckt, &cfg);
     println!("\n*INFO* Done");
 
-    assert!(stats.end >= eng.TSTOP);
+    assert!(stats.end >= cfg.TSTOP);
 }
 
 #[test]
@@ -23,12 +28,16 @@ fn test_irrc_trans_1kHz() {
 fn test_irrc_trans_2kHz() {
 
     let mut eng = engine::Engine::new();
-    eng.TSTEP = 1e-6;
+    let mut cfg = analysis::Configuration::new();
+
+    cfg.set_transient(2.0e-3, 1e-6, 0.0);
+    cfg.set_wavefile("waves/trans_irrc_2kHz.dat");
+
     let ckt = build(2.0e3);
-    let stats = eng.transient_analysis(&ckt, "waves/trans_irrc_2kHz.dat");
+    let stats = eng.transient_analysis(&ckt, &cfg);
     println!("\n*INFO* Done");
 
-    assert!(stats.end >= eng.TSTOP);
+    assert!(stats.end >= cfg.TSTOP);
 }
 
 #[test]
@@ -36,12 +45,16 @@ fn test_irrc_trans_2kHz() {
 fn test_irrc_trans_5kHz() {
 
     let mut eng = engine::Engine::new();
-    eng.TSTEP = 1e-6;
+    let mut cfg = analysis::Configuration::new();
+
+    cfg.set_transient(2.0e-3, 1e-6, 0.0);
+    cfg.set_wavefile("waves/trans_irrc_5kHz.dat");
+
     let ckt = build(5.0e3);
-    let stats = eng.transient_analysis(&ckt, "waves/trans_irrc_5kHz.dat");
+    let stats = eng.transient_analysis(&ckt, &cfg);
     println!("\n*INFO* Done");
 
-    assert!(stats.end >= eng.TSTOP);
+    assert!(stats.end >= cfg.TSTOP);
 }
 
 #[test]
@@ -49,12 +62,16 @@ fn test_irrc_trans_5kHz() {
 fn test_irrc_trans_10kHz() {
 
     let mut eng = engine::Engine::new();
-    eng.TSTEP = 1e-6;
+    let mut cfg = analysis::Configuration::new();
+
+    cfg.set_transient(2.0e-3, 1e-6, 0.0);
+    cfg.set_wavefile("waves/trans_irrc_10kHz.dat");
+
     let ckt = build(10.0e3);
-    let stats = eng.transient_analysis(&ckt, "waves/trans_irrc_10kHz.dat");
+    let stats = eng.transient_analysis(&ckt, &cfg);
     println!("\n*INFO* Done");
 
-    assert!(stats.end >= eng.TSTOP);
+    assert!(stats.end >= cfg.TSTOP);
 }
 
 
@@ -70,14 +87,16 @@ fn test_irrc_trans_lpf_loop() {
         for freq in freqs.iter() {
 
             let mut eng = engine::Engine::new();
-            eng.TSTEP = *timestep;
-            eng.TSTOP = 2.0e-3;
+            let mut cfg = analysis::Configuration::new();
+            cfg.set_transient(2.0e-3, *timestep, 0.0);
+
             let ckt = build(*freq);
 
             let filename = format!("waves/test_trans_irrc_lpf_loop/{:03}.dat", i);
-            let stats = eng.transient_analysis(&ckt, &filename);
+            cfg.set_wavefile(&filename);
+            let stats = eng.transient_analysis(&ckt, &cfg);
             println!("{}", stats);
-            if stats.end >= eng.TSTOP {
+            if stats.end >= cfg.TSTOP {
                 println!("LOOPRESULT {} {} GOOD\n\n", timestep, freq);
             } else {
                 println!("LOOPRESULT {} {} BAD\n\n", timestep, freq);

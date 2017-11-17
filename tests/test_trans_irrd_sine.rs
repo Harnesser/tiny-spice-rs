@@ -2,6 +2,7 @@ extern crate tiny_spice;
 
 use tiny_spice::circuit::*;
 use tiny_spice::engine;
+use tiny_spice::analysis;
 
 mod common;
 
@@ -10,12 +11,16 @@ mod common;
 fn test_trans_irrd_sine_1kHz_10us() {
 
     let mut eng = engine::Engine::new();
-    eng.TSTEP = 10e-6;
+    let mut cfg = analysis::Configuration::new();
+
+    cfg.set_transient(2.0e-3, 10e-6, 0.0);
+    cfg.set_wavefile("waves/trans_irrd_sine_1kHz_10us.dat");
+
     let ckt = build(1e3);
-    let stats = eng.transient_analysis(&ckt, "waves/trans_irrd_sine_1kHz_10us.dat");
+    let stats = eng.transient_analysis(&ckt, &cfg);
     println!("\n*INFO* Done");
 
-    assert!(stats.end >= eng.TSTOP);
+    assert!(stats.end >= cfg.TSTOP);
 }
 
 
@@ -24,12 +29,16 @@ fn test_trans_irrd_sine_1kHz_10us() {
 fn test_trans_irrd_sine_1kHz_1us() {
 
     let mut eng = engine::Engine::new();
-    eng.TSTEP = 1e-6;
+    let mut cfg = analysis::Configuration::new();
+
+    cfg.set_transient(2.0e-3, 1e-6, 0.0);
+    cfg.set_wavefile("waves/trans_irdd_sine_1kHz_1us.dat");
+
     let ckt = build(1e3);
-    let stats = eng.transient_analysis(&ckt, "waves/trans_irrd_sine_1kHz_1us.dat");
+    let stats = eng.transient_analysis(&ckt, &cfg);
     println!("\n*INFO* Done");
 
-    assert!(stats.end >= eng.TSTOP);
+    assert!(stats.end >= cfg.TSTOP);
 }
 
 
@@ -45,14 +54,16 @@ fn test_trans_irrd_sine_loop() {
         for freq in freqs.iter() {
 
             let mut eng = engine::Engine::new();
-            eng.TSTEP = *timestep;
-            eng.TSTOP = 2.0e-3;
+            let mut cfg = analysis::Configuration::new();
+            cfg.set_transient(2.0e-3, *timestep, 0.0);
+
             let ckt = build(*freq);
 
             let filename = format!("waves/test_trans_irrd_sine_loop/{:03}.dat", i);
-            let stats = eng.transient_analysis(&ckt, &filename);
+            cfg.set_wavefile(&filename);
+            let stats = eng.transient_analysis(&ckt, &cfg);
             println!("{}", stats);
-            if stats.end >= eng.TSTOP {
+            if stats.end >= cfg.TSTOP {
                 println!("LOOPRESULT {} {} GOOD\n\n", timestep, freq);
             } else {
                 println!("LOOPRESULT {} {} BAD\n\n", timestep, freq);

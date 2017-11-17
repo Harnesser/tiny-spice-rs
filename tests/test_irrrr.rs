@@ -2,6 +2,7 @@ extern crate tiny_spice;
 
 use tiny_spice::circuit;
 use tiny_spice::engine;
+use tiny_spice::analysis;
 
 mod common;
 use common::assert_nearly;
@@ -10,10 +11,14 @@ use common::assert_nearly;
 fn test() {
 
     let mut eng = engine::Engine::new();
-    let ckt = build();
-    let (v,_) = eng.dc_operating_point(&ckt);
-    println!("\n*INFO* Done");
+    let mut cfg = analysis::Configuration::new();
+    cfg.set_dc_operating_point();
 
+    let ckt = build();
+    let _ = eng.dc_operating_point(&ckt, &cfg);
+    let v = eng.dc().unwrap();
+
+    println!("\n*INFO* Done");
     assert_nearly(v[1], 33.0);
     assert_nearly(v[2], 18.0);
     assert_nearly(v[3], 12.0);

@@ -2,18 +2,23 @@ extern crate tiny_spice;
 
 use tiny_spice::circuit::*;
 use tiny_spice::engine;
+use tiny_spice::analysis;
 
 #[test]
 #[allow(non_snake_case)]
 fn test_trans_ir_bridge_rc_1kHz() {
 
     let mut eng = engine::Engine::new();
-    eng.TSTEP = 1.0e-6;
+    let mut cfg = analysis::Configuration::new();
+
+    cfg.set_transient(2.0e-3, 1e-6, 0.0);
+    cfg.set_wavefile("waves/trans_ir_bridge_1kHz_rc_load.dat");
+
     let ckt = build(2.0, 1e3, 1e-6);
-    let stats = eng.transient_analysis(&ckt, "waves/trans_ir_bridge_1kHz_rc_load.dat");
+    let stats = eng.transient_analysis(&ckt, &cfg);
     println!("\n*INFO* Done");
     println!("{}", stats);
-    assert!(stats.end >= eng.TSTOP);
+    assert!(stats.end >= cfg.TSTOP);
 }
 
 
@@ -21,12 +26,15 @@ fn test_trans_ir_bridge_rc_1kHz() {
 fn test_trans_ir_bridge_rc_failure_003() {
 
     let mut eng = engine::Engine::new();
-    eng.TSTEP = 0.000001;
+    let mut cfg = analysis::Configuration::new();
+
+    cfg.set_transient(2.0e-3, 0.000001, 0.0);
+    cfg.set_wavefile("waves/trans_ir_bridge_rc_failure_003.dat");
     let ckt = build(-2.0, 3.0e3, 0.000001);
-    let stats = eng.transient_analysis(&ckt, "waves/trans_ir_bridge_rc_failure_003.dat");
+    let stats = eng.transient_analysis(&ckt, &cfg);
     println!("\n*INFO* Done");
     println!("{}", stats);
-    assert!(stats.end >= eng.TSTOP);
+    assert!(stats.end >= cfg.TSTOP);
 }
 
 
@@ -54,17 +62,18 @@ fn test_trans_ir_bridge_rc_load_loop() {
             for amp in amps.iter() {
                 for timestep in timesteps.iter() {
                     let mut eng = engine::Engine::new();
-                    eng.TSTEP = *timestep;
-                    eng.TSTOP = 2.0e-3;
+                    let mut cfg = analysis::Configuration::new();
+                    cfg.set_transient(2.0e-3, *timestep, 0.0);
 
                     let specs = format!("{:03} {} {} {} {}", i, timestep, amp, freq, cap);
                     println!("LOOP-SPEC {}", specs);
                     let ckt = build(*amp, *freq, *cap);
 
                     let filename = format!("waves/test_trans_ir_bridge_rc_load_loop/{:03}.dat", i);
-                    let stats = eng.transient_analysis(&ckt, &filename);
+                    cfg.set_wavefile(&filename);
+                    let stats = eng.transient_analysis(&ckt, &cfg);
                     println!("{}", stats);
-                    if stats.end >= eng.TSTOP {
+                    if stats.end >= cfg.TSTOP {
                         println!("LOOP-RESULT {} GOOD\n\n", specs);
                     } else {
                         println!("LOOP-RESULT {} BAD\n\n", specs);

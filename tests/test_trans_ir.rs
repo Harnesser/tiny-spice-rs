@@ -2,6 +2,7 @@ extern crate tiny_spice;
 
 use tiny_spice::circuit;
 use tiny_spice::engine;
+use tiny_spice::analysis;
 
 mod common;
 
@@ -9,11 +10,16 @@ mod common;
 fn trans_ir() {
 
     let mut eng = engine::Engine::new();
+    let mut cfg = analysis::Configuration::new();
+
+    cfg.set_transient(2.0e-3, 10e-6, 0.0);
+    cfg.set_wavefile("waves/trans_ir.dat");
+
     let ckt = build();
-    let stats = eng.transient_analysis(&ckt, "waves/trans_ir.dat");
+    let stats = eng.transient_analysis(&ckt, &cfg);
     println!("\n*INFO* Done");
     
-    assert!(stats.end >= eng.TSTOP);
+    assert!(stats.end >= cfg.TSTOP);
 }
 
 

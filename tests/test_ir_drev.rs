@@ -2,6 +2,7 @@ extern crate tiny_spice;
 
 use tiny_spice::circuit;
 use tiny_spice::engine;
+use tiny_spice::analysis;
 
 mod common;
 use common::assert_nearly;
@@ -10,8 +11,13 @@ use common::assert_nearly;
 fn test_ird_rev() {
 
     let mut eng = engine::Engine::new();
+    let mut cfg = analysis::Configuration::new();
+
+    cfg.set_dc_operating_point();
+
     let ckt = build();
-    let (v,_) = eng.dc_operating_point(&ckt);
+    let _ = eng.dc_operating_point(&ckt, &cfg);
+    let v = eng.dc().unwrap();
     println!("\n*INFO* Done");
 
     assert_nearly(v[1], 10.0 * 3.0);
