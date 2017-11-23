@@ -1,6 +1,3 @@
-#![feature(associated_consts)]
-
-
 pub mod circuit;
 pub mod analysis;
 pub mod engine;
