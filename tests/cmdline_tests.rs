@@ -14,8 +14,10 @@ macro_rules! spice {
         fn $name() {
             let mut cmd = Command::new("ls");
             cmd.arg("-lrt");
-            cmd.spawn();
-            assert!(false);
+            let mut child = cmd.spawn().expect("failed to execute");
+
+            let ecode = child.wait().expect("failed to wait");
+            assert!(ecode.success());
         }
 
     };
