@@ -12,8 +12,8 @@ macro_rules! spice {
     ($name:ident, $path: expr) => {
         #[test]
         fn $name() {
-            let mut cmd = Command::new("ls");
-            cmd.arg("-lrt");
+            let mut cmd = Command::new("target/debug/tiny-spice");
+            cmd.arg($path);
             let mut child = cmd.spawn().expect("failed to execute");
 
             let ecode = child.wait().expect("failed to wait");
@@ -26,5 +26,5 @@ macro_rules! spice {
 
 
 // cargo test spice - will run all tests starting with "spice"
-spice!(spice_irrrr, "../ngspice/test_reader.spi");
+spice!(spice_irrrr, "./ngspice/test_reader.spi");
 
