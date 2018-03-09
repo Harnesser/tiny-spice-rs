@@ -1,6 +1,7 @@
 target
 *.log
 *.swp
+*.swo
 *.~lock*
 waves
 log
