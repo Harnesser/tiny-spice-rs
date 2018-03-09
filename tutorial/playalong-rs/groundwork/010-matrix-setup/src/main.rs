@@ -1,3 +1,7 @@
+extern crate tiny_spice;
+
+use tiny_spice::engine;
+
 fn banner(build: &str) {
     println!("=======================================================");
     println!(" tiny-spice - a Toy SPICE electrical circuit simulator");
@@ -10,4 +14,5 @@ fn banner(build: &str) {
 
 fn main() {
     banner("000");
+    engine::init();
 }
