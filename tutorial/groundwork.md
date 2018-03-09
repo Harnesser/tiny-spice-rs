@@ -142,7 +142,98 @@ programming languages with their Unicode support will allow for emoji net names,
 the sooner all the major CAD companies implement this, the better :| .
 
 
+Adding An "Engine" Module
+-------------------------
 
+Step 1. Make sure the package name in `Cargo.toml` is `tiny-spice`.
+
+Step 2. Create our SPICE engine module file, `src/engine.rs`. For now, we'll just put
+a function in it that prints something to the screen:
+
+    pub fn init() {
+        println!("It's alive");
+    }
+
+Step 3. Create `src/lib.rs` and export our engine module:
+
+    pub mod engine;
+
+Step 4. In our `src/main.rs` file, import the engine module. At the top of the
+file before the `banner()` declaration:
+
+    extern crate tiny_spice;
+    use tiny_spice::engine;
+
+
+Step 5. Call our print function. Our `main()` function in `src/main.rs` now 
+looks like:
+
+    fn main() {
+        banner("000");
+        engine::init();
+    }
+
+
+Step 6. Run it to see if it hangs together:
+
+    cargo run
+
+
+Adding Circuit Matrix to engine module
+--------------------------------------
+
+A job for the simulator engine module is to deal with the circuit matrix. This
+means initialising it, storing it, and solving it. I don't think it's a good
+idea to have the engien know how to stamp elements.
+
+It'll also need to know how many voltage sources are in the circuit. In 
+`src/engine.rs`:
+
+
+    /// Simulator engine datastructure
+    pub struct Engine {
+    
+        // Number of nodes in the circuit
+        n_node: usize,
+
+        // Number of independent voltage sources
+        n_vsrc: usize,
+       
+        // Circuit Matrix
+        m: Vec<Vec<f32>>,
+    
+    }
+
+
+And then an initialisation function for it. When we call this, we'd better
+have the final count of nodes and voltage sources, but this is doable. In
+`src/engine.rs`, underneath the above structure:
+
+    impl Engine {
+    
+        /// Initialise the `Engine` structure.
+        ///
+        /// We need to know the final node and voltage source count
+        /// before calling this function
+        pub fn new(n_node: usize, n_vsrc: usize) -> Engine {
+            println!("*INFO* Initialising circuit matrix");
+            Engine {
+                n_node: n_node,
+                n_vsrc: n_vsrc,
+                m: vec![ vec![0.0; n_node+n_vsrc]; n_node+n_vsrc],
+            }
+        }
+    }
+
+
+And finally, to get things to compile, in `src/main.rs` replace the call
+to `engine::init()` with `let eng = engine::Engine::new(4,4);`
+
+
+The Solver
+----------
+We don't have to worry about stamping the matrix with component elements
+just yet, but we can implement and test a Guassian Elimination solver
 
 
 
