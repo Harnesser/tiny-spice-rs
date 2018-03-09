@@ -229,11 +229,63 @@ have the final count of nodes and voltage sources, but this is doable. In
 And finally, to get things to compile, in `src/main.rs` replace the call
 to `engine::init()` with `let eng = engine::Engine::new(4,4);`
 
+A `cargo run` now should print our banner, and the "initialising circuit
+matrix" message. If you've been following on diligently and including
+the comment lines, `cargo doc --open` will build some preliminary
+documentation for our simulator and launch it in your favourite broswer!
+How neat is that!
+
+
 
 The Solver
 ----------
 We don't have to worry about stamping the matrix with component elements
-just yet, but we can implement and test a Guassian Elimination solver
+just yet, but we can implement and test a Guassian Elimination solver. 
+And we do this by cribbing massively off [wikipedia][GaEl-wiki-pseudo]:
+we'll do row-reordering using partial pivoting, and then use back-substitution to
+solve the variables. No biggie.
+
+Our `Engine` struct feels like it has to have a method called `solve()` that
+will do all of the above, and return a vector of solved values. Since there's
+no guarantee that whatever numbers we stick into the matrix will represent a
+solvable system of linear equations -- we have to legislate for failure. Not
+being able to solve the matrix is kinda catastrophic for a circuit simulator,
+so it's reasonable for `solve()` to return a [`Result`][rust-result] type
+rather than an option:
+
+    pub fn solve(&mut self) -> Result< Vec<f32>, &'static str > {
+        ... a call to self.reorder(), say
+	... a call to self.back_substitute() 
+	// plus whatever error wrapper thing...
+    }
+
+The function is called on the structure this time (unlike `new()`) and we're
+changing data in the structure, so `solve()` needs to take a mutable reference to
+the structure. It will return a vector of results in an `Ok()` enum, or a
+failure. All this might be a bit daunting if you're newish to Rust, maybe the
+following testing will help things settle in place for you if you're struggling:
+
+Let's add the Cargo testing structure to `src/engine.rs`. At the bottom of the
+file:
+
+    #[cfg(test)]
+    mod tests {
+    
+        #[test]
+        fn it_works() {
+            assert_eq!(2,2);
+        }
+    
+    }
+
+
+Do a `cargo test` (`test` not `run` this time), and look for the following line in 
+the output:
+
+    test engine::tests::it_works ... ok
+
+It's tres simple to get Rust's testing framework running, but the code above isn't
+really doing anything for our simulator.
 
 
 
@@ -246,3 +298,5 @@ References
   [MNA-wiki]: https://en.wikipedia.org/wiki/Modified_nodal_analysis
   [KCL-wiki]: https://en.wikipedia.org/wiki/Kirchhoff%27s_circuit_laws#Kirchhoff's_current_law_(KCL)
   [GaEl-wiki]: https://en.wikipedia.org/wiki/Gaussian_elimination
+  [GaEl-wiki-pseudo]: https://en.wikipedia.org/wiki/Gaussian_elimination#Pseudocode
+  [rust-result]: https://doc.rust-lang.org/std/result/#result-and-option
