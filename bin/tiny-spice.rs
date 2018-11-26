@@ -11,8 +11,7 @@ use tiny_spice::analysis::{Kind};
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        println!("Please supply a SPICE filename");
-        panic!("adsfasDSF");
+        panic!("Please supply a SPICE filename");
     }
 
     let mut reader = spice::Reader::new();
@@ -21,31 +20,13 @@ fn main() {
     let ckt = reader.circuit();
     let cfg = reader.configuration();
 
-    /*
-    let commands = reader.commands();
-    for cmd in commands {
-        let mut eng = engine::Engine::new();
-        match cmd {
-            //OP => eng.dc_operating_point(rdr.circuit()),
-            TRANS => eng.transient_analysis(rdr.circuit()),
-            _ => panic!("Unimplemented command"),
-        }
-    }
-*/
-
     // tmp analysis
     let mut eng = engine::Engine::new();
     if let Some(stats) = eng.go(&ckt, &cfg) {
         println!("\n*INFO* Done");
     } else {
-        println!("\n*ERROR* Bad, bad bad...");
+        println!("\n*ERROR* Bad, bad bad... '{}'", &args[1]);
     }
 
-    if false {
-        let mut cfg2 = cfg.clone();
-        cfg2.set_transient(3e-3, 1e-6, 0.0);
-        cfg2.set_wavefile("waves/asdfasdf.dat");
-        eng.go(&ckt, &cfg2);
-    }
 }
 

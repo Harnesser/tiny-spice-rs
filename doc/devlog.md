@@ -1,5 +1,51 @@
 # Development Log
 
+## 2018-11-26
+Between upgrading my desktop, getting a new laptop, losing and finding my
+github stick, I needed to consolidate my github repos.
+
+
+## 2018-02-02
+Can't remember where I was and what's left to do. 
+
+Ok, now I remember - I'm trying to write a spice deck reader. I'm not sure how far
+I got, and what I'd consider a minimum viable product.
+
+Suppose:
+1. I, V, R, C, D
+2. `trans` and `op` in `.control` blocks
+3. Test all this
+4. Waveforms? Do I need a `--output` switch, maybe?
+
+Getting weird results from the command line testing:
+
+    test spice_irrc ... ok
+    test spice_irrrr ...   [ELEMENT] Current source: 0.015709353792572548A into node 0 and out of node 1
+    test spice_reader ... 
+
+It looks like `.success()` is not reliable. 
+
+How do you test a SPICE engine?
+
+
+## 2017-11-23
+Rustup
+
+https://users.rust-lang.org/t/how-do-you-test-binaries-not-libraries/9554/9
+
+
+## 2017-11-17
+Can read SPICE files now (crudely). The simulator engine now uses a configuration
+object to store parameters like TSTEP, RELTOL and waveform filenames. All tests
+have been updated to use this new scheme.
+
+Todo:
+* find out how to test binaries
+
+Decisions:
+* not going to support multiple analyses in .control block
+
+
 ## 2017-11-07
 Started `tiny-spice.rs` which is the toplevel binary to tie everything
 together. I'm trying to write this and the SPICE file reader at the 

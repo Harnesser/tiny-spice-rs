@@ -26,5 +26,13 @@ macro_rules! spice {
 
 
 // cargo test spice - will run all tests starting with "spice"
-spice!(spice_irrrr, "./ngspice/test_reader.spi");
+
+// check out some number format parsing
+spice!(spice_reader, "./ngspice/test_reader.spi");
+
+// DC solve of a resistor network
+spice!(spice_irrrr, "./ngspice/test_irrrr.spi");
+
+// Transient analysis of a HPF
+spice!(spice_irrc, "./ngspice/test_irrc.spi");
 

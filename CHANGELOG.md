@@ -1,5 +1,19 @@
 # Changelog
 
+## [UNRELEASED]
+
+### Added
+- Toplevel program `tiny-spice` 
+- SPICE deck reader
+ * Components: I, V, R, D, C
+
+### Changed
+- Configuration object to hold parameters for analyses
+
+
+### Fixed
+- Sort test_results.log
+
 
 ## [0.6.0] Capacitors
 Deal with capacitors

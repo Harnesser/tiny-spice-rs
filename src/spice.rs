@@ -70,7 +70,6 @@ impl Reader {
                 if bits[0] == "op" {
                     self.cfg.kind = Some(Kind::DcOperatingPoint);
                 } else if bits[0] == "tran" {
-                    // !!!HOBBLE!!! intentionally hobbled until SIN parsing fixed
                     self.cfg.kind = Some(Kind::Transient);
                     // step stop <start>
                     if bits.len() < 3 {

@@ -1,8 +1,9 @@
 ARGS:=
 WAVES:=
+TC:=ngspice/test_bridge_loaded_sine.spi
 
 run:
-	cargo run ${ARGS} | tee sim.log
+	cargo run ${ARGS} ${TC} | tee sim.log
 
 release: ARGS+=--release
 release: run

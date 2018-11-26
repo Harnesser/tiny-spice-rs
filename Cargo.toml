@@ -1,10 +1,10 @@
 [package]
 name = "tiny_spice"
-version = "0.6.0"
+version = "0.7.0"
 authors = ["Marty <harnesser+kartoffel@gmail.com>"]
 
 [dependencies]
 
 [[bin]]
-name = "bringup"
-path = "bin/bringup.rs"
+name = "tiny-spice"
+path = "bin/tiny-spice.rs"
