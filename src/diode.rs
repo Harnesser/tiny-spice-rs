@@ -18,10 +18,10 @@ impl Diode {
 
     pub fn new(p :NodeId, n :NodeId, i_sat :f64, tdegc: f64) -> Diode {
         let mut d = Diode {
-            p: p,
-            n: n,
-            i_sat: i_sat,
-            tdegc: tdegc,
+            p,
+            n,
+            i_sat,
+            tdegc,
             v_thermal: 0.0,
             v_crit: 0.0,
             v_d_prev: Cell::new(0.0),
