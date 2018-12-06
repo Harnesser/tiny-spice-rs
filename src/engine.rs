@@ -712,7 +712,7 @@ impl Engine {
     }
 
 
-    fn storage_stamp(&self, m: &mut Vec<Vec<f64>>, n: &Vec<f64>, t: f64) {
+    fn storage_stamp(&self, m: &mut Vec<Vec<f64>>, n: &[f64], t: f64) {
         println!("*INFO* Stamping storage elements");
         for el in &self.storage_elements {
             match *el {
@@ -745,7 +745,7 @@ impl Engine {
 
     // stamp a matrix with linearized companion models of all the nonlinear
     // devices listed in the SPICE netlist
-    fn nonlinear_stamp(&self, m: &mut Vec<Vec<f64>>, n: &Vec<f64>, n_prev: &Vec<f64> ) {
+    fn nonlinear_stamp(&self, m: &mut Vec<Vec<f64>>, n: &[f64], n_prev: &[f64] ) {
         println!("*INFO* Stamping nonlinear elements");
         for el in &self.nonlinear_elements {
             match *el {
@@ -811,8 +811,8 @@ impl Engine {
     // RELTOL and the like
     pub fn convergence_check(
         &self,
-        xv: &Vec<f64>,
-        yv: &Vec<f64>,
+        xv: &[f64],
+        yv: &[f64],
         cfg: &analysis::Configuration,
     ) -> ConvergenceResult {
 
@@ -823,12 +823,12 @@ impl Engine {
                 res = Err(ConvergenceError::Divergent);
                 break;
             }
-            let limit: f64;
-            if i < self.c_nodes {
-                limit = x.abs() * cfg.RELTOL + cfg.VNTOL;
+            let limit: f64 = if i < self.c_nodes {
+                x.abs() * cfg.RELTOL + cfg.VNTOL
             } else {
-                limit = x.abs() * cfg.RELTOL + cfg.ABSTOL;
-            }
+                x.abs() * cfg.RELTOL + cfg.ABSTOL
+            };
+
             let this = (x - yv[i]).abs();
             println!(" {} < {} = {}", this, limit, (this < limit));
             if this > limit {

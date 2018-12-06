@@ -1,6 +1,7 @@
 // Sinusoidal Current Source
 
 use circuit::{NodeId};
+use std::f64::consts::PI;
 
 #[derive(Clone)]
 pub struct CurrentSourceSine {
@@ -15,7 +16,7 @@ impl CurrentSourceSine {
 
     // calculate the value at a certain time
     pub fn evaluate(&self, t: f64) -> f64 {
-        self.vo + self.va * (2.0 * 3.142 * self.freq * t).sin()
+        self.vo + self.va * (2.0 * PI * self.freq * t).sin()
     }
 
 }
