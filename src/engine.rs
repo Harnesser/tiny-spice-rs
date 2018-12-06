@@ -641,7 +641,7 @@ impl Engine {
             for val in r {
                 print!("{:.3}   ", val);
             }
-            println!("");
+            println!();
         }
     }
 

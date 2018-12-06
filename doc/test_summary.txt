@@ -1,8 +1,8 @@
 *ERROR* Bad, bad bad... './ngspice/test_reader.spi'
 test diode::tests::curve_trace ... ok
 test spice_irrc ... ok
-test spice_irrrr ... *INFO* Convergence check: Ok(true)
-test spice_reader ... ok 0 < 0.000001 = true
+test spice_irrrr ... *INFO* Stamping nonlinear elements
+test spice_reader ...  v[ 1] = 0.4521953539816432
 test spice::tests::simple_read ... ok
 test test_dc_bridge_loaded_2v0 ... ok
 test test_dc_bridge_loaded_gnd ... ok

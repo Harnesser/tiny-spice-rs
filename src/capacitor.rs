@@ -11,8 +11,8 @@ impl Capacitor {
 
     pub fn new(a: NodeId, b: NodeId, value: f64) -> Capacitor {
         Capacitor {
-            a: a,
-            b: b,
+            a,
+            b,
             value: value,
         }
     }
