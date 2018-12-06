@@ -1,7 +1,7 @@
 *ERROR* Bad, bad bad... './ngspice/test_reader.spi'
 test diode::tests::curve_trace ... ok
 test spice_irrc ... ok
-test spice_irrrr ... *INFO* Isin p:0 n:1 = 0 + 1 * sin(2pi 10000)
+test spice_irrrr ... ok
 test spice_reader ... ok
 test spice::tests::simple_read ... ok
 test test_dc_bridge_loaded_2v0 ... ok

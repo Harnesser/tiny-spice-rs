@@ -195,21 +195,21 @@ impl Circuit {
     /// Add DC voltage source
     pub fn add_v(&mut self, p: NodeId, n: NodeId, value: f64) {
         self.elements.push(
-            Element::V(VoltageSource{p: p, n: n, value: value})
+            Element::V(VoltageSource{p, n, value})
         );
     }
 
     /// Add resistor
     pub fn add_r(&mut self, a: NodeId, b: NodeId, value: f64) {
         self.elements.push(
-            Element::R(Resistor{a: a, b: b, value: value})
+            Element::R(Resistor{a, b, value})
         );
     }
 
     /// Add capacitor
     pub fn add_c(&mut self, a: NodeId, b: NodeId, value: f64) {
         self.elements.push(
-            Element::C(Capacitor{a: a, b: b, value: value})
+            Element::C(Capacitor{a, b, value})
         );
     }
 
