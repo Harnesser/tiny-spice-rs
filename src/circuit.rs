@@ -6,7 +6,7 @@ pub use capacitor::Capacitor;
 
 pub type NodeId = usize;
 
-pub const BOLTZMANN : f64 = 1.3806488e-23;
+pub const BOLTZMANN : f64 = 1.380_648_8e-23;
 pub const CHARGE : f64 = 1.603e-19;
 pub const GMIN : f64 = 1.0e-12;
 
@@ -169,12 +169,8 @@ impl Circuit {
         let mut c_vsrc: usize = 0;
 
         for el in &self.elements {
-                match *el {
-                    Element::V(VoltageSource{..}) => {
+                if let Element::V(VoltageSource{..}) = *el {
                         c_vsrc += 1;
-                        }
-                    _ => {
-                    }
                 }
         }
         c_vsrc

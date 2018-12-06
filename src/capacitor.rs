@@ -13,7 +13,7 @@ impl Capacitor {
         Capacitor {
             a,
             b,
-            value: value,
+            value,
         }
     }
 

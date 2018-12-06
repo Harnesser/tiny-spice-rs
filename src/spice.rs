@@ -143,9 +143,9 @@ impl Reader {
 
     }
 
-    fn extract_diode(&self, bits: &Vec<&str>) -> Diode {
-        let mut i_sat = 1e-9;
-        let mut tdegc = 27.0;
+    fn extract_diode(&self, bits: &[&str]) -> Diode {
+        let i_sat = 1e-9;
+        let tdegc = 27.0;
         let _ = extract_identifier(&bits[0]);
         let node1 = extract_node(&bits[1]);
         let node2 = extract_node(&bits[2]);
@@ -158,7 +158,7 @@ impl Reader {
     }
 
     // only support one parameter per .option line
-    fn extract_option(&mut self, bits: &Vec<&str>) {
+    fn extract_option(&mut self, bits: &[&str]) {
         if bits[2] != "=" {
             println!("*ERROR* shite....");
         }
@@ -168,7 +168,7 @@ impl Reader {
     }
 
     // extract the stuff from SIN()
-    fn extract_i_sine(&mut self, bits: &Vec<&str>) -> CurrentSourceSine {
+    fn extract_i_sine(&mut self, bits: &[&str]) -> CurrentSourceSine {
         let _ = extract_identifier(&bits[0]);
         let node1 = extract_node(&bits[1]);
         let node2 = extract_node(&bits[2]);

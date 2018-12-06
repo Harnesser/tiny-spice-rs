@@ -87,10 +87,10 @@ impl Engine {
 
     // Grab the DC operating point values
     pub fn dc(self) -> Option<Vec<f64>> {
-        if self.dc_op.len() > 0 {
-            Some(self.dc_op.clone())
-        } else {
+        if self.dc_op.is_empty() {
             None
+        } else {
+            Some(self.dc_op.clone())
         }
     }
 
@@ -125,7 +125,7 @@ impl Engine {
 
         // FIXME very fragile - what if there's more than one voltage source in
         // the design?
-        let mut i_vsrc : usize = self.c_nodes; // index, not amperage...
+        let i_vsrc : usize = self.c_nodes; // index, not amperage...
 
         // tweak the thing we're sweeping
         for s in 0..VSTEPS {
@@ -144,7 +144,7 @@ impl Engine {
 
             self.stamp_voltage_source(&mut mna, &v_src, i_vsrc);
             
-            let stats = self.dc_solve(&mna, &cfg);
+            let _stats = self.dc_solve(&mna, &cfg);
             wavedb.dump_vector(v_sweep, &self.dc_op);
 
         }
@@ -271,7 +271,7 @@ impl Engine {
                         } else {
                             // adjust timestep if we can
                             if c_itl >= cfg.ITL4 {
-                                t_delta = t_delta * cfg.FT;
+                                t_delta *= cfg.FT;
                                 // check if we're ok to continue iterating
                                 if t_delta < t_delta_min {
                                     println!("*ERROR* Internal timestep too small");
@@ -303,7 +303,7 @@ impl Engine {
                 // solver found it too easy, maybe there's not a lot going on
                 // reduce the t_delta
                 if !geared & (c_itl < cfg.ITL3) {
-                    t_delta = t_delta * 2.0;
+                    t_delta *= 2.0;
                     let t_delta_max = cfg.TSTEP * cfg.RMAX;
                     if t_delta > t_delta_max {
                         println!("*INFO* Downshifting maxed out");
@@ -341,7 +341,7 @@ impl Engine {
     // assume circuit has been elaborated
     fn dc_solve(
         &mut self,
-        mna: &Vec<Vec<f64>>,
+        mna: &[Vec<f64>],
         cfg: &analysis::Configuration,
     )
         -> analysis::Statistics
@@ -363,7 +363,7 @@ impl Engine {
             // copy the base matrix, cos we're going to change it a lot:
             // * stamp nonlinear element companion models
             // * re-order during guassian elimination
-            let mut v = mna.clone();
+            let mut v = mna.to_owned();
 
             // Stamp independent sources at time=0.0
             // !!!FIXME!!! - hoist out of loop?
