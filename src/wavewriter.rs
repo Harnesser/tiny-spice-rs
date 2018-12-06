@@ -49,10 +49,10 @@ impl WaveWriter {
 
         let mut units = "s".to_string();
         for _ in 0..c_nodes {
-            units += &format!("\tV");
+            units += &"\tV".to_string();
         }
         for _ in 0..c_vsrcs {
-            units += &format!("\tA");
+            units += &"\tA".to_string();
         }
         units += "\n";
 

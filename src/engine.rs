@@ -610,7 +610,7 @@ impl Engine {
 
     }
 
-    fn index_of_next_abs( &self, m: &Vec<Vec<f64>>, k: usize ) -> usize {
+    fn index_of_next_abs( &self, m: &[Vec<f64>], k: usize ) -> usize {
         let mut biggest: f64 = 0.0;
         let mut r_biggest: usize = k;
         let c_rows = m.len();
@@ -625,18 +625,18 @@ impl Engine {
     }
 
     // mean squared error of the two vectors
-    fn mean_squared_error(&self, v1: &Vec<f64>, v2: &Vec<f64>) -> f64 {
+    fn mean_squared_error(&self, v1: &[f64], v2: &[f64]) -> f64 {
         let mut mse :f64 = 0.0;
         let bits = v1.iter().zip(v2.iter());
         for (x,y) in bits {
             mse += ( x - y ).powi(2);
         }
-        mse = mse / (v1.len() as f64);
+        mse /= v1.len() as f64;
         mse
     }
 
 
-    fn pp_matrix(&self, m : &Vec<Vec<f64>> ) {
+    fn pp_matrix(&self, m : &[Vec<f64>] ) {
         for r in m {
             for val in r {
                 print!("{:.3}   ", val);
@@ -651,10 +651,10 @@ impl Engine {
                 isrc.value, isrc.p, isrc.n);
         let ia = self.c_nodes + self.c_vsrcs; // index for ampere vector
         if isrc.p != 0 {
-            m[isrc.p][ia] = m[isrc.p][ia] - isrc.value;
+            m[isrc.p][ia] -= isrc.value;
         }
         if isrc.n != 0 {
-            m[isrc.n][ia] = m[isrc.n][ia] + isrc.value;
+            m[isrc.n][ia] += isrc.value;
         }
     }
 
@@ -696,17 +696,17 @@ impl Engine {
 
         // out of node 'a'
         if r.a != 0 {
-            m[r.a][r.a] = m[r.a][r.a] + over;
+            m[r.a][r.a] += over;
             if r.b != 0 {
-                m[r.a][r.b] = m[r.a][r.b] - over;
+                m[r.a][r.b] -= over;
             }
         }
 
         // out of node 'b'
         if r.b != 0 {
-            m[r.b][r.b] = m[r.b][r.b] + over;
+            m[r.b][r.b] += over;
             if r.a != 0 {
-                m[r.b][r.a] = m[r.b][r.a] - over;
+                m[r.b][r.a] -= over;
             }
         }
     }

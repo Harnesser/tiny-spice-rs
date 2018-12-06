@@ -46,7 +46,7 @@ impl Reader {
             let all_bits :Vec<&str> = line.split_whitespace().collect();
 
             // jump blank lines
-            if all_bits.len() == 0 {
+            if all_bits.is_empty() {
                 continue;
             }
 

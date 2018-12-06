@@ -1,8 +1,8 @@
 *ERROR* Bad, bad bad... './ngspice/test_reader.spi'
 test diode::tests::curve_trace ... ok
 test spice_irrc ... ok
-test spice_irrrr ...   [ELEMENT] Resistor 156.24999999999997 Ohms between node 2 and node 0
-test spice_reader ...   [ELEMENT] Current source: -0.4565836509239158A into node 0 and out of node 1
+test spice_irrrr ... ok
+test spice_reader ... ok
 test spice::tests::simple_read ... ok
 test test_dc_bridge_loaded_2v0 ... ok
 test test_dc_bridge_loaded_gnd ... ok
