@@ -183,7 +183,7 @@ impl Circuit {
     /// Add DC current source
     pub fn add_i(&mut self, p: NodeId, n: NodeId, value: f64) {
         self.elements.push(
-            Element::I(CurrentSource{p: p, n: n, value: value})
+            Element::I(CurrentSource{p, n, value})
         );
     }
 
