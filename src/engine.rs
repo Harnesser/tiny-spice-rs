@@ -22,6 +22,7 @@ pub enum ConvergenceError {
 pub type ConvergenceResult = Result<bool, ConvergenceError>;
 
 
+#[derive(Default)]
 #[allow(non_snake_case)]
 pub struct Engine {
 
@@ -548,7 +549,7 @@ impl Engine {
                 }
                 let ratio = v[r_mod][r_ref] / v[r_ref][r_ref];
 
-                for c_mod in r_ref..c_mna+1 { // column we're scaling
+                for c_mod in r_ref..=c_mna { // column we're scaling
                     let val = v[r_mod][c_mod];
                     let wiggle = v[r_ref][c_mod];
                     let new = val - (wiggle * ratio); 

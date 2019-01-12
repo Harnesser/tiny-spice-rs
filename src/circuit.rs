@@ -70,6 +70,7 @@ impl fmt::Display for Element {
 }
 
 
+#[derive(Default)]
 pub struct Circuit {
     pub elements: Vec<Element>,
 }

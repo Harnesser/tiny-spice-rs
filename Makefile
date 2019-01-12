@@ -11,7 +11,7 @@ debug:
 	env RUST_BACKTRACE=1 cargo run
 
 clippy:
-	rustup run nightly cargo clippy
+	cargo clippy
 
 spice_t: 
 	rm -rf ./spice; rustc --test src/spice.rs; ./spice --nocapture

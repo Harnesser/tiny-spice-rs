@@ -36,6 +36,7 @@ impl fmt::Display for Statistics {
 /// Analysis datastructure holding all of the options such as
 /// RELTOL, ITL4, etc.
 #[derive(Clone)]
+#[derive(Default)]
 #[allow(non_snake_case)]
 pub struct Configuration {
 
