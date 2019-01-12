@@ -1,6 +1,6 @@
 // Sinusoidal Current Source
 
-use circuit::{NodeId};
+use crate::circuit::{NodeId};
 use std::f64::consts::PI;
 
 #[derive(Clone)]

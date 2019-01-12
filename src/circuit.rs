@@ -1,8 +1,8 @@
 use std::fmt;
 
-pub use diode::Diode;
-pub use isine::CurrentSourceSine;
-pub use capacitor::Capacitor;
+pub use crate::diode::Diode;
+pub use crate::isine::CurrentSourceSine;
+pub use crate::capacitor::Capacitor;
 
 pub type NodeId = usize;
 

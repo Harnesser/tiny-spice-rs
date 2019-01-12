@@ -14,8 +14,8 @@
 use std::fs::File;
 use std::io::{BufReader, BufRead};
 
-use circuit::{Circuit, Diode, CurrentSourceSine};
-use analysis::{Configuration, Kind};
+use crate::circuit::{Circuit, Diode, CurrentSourceSine};
+use crate::analysis::{Configuration, Kind};
 
 pub struct Reader {
     ckt: Circuit,

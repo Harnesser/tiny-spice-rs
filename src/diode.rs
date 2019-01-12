@@ -1,5 +1,5 @@
 use std::cell::Cell;
-use circuit::{NodeId, BOLTZMANN, CHARGE, GMIN};
+use crate::circuit::{NodeId, BOLTZMANN, CHARGE, GMIN};
 
 #[derive(Clone)]
 pub struct Diode {

@@ -6,7 +6,7 @@ use tiny_spice::analysis;
 
 
 mod common;
-use common::assert_nearly;
+use crate::common::assert_nearly;
 
 #[test]
 #[allow(non_snake_case)]

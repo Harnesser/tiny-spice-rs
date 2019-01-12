@@ -1,8 +1,8 @@
 
-use analysis;
-use circuit;
-use circuit::NodeId;
-use wavewriter::WaveWriter;
+use crate::analysis;
+use crate::circuit;
+use crate::circuit::NodeId;
+use crate::wavewriter::WaveWriter;
 
 fn banner() {
 

@@ -5,7 +5,7 @@ use tiny_spice::engine;
 use tiny_spice::analysis;
 
 mod common;
-use common::assert_nearly;
+use crate::common::assert_nearly;
 
 #[test]
 fn test_ird_rev() {
