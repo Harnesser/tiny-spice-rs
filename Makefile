@@ -19,7 +19,7 @@ spice_t:
 test: test_rust test_grep
 
 test_rust: waves/stamp log/stamp
-	cargo test -j2 --no-fail-fast --all > log/test.log || echo 0
+	cargo test --no-fail-fast --message-format=short -- --test-threads=1 > log/test.log || echo 0
 
 test_grep:
 	grep "\.\.\." log/test.log | sort > doc/test_summary.txt; \

@@ -14,10 +14,9 @@ macro_rules! spice {
         fn $name() {
             let mut cmd = Command::new("target/debug/tiny-spice");
             cmd.arg($path);
-            let mut child = cmd.spawn().expect("failed to execute");
+            let output = cmd.output().expect("failed to execute");
 
-            let ecode = child.wait().expect("failed to wait");
-            assert!(ecode.success());
+            assert!(output.status.success());
         }
 
     };

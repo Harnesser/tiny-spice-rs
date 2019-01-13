@@ -396,8 +396,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn simple_read() {
+    fn simple_read_count_voltage_sources() {
         let mut rdr = Reader::new();
         rdr.read("./ngspice/test_reader.spi");
+        assert!(rdr.ckt.count_voltage_sources() == 1);
+    }
+
+    #[test]
+    fn simple_read_count_nodes() {
+        let mut rdr = Reader::new();
+        rdr.read("./ngspice/test_reader.spi");
+        assert!(rdr.ckt.count_nodes() == 8);
     }
 }
