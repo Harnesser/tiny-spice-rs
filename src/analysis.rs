@@ -82,7 +82,7 @@ pub struct Configuration {
     /// Largest delta-time step allowed factor
     pub RMAX: f64,
 
-    /// 'Easy' iteratin count limit for transient analysis.
+    /// 'Easy' iteration count limit for transient analysis.
     /// If we solve in fewer iterations, increase delta-time.
     pub ITL3: usize,
 
