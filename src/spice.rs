@@ -406,6 +406,6 @@ mod tests {
     fn simple_read_count_nodes() {
         let mut rdr = Reader::new();
         rdr.read("./ngspice/test_reader.spi");
-        assert!(rdr.ckt.count_nodes() == 8);
+        assert!(rdr.ckt.count_nodes() == 9);
     }
 }
