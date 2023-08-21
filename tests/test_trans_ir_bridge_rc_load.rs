@@ -106,7 +106,7 @@ fn build(amp: f64, freq: f64, cap: f64) -> Circuit {
     );
 
 
-    ckt.elements.push(Element::V(VoltageSource{p: 2, n: 0, value: 0.0}));
+    ckt.elements.push(Element::V(VoltageSource{p: 2, n: 0, value: 0.0, idx:0}));
 
     // Diode bridge
     //  (1) is top

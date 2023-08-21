@@ -1,0 +1,7 @@
+#! /usr/bin/env sh
+
+grep \
+	--exclude-dir=target \
+	--exclude-dir=waves \
+	--exclude-dir=log \
+	$*

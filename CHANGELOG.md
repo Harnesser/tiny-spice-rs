@@ -4,6 +4,7 @@
 
 ### Added
 - Toplevel program `tiny-spice` 
+- Sinewave Voltage Source
 - SPICE deck reader
  * Components: I, V, R, D, C
 
@@ -12,7 +13,8 @@
 
 
 ### Fixed
-- Sort test_results.log
+- Sort `test_results.log`
+- Give tests unique names
 
 
 ## [0.6.0] Capacitors

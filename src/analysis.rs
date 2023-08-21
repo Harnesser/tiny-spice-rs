@@ -91,6 +91,9 @@ pub struct Configuration {
     /// step, reduce the delta-time step and restart the solution attempt.
     pub ITL4: usize,
 
+    /// Name of circuit (taken from SPICE filename)
+    pub ckt_name: String,
+
     /// Name of file to write waveform data to
     pub wavefile: String,
 }
@@ -128,6 +131,7 @@ impl Configuration {
             ITL3: 6,
             ITL4: 50,
 
+            ckt_name: "Default_Circuit_Name".to_string(),
             wavefile: "waves/default.dat".to_string(),
 
         }

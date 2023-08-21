@@ -2,6 +2,7 @@ use std::fmt;
 
 pub use crate::diode::Diode;
 pub use crate::isine::CurrentSourceSine;
+pub use crate::vsine::VoltageSourceSine;
 pub use crate::capacitor::Capacitor;
 
 pub type NodeId = usize;
@@ -30,6 +31,7 @@ pub struct VoltageSource {
     pub p: NodeId,
     pub n: NodeId,
     pub value: f64, // Volts
+    pub idx: usize, // index of voltage source in "known" column
 }
 
 #[allow(dead_code)]
@@ -39,6 +41,7 @@ pub enum Element {
     V(VoltageSource),
     D(Diode),
     Isin(CurrentSourceSine),
+    Vsin(VoltageSourceSine),
     C(Capacitor),
 }
 
@@ -62,6 +65,10 @@ impl fmt::Display for Element {
                 write!(f, "Isin p:{} n:{} = {} + {} * sin(2pi {})",
                     el.p, el.n, el.vo, el.va, el.freq)
             },
+            Element::Vsin(ref el) => {
+                write!(f, "Vsin p:{} n:{} = {} + {} * sin(2pi {})",
+                    el.p, el.n, el.vo, el.va, el.freq)
+            },
             Element::C(ref el) => {
                 write!(f, "C a:{} b:{} {}Farads", el.a, el.b, el.value)
             },
@@ -73,6 +80,7 @@ impl fmt::Display for Element {
 #[derive(Default)]
 pub struct Circuit {
     pub elements: Vec<Element>,
+    pub v_idx_next: usize,
 }
 
 impl Circuit {
@@ -80,6 +88,7 @@ impl Circuit {
     pub fn new() -> Circuit {
         Circuit {
             elements: vec![],
+            v_idx_next: 0,
         }
     }
 
@@ -149,6 +158,16 @@ impl Circuit {
                             c_nodes += 1;
                         }
                     }
+                    Element::Vsin(VoltageSourceSine{ ref p, ref n, .. }) => {
+                        if !seen[*p] {
+                            seen[*p] = true;
+                            c_nodes += 1;
+                        }
+                        if !seen[*n] {
+                            seen[*n] = true;
+                            c_nodes += 1;
+                        }
+                    }
                     Element::C(Capacitor{ ref a, ref b, .. }) => {
                         if !seen[*a] {
                             seen[*a] = true;
@@ -164,15 +183,23 @@ impl Circuit {
         c_nodes
     } 
 
+
+    // FIXME - update for Vsin
     pub fn count_voltage_sources(&self) -> usize {
 
         // number of voltage sources in the circuit
         let mut c_vsrc: usize = 0;
 
         for el in &self.elements {
-                if let Element::V(VoltageSource{..}) = *el {
+            match *el {
+                Element::V(VoltageSource{..}) => {
                         c_vsrc += 1;
-                }
+                },
+                Element::Vsin(VoltageSourceSine{..}) => {
+                        c_vsrc += 1;
+                },
+                _ => {}
+            }
         }
         c_vsrc
     } 
@@ -189,11 +216,20 @@ impl Circuit {
         self.elements.push(Element::Isin(i_sin));
     }
 
+    /// Add AC voltage source
+    pub fn add_v_sin(&mut self, v_sin: VoltageSourceSine) {
+        let mut v_sin_upd = v_sin.clone();
+        v_sin_upd.idx = self.v_idx_next;
+        self.elements.push(Element::Vsin(v_sin_upd));
+        self.v_idx_next += 1;
+    }
+
     /// Add DC voltage source
     pub fn add_v(&mut self, p: NodeId, n: NodeId, value: f64) {
         self.elements.push(
-            Element::V(VoltageSource{p, n, value})
+            Element::V(VoltageSource{p, n, value, idx:self.v_idx_next})
         );
+        self.v_idx_next += 1;
     }
 
     /// Add resistor

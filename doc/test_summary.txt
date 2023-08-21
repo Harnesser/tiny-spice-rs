@@ -11,6 +11,7 @@ test test_dc_ird ... ok
 test test_diode_bridge_unloaded_10V ... ok
 test test_ird_rev ... ok
 test test_ird_vv ... ok
+test test_ir ... ok
 test test_irrc_dc ... ok
 test test_irrc_trans_10kHz ... ok
 test test_irrc_trans_1kHz ... ok
@@ -21,10 +22,7 @@ test test_irrc_trans_hpf_1kHz ... ok
 test test_irrc_trans_hpf_2kHz ... ok
 test test_irrc_trans_hpf_5kHz ... ok
 test test_irrc_trans_lpf_loop ... ignored
-test test ... ok
-test test ... ok
-test test ... ok
-test test_sweep_v_rd ... FAILED
+test test_irrrr ... ok
 test test_trans_ir_bridge_1kHz_10us ... ok
 test test_trans_ir_bridge_1kHz_1us ... ok
 test test_trans_ir_bridge_loaded_loop ... ignored
@@ -40,4 +38,5 @@ test test_trans_ir_sine_1kHz_1us ... ok
 test test_trans_ir_sine_1kHz ... ok
 test test_trans_ir_sine_loop ... ignored
 test test_v_d_vs_d ... ok
+test test_vvrrr ... ok
 test trans_ir ... ok

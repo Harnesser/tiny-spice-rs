@@ -8,7 +8,7 @@ mod common;
 use crate::common::assert_nearly;
 
 #[test]
-fn test() {
+fn test_irrrr() {
 
     let mut eng = engine::Engine::new();
     let mut cfg = analysis::Configuration::new();

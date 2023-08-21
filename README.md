@@ -27,11 +27,15 @@ Huge list of things not supported. Everything else, including:
 Configuration
 ----------------------
 
-* OpenOffice 5.0.3.2
-* Rust 1.30.0
+Needed:
+* Rust 1.71.1
+
+Auxiliary:
+* OpenOffice 6.4.7.2
 * KST2 
 * Gvim 7.4
-* Python 2.7.6
+* Python 3.8.10
+ * python3-tk
 
 
 

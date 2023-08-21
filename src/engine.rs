@@ -8,7 +8,7 @@ fn banner() {
 
     println!("**********************************************");
     println!("***          Tiny-SPICE-Simulator          ***");
-    println!("***       (c) CrapCadCorp 2017-2018        ***");
+    println!("***       (c) CrapCadCorp 2017-2022        ***");
     println!("*** No Patents Pending, No rights reserved ***");
     println!("**********************************************");
 
@@ -95,7 +95,7 @@ impl Engine {
         }
     }
 
-
+/*
     // need to know which element to sweep
     pub fn dc_sweep(
         &mut self,
@@ -126,7 +126,7 @@ impl Engine {
 
         // FIXME very fragile - what if there's more than one voltage source in
         // the design?
-        let i_vsrc : usize = self.c_nodes; // index, not amperage...
+        let idx_vsrc : usize = self.c_nodes; // index, not amperage...
 
         // tweak the thing we're sweeping
         for s in 0..VSTEPS {
@@ -143,7 +143,7 @@ impl Engine {
                 value: v_sweep,
             };
 
-            self.stamp_voltage_source(&mut mna, &v_src, i_vsrc);
+            self.stamp_voltage_source(&mut mna, &v_src, idx_vsrc);
             
             let _stats = self.dc_solve(&mna, &cfg);
             wavedb.dump_vector(v_sweep, &self.dc_op);
@@ -151,7 +151,7 @@ impl Engine {
         }
 
     }
-
+*/
 
     pub fn transient_analysis(
         &mut self,
@@ -457,6 +457,7 @@ impl Engine {
 
         // Modified Nodal Analysis (MNA) Matrix
         let c_mna = self.c_nodes + self.c_vsrcs;
+
         // I think I have to make this out of Vecs (on the heap) because c_nodes is
         // not known at compile time. Makes sense, I suppose - could blow the stack if
         // c_nodes is any way huge.
@@ -466,7 +467,7 @@ impl Engine {
         // Fill up the voltage node and current vector
         // This needs to know about each of the kinds of circuit elements, so
         // the node equations can be built up appropriately.
-        let mut i_vsrc : usize = self.c_nodes; // index, not amperage...
+        let mut idx_vsrc : usize = self.c_nodes;
         for el in &ckt.elements {
             match *el {
                 // From NGSPICE manual:
@@ -483,8 +484,8 @@ impl Engine {
                 }
 
                 circuit::Element::V(ref vsrc) => {
-                    self.stamp_voltage_source(&mut m, vsrc, i_vsrc);
-                    i_vsrc += 1; // voltage source matrix index update 
+                    self.stamp_voltage_source(&mut m, vsrc);
+                    idx_vsrc += 1; // voltage source matrix index update 
                 }
 
                 circuit::Element::D(ref d) => {
@@ -498,6 +499,13 @@ impl Engine {
                     println!("  [ELEMENT] Current Source (~):");
                     self.independent_sources.push(
                         circuit::Element::Isin(isrcsine.clone())
+                    );
+                }
+
+                circuit::Element::Vsin(ref vsrcsine) => {
+                    println!("  [ELEMENT] Voltage Source (~):");
+                    self.independent_sources.push(
+                        circuit::Element::Vsin(vsrcsine.clone())
                     );
                 }
 
@@ -665,26 +673,26 @@ impl Engine {
         &self,
         m: &mut Vec<Vec<f64>>,
         vsrc: &circuit::VoltageSource,
-        i_vsrc: NodeId,
     ) {
         println!("  [ELEMENT] Voltage source: {}V from node {} to node {}",
                 vsrc.value, vsrc.p, vsrc.n);
-        let ia = self.c_nodes + self.c_vsrcs; // index for ampere vector
+        let idx_vsrc = self.c_nodes + vsrc.idx; // index in ampere vector
 
         // put the voltage value in the 'known' vector
-        m[i_vsrc][ia] = vsrc.value;
+        let idx_unknown = m[0].len() - 1;
+        m[idx_vsrc][idx_unknown] = vsrc.value;
 
         let p_not_grounded = (vsrc.p != 0);
         let n_not_grounded = (vsrc.n != 0);
 
         if p_not_grounded {
-            m[i_vsrc][vsrc.p] = 1.0;
-            m[vsrc.p][i_vsrc] = 1.0;
+            m[idx_vsrc][vsrc.p] = 1.0;
+            m[vsrc.p][idx_vsrc] = 1.0;
         }
 
         if n_not_grounded {
-            m[i_vsrc][vsrc.n] = -1.0;
-            m[vsrc.n][i_vsrc] = -1.0;
+            m[idx_vsrc][vsrc.n] = -1.0;
+            m[vsrc.n][idx_vsrc] = -1.0;
         }
     }
 
@@ -798,7 +806,22 @@ impl Engine {
                         n: isrc.n,
                         value: i_now,
                     });
-                }
+                },
+
+                circuit::Element::Vsin(ref vsrc) => {
+                    println!("*INFO* {}", el);
+
+                    // evaluate at the present sim time
+                    let v_now = vsrc.evaluate(t_now);
+
+                    // stamp
+                    self.stamp_voltage_source(m, &circuit::VoltageSource{
+                        p: vsrc.p,
+                        n: vsrc.n,
+                        value: v_now,
+                        idx: vsrc.idx,
+                    });
+                },
 
                 _ => { println!("*ERROR* - unrecognised independent source element"); }
             }

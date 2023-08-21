@@ -1,5 +1,96 @@
 # Development Log
 
+    This is a personal project. It does not have to be rigourously tested.
+
+## 2023-08-21
+Still trying to figure out how much SPICE to support.
+
+I fixed voltage sinewave sources, I think, and gave some test unique names. Having
+multipe tests named `test` is not great for the summary.
+
+All voltage sources know their index past the node-count. This is so we can
+stamp them without lookups. That said, we still look up the index of the "known"
+column to place the voltage source values in.
+
+I downloaded KST2 again. I can't find anything better for waveforms atm.
+
+
+## 2022-10-15
+What if the next step is to just make everything I have working now be doable from a 
+SPICE card? That might make a nice next release.
+
+Then, I have 2 problems:
+1. Check that the reader works, parsing-wise
+2. Check that they trigger the correct analysis
+
+My imagination for this is, uncommonly, too much for this. I need to reign in things and
+just do something that I can cut a release for. I need to write some requirements. Some 
+simple ones. Do I want to write an EBNF?
+
+## After I get through this
+In general though, I want to understand noise better. So after this, I want to see 
+how to implement noise analysis and do that thing where you can get the noise contributors.
+
+I think after this I want to tackle subcircuits too. Noise or subcircuits?
+
+### Testing
+I have 5 SPICE tests running at the moment.
+* 2 of them are unittests of `spice.rs` checking the parsing of numbers
+* 3 are analysis tests that read in SPICE files
+
+I have a problem with testing the results of the analysis tests. Do I need golden waveforms
+to check against in the case of the transient tests? For the DC tests, I have comments in 
+the file with the node voltages that `ngspice` produces. Do I need to parse and check these
+against `tiny-spice` outputs?
+
+But none of my transient tests are self-checked at the minute, I'm only testing if they
+don't raise a "timestep too small".
+
+### VSIN Initial Value
+How do I, say, set an initial value for a sinewave node? Can I do this? How would I get
+a `dc` value for a voltage source to be the starting point for a `VSIN`, for example?A
+
+Maybe there's some kind of check that the `dc` value is a valid solution to A sin(wt) and 
+set the phase accordingly? Is this even how SPICE does things or are `dc` and `trans` 
+totally separate - they can't be, right?
+
+There is an offset in the VSIN definition, do I do the right thing here for `op` analysis?
+This is where it would be nice to do a sweep of a source parameter. Is that offset a DC 
+offset or is it the initial value?
+
+### Plots
+I also want an command that I can just run and have waveforms pop up afterwards. Then I'd 
+have to deal with batch mode and immediate mode runs of the simulator.
+
+Maybe `plot` for this means writing out a waveform data file? What if there are multiple plots?
+If I was targeting KST2, I could write the data file that is the sum of all the waveforms,
+and also write out KST2 commands to plot the overlays.
+
+What should this do in `tiny-spice`?
+```
+    plot v(1)
+    plot v(2), v(3)
+```
+
+What would I want it to do? If not in batch mode, pop up some windows with plots. If in batch
+mode, dump some pngs somewhere. But this is all extra shit. I don't want to have to write a
+GUI for waveform display, but maybe, in the real world, this just /IS/ part of a simulator.
+
+So maybe I don't implement `plot`, but instead implement whatever the SPICE equivalent of
+`keep` is? And this infers a separate database for waveforms, I suppose.
+
+So this then is how many of the waveforms should be stored off as the simulation progresses?
+If you can do plots after the fact, then everything has to get stored in the waveform database.
+And now there's a new object - the "waveform database".
+
+### `print all`
+This is the easiest thing to implement, right?
+
+### Quit
+The `quit` command assumes there's an interactive mode. I do not have an interactive mode
+in `tiny-spice`.
+
+
 ## 2018-11-26
 Between upgrading my desktop, getting a new laptop, losing and finding my
 github stick, I needed to consolidate my github repos.

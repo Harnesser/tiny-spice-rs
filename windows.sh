@@ -1,6 +1,6 @@
 #! /usr/bin/env sh
 
-PRJDIR=/home/harnesser/Projects/tiny-spice-rs
+PRJDIR=/home/${USER}/Projects/tiny-spice-rs
 
 cd $PRJDIR
  

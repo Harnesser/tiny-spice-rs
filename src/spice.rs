@@ -10,11 +10,19 @@
 //!   * Integers for now
 //! 4. Values:
 //!   * floating point with optional engineering scaler and unit
+//! 5. Options:
+//!   * `ABSTOL`
+//! 6. Control Blocks:
+//!   Only one operation for now - no sequences
+//!   * DC Operating Point `op`
+//!   * Transient : `trans <t_step> <t_stop> [t_start]`
+//!     * for now, `t_start` is ignored
 
+use std::path::Path;
 use std::fs::File;
 use std::io::{BufReader, BufRead};
 
-use crate::circuit::{Circuit, Diode, CurrentSourceSine};
+use crate::circuit::{Circuit, Diode, CurrentSourceSine, VoltageSourceSine};
 use crate::analysis::{Configuration, Kind};
 
 pub struct Reader {
@@ -31,12 +39,18 @@ impl Reader {
         }
     }
 
-    pub fn read(&mut self, filename :&str) {
+    pub fn read(&mut self, filename :&Path) {
 
         let input = File::open(filename).unwrap();
         let buf = BufReader::new(input);
         let mut lines_iter = buf.lines();
         let mut in_control_block = false;
+
+        // circuit name is the SPICE name without any 
+        let ckt_name = filename
+            .file_stem().expect("can't get stem of SPICE file path")
+            .to_str().expect("cant stringify SPICE filename");
+        self.cfg.ckt_name = ckt_name.to_string();
 
         // first line is a comment and is ignored
         lines_iter.next();
@@ -64,13 +78,25 @@ impl Reader {
                 bits.push(b);
             }
 
+            println!("Bits: {:?}", bits);
+
             // let's go
             if in_control_block {
-                println!("*INFO* Reading control '{}'", bits[0]);
+                println!("*INFO* Parsing control '{}'", bits[0]);
                 if bits[0] == "op" {
                     self.cfg.kind = Some(Kind::DcOperatingPoint);
+                    let wavefile = Path::new("waves")
+                        .join(&self.cfg.ckt_name)
+                        .join("dc.dat");
+                    self.cfg.set_wavefile(wavefile.to_str().expect("CasdfasDF"));
+
                 } else if bits[0] == "tran" {
                     self.cfg.kind = Some(Kind::Transient);
+                    let wavefile = Path::new("waves")
+                        .join(&self.cfg.ckt_name)
+                        .join("tran.dat");
+                    self.cfg.set_wavefile(wavefile.to_str().expect("CasdfasDF"));
+
                     // step stop <start>
                     if bits.len() < 3 {
                         println!("*ERROR* not enough trans info");
@@ -80,6 +106,10 @@ impl Reader {
                     if bits.len() > 3 {
                         self.cfg.TSTART = extract_value(&bits[3]).unwrap();
                     }
+                } else if bits[0] == ".endc" {
+                    in_control_block = false;
+                } else {
+                    println!("*WARN* Ignoring unrecognised command '{}'", bits[0]);
                 }
             } else {
 
@@ -105,8 +135,10 @@ impl Reader {
                         println!("*INFO* Vdc");
                         let value = extract_value(&bits[3]);
                         self.ckt.add_v(node1, node2, value.unwrap());
-                    } else if bits[3] == "SIN(" {
+                    } else if bits[3].starts_with("SIN(") {
                         println!("*INFO* Vsin");
+                        let src = self.extract_v_sine(&bits);
+                        self.ckt.add_v_sin(src);
                     }
                 } else if bits[0].starts_with('R') {
                     let _ = extract_identifier(&bits[0]);
@@ -126,8 +158,6 @@ impl Reader {
                 } else if bits[0].starts_with('.') {
                     if bits[0] == ".control" {
                         in_control_block = true;
-                    } else if bits[0] == ".endc" {
-                        in_control_block = false;
                     } else if bits[0] == ".option" {
                         self.extract_option(&bits);
                     }
@@ -205,6 +235,46 @@ impl Reader {
         }
     }
 
+    // extract the stuff from SIN()
+    fn extract_v_sine(&mut self, bits: &[&str]) -> VoltageSourceSine {
+        let _ = extract_identifier(&bits[0]);
+        let node1 = extract_node(&bits[1]);
+        let node2 = extract_node(&bits[2]);
+
+        // ugly stuff...
+        // push all the remaining bits of the SPICE line into 1 string
+        let mut line = "".to_string();
+        for b in bits[3..].iter() {
+            line += *b;
+            line.push(' ');
+        }
+
+        // then when we remove "SIN" "(" and ")" we should be left with
+        // some numbers that we can extract
+        line = line.replace("SIN", "");
+        line = line.replace("(", "");
+        line = line.replace(")", "");
+
+        let all_bits :Vec<&str> = line.split_whitespace().collect();
+        if all_bits.len() != 3 {
+            println!("*ERROR* not enough parameters to SIN()");
+        }
+        let offset = extract_value(all_bits[0]).unwrap();
+        let amplitude = extract_value(all_bits[1]).unwrap();
+        let frequency = extract_value(all_bits[2]).unwrap();
+        println!("*INFO* VSIN {} {} {}", offset, amplitude, frequency);
+
+        VoltageSourceSine {
+            p: node1,
+            n: node2,
+            vo: offset,
+            va: amplitude,
+            freq: frequency,
+            idx: 0
+        }
+    }
+
+
 
     // Return reference to the completed circuit datastructure
     pub fn circuit(&self) -> &Circuit {
@@ -223,11 +293,12 @@ fn extract_identifier(text: &str) -> String {
     text.to_string()
 }
 
+/// Nodes are integers (for now)
 fn extract_node(text: &str) -> usize {
     let mut node: usize = 0;
     match text.parse::<usize>() {
         Ok(n) => node = n,
-        Err(_) => println!("*ERROR* bad node name"),
+        Err(_) => println!("*ERROR* bad node name: '{}'", text),
     }
     node
 }
@@ -398,14 +469,14 @@ mod tests {
     #[test]
     fn simple_read_count_voltage_sources() {
         let mut rdr = Reader::new();
-        rdr.read("./ngspice/test_reader.spi");
+        rdr.read(Path::new("./ngspice/test_reader.spi"));
         assert!(rdr.ckt.count_voltage_sources() == 1);
     }
 
     #[test]
     fn simple_read_count_nodes() {
         let mut rdr = Reader::new();
-        rdr.read("./ngspice/test_reader.spi");
+        rdr.read(Path::new("./ngspice/test_reader.spi"));
         assert!(rdr.ckt.count_nodes() == 9);
     }
 }

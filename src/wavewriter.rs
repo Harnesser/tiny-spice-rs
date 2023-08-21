@@ -17,6 +17,11 @@ impl WaveWriter {
         let path = Path::new(filename);
         let display = path.display();
 
+        // make all parent directories
+        let leadup = path.parent().expect("UIOPUPOIUPOIUPIOU");
+        std::fs::create_dir_all(leadup).expect("ASDFASDFASDFASF");
+
+        // wave writer
         let mut writer = WaveWriter {
             file: None,
         };
@@ -28,7 +33,10 @@ impl WaveWriter {
                          display, why.description() );
                 None
             },
-            Ok(file) => Some(file),
+            Ok(file) => {
+                println!("*INFO* Dumping into file {}", display);
+                Some(file)
+            },
         };
 
         Some(writer)

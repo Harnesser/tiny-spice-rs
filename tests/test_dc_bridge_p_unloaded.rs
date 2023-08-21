@@ -37,8 +37,8 @@ fn build() -> Circuit {
     let mut ckt = Circuit::new();
 
     // bridge input voltage
-    ckt.elements.push(Element::V(VoltageSource{p: 1, n: 2, value: 10.0}));
-    ckt.elements.push(Element::V(VoltageSource{p: 2, n: 0, value: 0.0}));
+    ckt.elements.push(Element::V(VoltageSource{p: 1, n: 2, value: 10.0, idx:0 }));
+    ckt.elements.push(Element::V(VoltageSource{p: 2, n: 0, value: 0.0 , idx:1 }));
 
     // Diode bridge
     //  (1) is top

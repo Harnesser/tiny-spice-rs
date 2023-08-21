@@ -35,7 +35,7 @@ fn build() -> Circuit {
 
     // R with series 0V source to measure branch current
     ckt.elements.push(
-        Element::V(VoltageSource{p: 1, n: 2, value: 0.0}),
+        Element::V(VoltageSource{p: 1, n: 2, value: 0.0, idx: 0}),
     );
 
     ckt.elements.push(
@@ -44,7 +44,7 @@ fn build() -> Circuit {
 
     // D with series 0V source to measure branch current
     ckt.elements.push(
-        Element::V(VoltageSource{p: 1, n: 3, value: 0.0}),
+        Element::V(VoltageSource{p: 1, n: 3, value: 0.0, idx: 1}),
     );
     ckt.elements.push(
         Element::D(Diode::new(3, 0, 1e-9, 27.0)),

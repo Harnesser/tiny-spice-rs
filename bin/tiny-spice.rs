@@ -1,6 +1,7 @@
 extern crate tiny_spice;
 
 use std::env;
+use std::path::Path;
 
 use tiny_spice::spice;
 use tiny_spice::engine;
@@ -14,8 +15,12 @@ fn main() {
         panic!("Please supply a SPICE filename");
     }
 
+    // See if the filename exists
+    let spice_file = Path::new(&args[1]);
+    spice_file.try_exists().expect("Can't access spice file");
+
     let mut reader = spice::Reader::new();
-    reader.read(&args[1]);
+    reader.read(&spice_file);
 
     let ckt = reader.circuit();
     let cfg = reader.configuration();
