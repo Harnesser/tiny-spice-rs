@@ -2,6 +2,10 @@
 
     This is a personal project. It does not have to be rigourously tested.
 
+## 2023-08-28
+I think I have to decide how much `plot` and/or `print` support is enough for this
+release.
+
 ## 2023-08-21
 Still trying to figure out how much SPICE to support.
 

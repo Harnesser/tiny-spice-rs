@@ -1,7 +1,6 @@
 
 use crate::analysis;
 use crate::circuit;
-use crate::circuit::NodeId;
 use crate::wavewriter::WaveWriter;
 
 fn banner() {
@@ -164,7 +163,7 @@ impl Engine {
         // Find the DC operating point
         // used as the initial values in the transient simulation
         // this will also build the circuit
-        let dc_op_stats = self.dc_operating_point(&ckt, &cfg);
+        let dc_op_stats = self.dc_operating_point(ckt, cfg);
         let mut unknowns = self.dc_op.clone();
 
         println!("*INFO*: DC : {:?}", &unknowns);
@@ -263,7 +262,7 @@ impl Engine {
                 c_iteration += 1;
 
                 // Convergence check
-                match self.convergence_check(&unknowns, &unknowns_solve, &cfg) {
+                match self.convergence_check(&unknowns, &unknowns_solve, cfg) {
                     Ok(cnvg) => {
                         if cnvg {
                             println!("*INFO* Timestep converged after {} iterations", c_itl);
@@ -384,7 +383,7 @@ impl Engine {
             println!("{:?}", unknowns_prev);
 
             if c_iteration > 0 {
-                match self.convergence_check(&unknowns, &unknowns_prev, &cfg) {
+                match self.convergence_check(&unknowns, &unknowns_prev, cfg) {
                     Ok(cnvd) => {
                         if cnvd {
                             converged = true;
@@ -432,11 +431,11 @@ impl Engine {
     {
 
         // build the circuit matrix
-        self.elaborate(&ckt);
+        self.elaborate(ckt);
 
         // cos borrowck
         let mna = self.base_matrix.clone();
-        self.dc_solve(&mna, &cfg)
+        self.dc_solve(&mna, cfg)
     }
 
 
@@ -467,7 +466,6 @@ impl Engine {
         // Fill up the voltage node and current vector
         // This needs to know about each of the kinds of circuit elements, so
         // the node equations can be built up appropriately.
-        let mut idx_vsrc : usize = self.c_nodes;
         for el in &ckt.elements {
             match *el {
                 // From NGSPICE manual:
@@ -485,7 +483,6 @@ impl Engine {
 
                 circuit::Element::V(ref vsrc) => {
                     self.stamp_voltage_source(&mut m, vsrc);
-                    idx_vsrc += 1; // voltage source matrix index update 
                 }
 
                 circuit::Element::D(ref d) => {
@@ -593,6 +590,7 @@ impl Engine {
         // Solve the rest recursively
         for i_solve in (1..c_mna-1).rev() {
             let mut sum = 0.0;
+            #[allow(clippy::needless_range_loop)]
             for i_term in i_solve+1..c_mna {
                 sum += v[i_solve][i_term] * n[i_term];
                 //println!("[{:3}]  {} * {}",  i_solve, v[i_solve][i_term], n[i_term]);
@@ -608,9 +606,12 @@ impl Engine {
 
 
         println!("\n*INFO* Results");
+        #[allow(clippy::needless_range_loop)]
         for i_res in 1..self.c_nodes {
             println!(" v[{:2}] = {}", i_res, n[i_res]);
         }
+
+        #[allow(clippy::needless_range_loop)]
         for i_res in self.c_nodes..self.c_nodes+self.c_vsrcs {
             println!(" i[{:2}] = {}", i_res, n[i_res]);
         }
@@ -623,6 +624,7 @@ impl Engine {
         let mut biggest: f64 = 0.0;
         let mut r_biggest: usize = k;
         let c_rows = m.len();
+        #[allow(clippy::needless_range_loop)]
         for r in k..c_rows {
             let this = m[r][k].abs();
             if this > biggest {
@@ -655,7 +657,7 @@ impl Engine {
     }
 
 
-    fn stamp_current_source(&self, m: &mut Vec<Vec<f64>>, isrc: &circuit::CurrentSource) {
+    fn stamp_current_source(&self, m: &mut [Vec<f64>], isrc: &circuit::CurrentSource) {
         println!("  [ELEMENT] Current source: {}A into node {} and out of node {}",
                 isrc.value, isrc.p, isrc.n);
         let ia = self.c_nodes + self.c_vsrcs; // index for ampere vector
@@ -671,7 +673,7 @@ impl Engine {
     #[allow(unused_parens)]
     fn stamp_voltage_source(
         &self,
-        m: &mut Vec<Vec<f64>>,
+        m: &mut [Vec<f64>],
         vsrc: &circuit::VoltageSource,
     ) {
         println!("  [ELEMENT] Voltage source: {}V from node {} to node {}",
@@ -698,7 +700,7 @@ impl Engine {
 
 
 
-    fn stamp_resistor(&self, m: &mut Vec<Vec<f64>>, r: &circuit::Resistor) {
+    fn stamp_resistor(&self, m: &mut [Vec<f64>], r: &circuit::Resistor) {
         println!("  [ELEMENT] Resistor {} Ohms between node {} and node {}",
                 r.value, r.a, r.b);
         let over = 1.0 / r.value;
@@ -721,7 +723,7 @@ impl Engine {
     }
 
 
-    fn storage_stamp(&self, m: &mut Vec<Vec<f64>>, n: &[f64], t: f64) {
+    fn storage_stamp(&self, m: &mut [Vec<f64>], n: &[f64], t: f64) {
         println!("*INFO* Stamping storage elements");
         for el in &self.storage_elements {
             match *el {
@@ -754,7 +756,7 @@ impl Engine {
 
     // stamp a matrix with linearized companion models of all the nonlinear
     // devices listed in the SPICE netlist
-    fn nonlinear_stamp(&self, m: &mut Vec<Vec<f64>>, n: &[f64], n_prev: &[f64] ) {
+    fn nonlinear_stamp(&self, m: &mut [Vec<f64>], n: &[f64], n_prev: &[f64] ) {
         println!("*INFO* Stamping nonlinear elements");
         for el in &self.nonlinear_elements {
             match *el {
@@ -789,7 +791,7 @@ impl Engine {
 
 
     // stamp independent sources
-    fn independent_source_stamp(&self, m: &mut Vec<Vec<f64>>, t_now: f64) {
+    fn independent_source_stamp(&self, m: &mut [Vec<f64>], t_now: f64) {
         println!("*INFO* Stamping independent source elements");
         println!("*INFO*  {} of them", &self.independent_sources.len());
         for el in &self.independent_sources {

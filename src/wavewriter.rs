@@ -3,7 +3,6 @@
 use std::io::prelude::*;
 use std::fs::File;
 use std::path::Path;
-use std::error::Error;
 
 pub struct WaveWriter {
     file: Option<File>,
@@ -27,10 +26,10 @@ impl WaveWriter {
         };
 
         // open the path to write
-        writer.file = match File::create(&path) {
+        writer.file = match File::create(path) {
             Err(why) => {
                 println!("*ERROR* Can't open waveform file {}: {}",
-                         display, why.description() );
+                         display, why );
                 None
             },
             Ok(file) => {
@@ -57,10 +56,10 @@ impl WaveWriter {
 
         let mut units = "s".to_string();
         for _ in 0..c_nodes {
-            units += &"\tV".to_string();
+            units += "\tV";
         }
         for _ in 0..c_vsrcs {
-            units += &"\tA".to_string();
+            units += "\tA";
         }
         units += "\n";
 

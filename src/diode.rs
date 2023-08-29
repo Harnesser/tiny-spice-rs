@@ -43,6 +43,7 @@ impl Diode {
         let v_delta = v_hat - v_d_prev;
 
         let v_d_i :f64;
+        #[allow(clippy::if_same_then_else)] // FIXME??
         if v_hat < self.v_crit {
             v_d_i = v_hat;
         } else if v_delta.abs() <= 2.0 * self.v_thermal {
@@ -109,7 +110,7 @@ impl Diode {
         // critical voltage for Colon
         self.v_crit = 
             self.v_thermal 
-            * ( self.v_thermal / ( (2.0 as f64).sqrt() * self.i_sat ) )
+            * ( self.v_thermal / ( (2.0_f64).sqrt() * self.i_sat ) )
             .ln();
     }
 

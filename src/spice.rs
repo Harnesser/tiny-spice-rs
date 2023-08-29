@@ -32,6 +32,7 @@ pub struct Reader {
 
 impl Reader {
 
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Reader {
         Reader {
             ckt: Circuit::new(),
@@ -101,10 +102,10 @@ impl Reader {
                     if bits.len() < 3 {
                         println!("*ERROR* not enough trans info");
                     }
-                    self.cfg.TSTEP = extract_value(&bits[1]).unwrap();
-                    self.cfg.TSTOP = extract_value(&bits[2]).unwrap();
+                    self.cfg.TSTEP = extract_value(bits[1]).unwrap();
+                    self.cfg.TSTOP = extract_value(bits[2]).unwrap();
                     if bits.len() > 3 {
-                        self.cfg.TSTART = extract_value(&bits[3]).unwrap();
+                        self.cfg.TSTART = extract_value(bits[3]).unwrap();
                     }
                 } else if bits[0] == ".endc" {
                     in_control_block = false;
@@ -115,12 +116,12 @@ impl Reader {
 
                 // find out what we're looking at
                 if bits[0].starts_with('I') {
-                    let _ = extract_identifier(&bits[0]);
-                    let node1 = extract_node(&bits[1]);
-                    let node2 = extract_node(&bits[2]);
+                    let _ = extract_identifier(bits[0]);
+                    let node1 = extract_node(bits[1]);
+                    let node2 = extract_node(bits[2]);
                     if bits.len() == 4 {
                         println!("*INFO* Idc");
-                        let value = extract_value(&bits[3]);
+                        let value = extract_value(bits[3]);
                         self.ckt.add_i(node1, node2, value.unwrap());
                     } else if bits[3].starts_with("SIN") {
                         println!("*INFO* Isin");
@@ -128,12 +129,12 @@ impl Reader {
                         self.ckt.add_i_sin(src);
                     }
                 } else if bits[0].starts_with('V') {
-                    let _ = extract_identifier(&bits[0]);
-                    let node1 = extract_node(&bits[1]);
-                    let node2 = extract_node(&bits[2]);
+                    let _ = extract_identifier(bits[0]);
+                    let node1 = extract_node(bits[1]);
+                    let node2 = extract_node(bits[2]);
                     if bits.len() == 4 {
                         println!("*INFO* Vdc");
-                        let value = extract_value(&bits[3]);
+                        let value = extract_value(bits[3]);
                         self.ckt.add_v(node1, node2, value.unwrap());
                     } else if bits[3].starts_with("SIN(") {
                         println!("*INFO* Vsin");
@@ -141,16 +142,16 @@ impl Reader {
                         self.ckt.add_v_sin(src);
                     }
                 } else if bits[0].starts_with('R') {
-                    let _ = extract_identifier(&bits[0]);
-                    let node1 = extract_node(&bits[1]);
-                    let node2 = extract_node(&bits[2]);
-                    let value = extract_value(&bits[3]);
+                    let _ = extract_identifier(bits[0]);
+                    let node1 = extract_node(bits[1]);
+                    let node2 = extract_node(bits[2]);
+                    let value = extract_value(bits[3]);
                     self.ckt.add_r(node1, node2, value.unwrap());
                 } else if bits[0].starts_with('C') {
-                    let _ = extract_identifier(&bits[0]);
-                    let node1 = extract_node(&bits[1]);
-                    let node2 = extract_node(&bits[2]);
-                    let value = extract_value(&bits[3]);
+                    let _ = extract_identifier(bits[0]);
+                    let node1 = extract_node(bits[1]);
+                    let node2 = extract_node(bits[2]);
+                    let value = extract_value(bits[3]);
                     self.ckt.add_c(node1, node2, value.unwrap());
                 } else if bits[0].starts_with('D') {
                     let d = self.extract_diode(&bits);
@@ -176,11 +177,12 @@ impl Reader {
     fn extract_diode(&self, bits: &[&str]) -> Diode {
         let i_sat = 1e-9;
         let tdegc = 27.0;
-        let _ = extract_identifier(&bits[0]);
-        let node1 = extract_node(&bits[1]);
-        let node2 = extract_node(&bits[2]);
+        let _ = extract_identifier(bits[0]);
+        let node1 = extract_node(bits[1]);
+        let node2 = extract_node(bits[2]);
         //let value = extract_value(&bits[3]);
 
+        #[allow(clippy::manual_range_contains)]
         if (i_sat < 0.0) || (i_sat > 1e-6) {
             println!("*WARN* check diode saturation current. It seems weird");
         }
@@ -193,15 +195,15 @@ impl Reader {
             println!("*ERROR* shite....");
         }
         if bits[1] == "ABSTOL" {
-            self.cfg.ABSTOL = extract_value(&bits[3]).unwrap();
+            self.cfg.ABSTOL = extract_value(bits[3]).unwrap();
         }
     }
 
     // extract the stuff from SIN()
     fn extract_i_sine(&mut self, bits: &[&str]) -> CurrentSourceSine {
-        let _ = extract_identifier(&bits[0]);
-        let node1 = extract_node(&bits[1]);
-        let node2 = extract_node(&bits[2]);
+        let _ = extract_identifier(bits[0]);
+        let node1 = extract_node(bits[1]);
+        let node2 = extract_node(bits[2]);
 
         // ugly stuff...
         // push all the remaining bits of the SPICE line into 1 string
@@ -214,8 +216,8 @@ impl Reader {
         // then when we remove "SIN" "(" and ")" we should be left with
         // some numbers that we can extract
         line = line.replace("SIN", "");
-        line = line.replace("(", "");
-        line = line.replace(")", "");
+        line = line.replace('(', "");
+        line = line.replace(')', "");
 
         let all_bits :Vec<&str> = line.split_whitespace().collect();
         if all_bits.len() != 3 {
@@ -237,9 +239,9 @@ impl Reader {
 
     // extract the stuff from SIN()
     fn extract_v_sine(&mut self, bits: &[&str]) -> VoltageSourceSine {
-        let _ = extract_identifier(&bits[0]);
-        let node1 = extract_node(&bits[1]);
-        let node2 = extract_node(&bits[2]);
+        let _ = extract_identifier(bits[0]);
+        let node1 = extract_node(bits[1]);
+        let node2 = extract_node(bits[2]);
 
         // ugly stuff...
         // push all the remaining bits of the SPICE line into 1 string
@@ -252,8 +254,8 @@ impl Reader {
         // then when we remove "SIN" "(" and ")" we should be left with
         // some numbers that we can extract
         line = line.replace("SIN", "");
-        line = line.replace("(", "");
-        line = line.replace(")", "");
+        line = line.replace('(', "");
+        line = line.replace(')', "");
 
         let all_bits :Vec<&str> = line.split_whitespace().collect();
         if all_bits.len() != 3 {
@@ -305,12 +307,12 @@ fn extract_node(text: &str) -> usize {
 
 #[derive(Debug)]
 enum ValueState {
-    START,
-    INT,
-    FRAC,
-    EXPSTART, // '+' | '-' | digit
-    EXP, // digit
-    UNIT,
+    Start,
+    Int,
+    Frac,
+    ExpStart, // '+' | '-' | digit
+    Exp, // digit
+    Unit,
 }
 
 // possibilities:
@@ -329,7 +331,7 @@ fn extract_value(text: &str) -> Option<f64> {
     let mut value: Option<f64> = None;
     let mut float_str = "".to_string();
     let mut c: char;
-    let mut state = ValueState::START;
+    let mut state = ValueState::Start;
     let mut nxt;
     let mut eng_mult :f64 = 1.0;
 
@@ -350,97 +352,97 @@ fn extract_value(text: &str) -> Option<f64> {
         //println!(" {:?} '{}'", state, c);
         match state {
 
-            ValueState::START => {
+            ValueState::Start => {
                 match c {
-                    '+' | '-' => { float_str.push(c); nxt = ValueState::INT },
-                    '0' ... '9' => { float_str.push(c); nxt = ValueState::INT },
+                    '+' | '-' => { float_str.push(c); nxt = ValueState::Int },
+                    '0' ..= '9' => { float_str.push(c); nxt = ValueState::Int },
                     _ => break 'things
                 }
             },
 
-            ValueState::INT => {
+            ValueState::Int => {
                 match c {
-                    '0' ... '9' => { float_str.push(c); nxt = ValueState::INT },
-                    '.' => { float_str.push(c); nxt = ValueState::FRAC },
-                    'e' => { float_str.push(c); nxt = ValueState::EXPSTART },
+                    '0' ..= '9' => { float_str.push(c); nxt = ValueState::Int },
+                    '.' => { float_str.push(c); nxt = ValueState::Frac },
+                    'e' => { float_str.push(c); nxt = ValueState::ExpStart },
                     'k' => {
                         eng_mult = 1e3;
                         value = eval(&float_str, eng_mult);
-                        nxt = ValueState::UNIT
+                        nxt = ValueState::Unit
                     },
                     'm' => {
                         eng_mult = 1e-3;
                         value = eval(&float_str, eng_mult);
-                        nxt = ValueState::UNIT
+                        nxt = ValueState::Unit
                     },
                     'u' => {
                         eng_mult = 1e-6;
                         value = eval(&float_str, eng_mult);
-                        nxt = ValueState::UNIT
+                        nxt = ValueState::Unit
                     },
                     'n' => {
                         eng_mult = 1e-9;
                         value = eval(&float_str, eng_mult);
-                        nxt = ValueState::UNIT
+                        nxt = ValueState::Unit
                     },
                     'p' => {
                         eng_mult = 1e-12;
                         value = eval(&float_str, eng_mult);
-                        nxt = ValueState::UNIT
+                        nxt = ValueState::Unit
                     },
                     _ => break 'things
                 }
             },
 
-            ValueState::FRAC => {
+            ValueState::Frac => {
                 match c {
-                    '0' ... '9' => { float_str.push(c); nxt = ValueState::FRAC },
-                    'e' => { float_str.push(c); nxt = ValueState::EXPSTART },
+                    '0' ..= '9' => { float_str.push(c); nxt = ValueState::Frac },
+                    'e' => { float_str.push(c); nxt = ValueState::ExpStart },
                     'k' => {
                         eng_mult = 1e3;
                         value = eval(&float_str, eng_mult);
-                        nxt = ValueState::UNIT
+                        nxt = ValueState::Unit
                     },
                     'm' => {
                         eng_mult = 1e-3;
                         value = eval(&float_str, eng_mult);
-                        nxt = ValueState::UNIT
+                        nxt = ValueState::Unit
                     },
                     'u' => {
                         eng_mult = 1e-6;
                         value = eval(&float_str, eng_mult);
-                        nxt = ValueState::UNIT
+                        nxt = ValueState::Unit
                     },
                     'n' => {
                         eng_mult = 1e-9;
                         value = eval(&float_str, eng_mult);
-                        nxt = ValueState::UNIT
+                        nxt = ValueState::Unit
                     },
                     'p' => {
                         eng_mult = 1e-12;
                         value = eval(&float_str, eng_mult);
-                        nxt = ValueState::UNIT
+                        nxt = ValueState::Unit
                     },
                     _ => break 'things
                 }
             },
 
-            ValueState::EXPSTART => {
+            ValueState::ExpStart => {
                 match c {
-                    '+' | '-' => { float_str.push(c); nxt = ValueState::EXP },
-                    '0' ... '9' => { float_str.push(c); nxt = ValueState::EXP },
+                    '+' | '-' => { float_str.push(c); nxt = ValueState::Exp },
+                    '0' ..= '9' => { float_str.push(c); nxt = ValueState::Exp },
                     _ => break 'things
                 }
             },
 
-            ValueState::EXP => {
+            ValueState::Exp => {
                 match c {
-                    '0' ... '9' => { float_str.push(c); nxt = ValueState::EXP },
+                    '0' ..= '9' => { float_str.push(c); nxt = ValueState::Exp },
                     _ => break 'things
                 }
             },
 
-            ValueState::UNIT => {
+            ValueState::Unit => {
                 break 'things
             },
         }
@@ -452,7 +454,7 @@ fn extract_value(text: &str) -> Option<f64> {
     // if we've broken out of the loop at a point where the gathered
     // string might be a valid number, calculate it.
     match state {
-        ValueState::INT | ValueState::FRAC | ValueState::EXP => {
+        ValueState::Int | ValueState::Frac | ValueState::Exp => {
             value = eval(&float_str, eng_mult)
         },
         _ => {}
