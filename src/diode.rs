@@ -1,6 +1,13 @@
 use std::cell::Cell;
 use crate::circuit::{NodeId, BOLTZMANN, CHARGE, GMIN};
 
+macro_rules! trace {
+    ($fmt:expr $(, $($arg:tt)*)?) => {
+        // uncomment the line below for tracing prints
+        //println!(concat!("<diode> ", $fmt), $($($arg)*)?);
+    };
+}
+
 #[derive(Clone)]
 pub struct Diode {
     pub p: NodeId,
@@ -58,10 +65,10 @@ impl Diode {
             } else {
                 v_d_i = v_d_prev + self.v_thermal * arg.ln();
             }
-            println!("*DIODE* v_d {}, v_d_prev {}", v_hat, v_d_prev);
-            println!("*DIODE* arg {}, v_d_i {}", arg, v_d_i);
+            trace!("v_d {}, v_d_prev {}", v_hat, v_d_prev);
+            trace!(" arg {}, v_d_i {}", arg, v_d_i);
         }
-        println!("*DIODE* V_d from {} V to {} V (v_crit={})", v_hat, v_d_i, self.v_crit);
+        trace!("V_d from {} V to {} V (v_crit={})", v_hat, v_d_i, self.v_crit);
 
         // current through the diode, given the bias voltage
         let exp_vd_over_vt =(v_d_i / self.v_thermal).exp();

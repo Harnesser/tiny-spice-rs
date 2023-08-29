@@ -1,7 +1,17 @@
+/// SPICE Engine
+///
+/// Contains the stamper, solver and convergence checkers
 
 use crate::analysis;
 use crate::circuit;
 use crate::wavewriter::WaveWriter;
+
+macro_rules! trace {
+    ($fmt:expr $(, $($arg:tt)*)?) => {
+        // uncomment the line below for tracing prints
+        //println!(concat!("<engine> ", $fmt), $($($arg)*)?);
+    };
+}
 
 fn banner() {
 
@@ -166,7 +176,7 @@ impl Engine {
         let dc_op_stats = self.dc_operating_point(ckt, cfg);
         let mut unknowns = self.dc_op.clone();
 
-        println!("*INFO*: DC : {:?}", &unknowns);
+        trace!(" [TRANSIENT] : DC : {:?}", &unknowns);
 
         // prep values
         let c_mna = self.c_nodes + self.c_vsrcs;
@@ -199,7 +209,8 @@ impl Engine {
 
         // timestep loop
         let mut is_final_timestep = false;
-        let mut c_step = 0;
+        #[allow(unused_variables)]
+        let mut c_step = 0; // goes away with empty trace!
         let mut c_iteration: usize = 0;
         loop {
 
@@ -209,7 +220,7 @@ impl Engine {
             // * the prevous go round the loop for other iterations
 
             if t_now >= cfg.TSTART && t_now != 0.0 {
-                println!("*DATA*: [{}] t={} : {:?}", c_step, t_now, unknowns);
+                trace!("*DATA*: [{}] t={} : {:?}", c_step, t_now, unknowns);
                 wavedb.dump_vector(t_now, &unknowns);
             }
 
@@ -229,11 +240,13 @@ impl Engine {
             let mut unknowns_solve : Vec<f64> = vec![0.0; c_mna];
             let mut unknowns_solve_prev : Vec<f64> = vec![0.0; c_mna];
             let mut geared = false;
-            let mut mse :f64 = 0.0;
+
+            #[allow(unused_variables)]
+            let mut mse :f64 = 0.0; // not used if trace! is empty
 
             loop {
 
-                println!("*METRIC* {} {} {} {} {} {}",
+                trace!("*METRIC* {} {} {} {} {} {}",
                          c_step, t_now, t_delta, c_iteration, c_itl, mse);
 
                 // copy the base matrix, cos we're going to change it a lot:
@@ -265,7 +278,7 @@ impl Engine {
                 match self.convergence_check(&unknowns, &unknowns_solve, cfg) {
                     Ok(cnvg) => {
                         if cnvg {
-                            println!("*INFO* Timestep converged after {} iterations", c_itl);
+                            trace!(" [TIMESTEP] Timestep converged after {} iterations", c_itl);
                             converged = true;
                             break;
                         } else {
@@ -279,7 +292,7 @@ impl Engine {
                                     break;
                                 } else {
                                     // reset iteration count
-                                    println!("*INFO* Upshifting -> new t_delta = {}", t_delta);
+                                    trace!(" [TIMESTEP] Upshifting -> new t_delta = {}", t_delta);
                                     geared = true;
                                     c_itl = 0;
                                 }
@@ -306,10 +319,10 @@ impl Engine {
                     t_delta *= 2.0;
                     let t_delta_max = cfg.TSTEP * cfg.RMAX;
                     if t_delta > t_delta_max {
-                        println!("*INFO* Downshifting maxed out");
+                        trace!(" [TIMESTEP] Downshifting maxed out");
                         t_delta = t_delta_max;
                     } else {
-                        println!("*INFO* Downshifting -> new t_delta = {}", t_delta);
+                        trace!(" [TIMESTEP] Downshifting -> new t_delta = {}", t_delta);
                     }
                 }
             }
@@ -378,9 +391,9 @@ impl Engine {
 
 
             // Convergence check
-            println!("*INFO* Convergence check {}", c_iteration);
-            println!("{:?}", unknowns);
-            println!("{:?}", unknowns_prev);
+            trace!(" [CONVERGE] Convergence check {}", c_iteration);
+            trace!(" [CONVERGE]  {:?}", unknowns);
+            trace!(" [CONVERGE]  {:?}", unknowns_prev);
 
             if c_iteration > 0 {
                 match self.convergence_check(&unknowns, &unknowns_prev, cfg) {
@@ -405,7 +418,7 @@ impl Engine {
 
 
         if converged {
-            println!("*INFO* Converged after {} iterations", c_iteration + 1);
+            trace!(" [CONVERGE] Converged after {} iterations", c_iteration + 1);
         } else {
             println!("*ERROR* Divergent");
         }
@@ -452,7 +465,7 @@ impl Engine {
         self.c_vsrcs = ckt.count_voltage_sources();
         println!("*INFO* There are {} voltage sources in the design", self.c_vsrcs);
 
-        println!("\n*INFO* Building Voltage Node Matrix and Current Vector");
+        trace!("Building Voltage Node Matrix and Current Vector");
 
         // Modified Nodal Analysis (MNA) Matrix
         let c_mna = self.c_nodes + self.c_vsrcs;
@@ -486,28 +499,28 @@ impl Engine {
                 }
 
                 circuit::Element::D(ref d) => {
-                    println!("  [ELEMENT] Diode:");
+                    trace!("  [ELEMENT] Diode:");
                     self.nonlinear_elements.push(
                         circuit::Element::D(d.clone())
                     );
                 }
 
                 circuit::Element::Isin(ref isrcsine) => {
-                    println!("  [ELEMENT] Current Source (~):");
+                    trace!("  [ELEMENT] Current Source (~):");
                     self.independent_sources.push(
                         circuit::Element::Isin(isrcsine.clone())
                     );
                 }
 
                 circuit::Element::Vsin(ref vsrcsine) => {
-                    println!("  [ELEMENT] Voltage Source (~):");
+                    trace!("  [ELEMENT] Voltage Source (~):");
                     self.independent_sources.push(
                         circuit::Element::Vsin(vsrcsine.clone())
                     );
                 }
 
                 circuit::Element::C(ref c) => {
-                    println!("  [ELEMENT] Capacitor:");
+                    trace!("  [ELEMENT] Capacitor:");
                     self.storage_elements.push(
                         circuit::Element::C(c.clone())
                     );
@@ -528,7 +541,7 @@ impl Engine {
 
         // Gaussian elimination with partial pivoting
         // https://en.wikipedia.org/wiki/Gaussian_elimination#Pseudocode
-        println!("\n*INFO* Gaussian Elimination");
+        trace!("*INFO* Gaussian Elimination");
         for r_ref in 1..c_mna-1 { // column we're eliminating, but index rows
 
             // find the k-th pivot
@@ -572,7 +585,7 @@ impl Engine {
       
         // TODO check result
 
-        println!("\n*INFO* Back-substitution");
+        trace!("*INFO* Back-substitution");
 
         // node voltage array
         let mut n = vec![0.0; c_mna];
@@ -605,15 +618,15 @@ impl Engine {
         }
 
 
-        println!("\n*INFO* Results");
-        #[allow(clippy::needless_range_loop)]
+        trace!(" [SOLVE] Results");
+        #[allow(clippy::needless_range_loop, unused_variables)]
         for i_res in 1..self.c_nodes {
-            println!(" v[{:2}] = {}", i_res, n[i_res]);
+            trace!(" v[{:2}] = {}", i_res, n[i_res]);
         }
 
-        #[allow(clippy::needless_range_loop)]
+        #[allow(clippy::needless_range_loop, unused_variables)]
         for i_res in self.c_nodes..self.c_nodes+self.c_vsrcs {
-            println!(" i[{:2}] = {}", i_res, n[i_res]);
+            trace!(" i[{:2}] = {}", i_res, n[i_res]);
         }
 
         n
@@ -658,7 +671,7 @@ impl Engine {
 
 
     fn stamp_current_source(&self, m: &mut [Vec<f64>], isrc: &circuit::CurrentSource) {
-        println!("  [ELEMENT] Current source: {}A into node {} and out of node {}",
+        trace!("  [STAMP] Current source: {}A into node {} and out of node {}",
                 isrc.value, isrc.p, isrc.n);
         let ia = self.c_nodes + self.c_vsrcs; // index for ampere vector
         if isrc.p != 0 {
@@ -676,7 +689,7 @@ impl Engine {
         m: &mut [Vec<f64>],
         vsrc: &circuit::VoltageSource,
     ) {
-        println!("  [ELEMENT] Voltage source: {}V from node {} to node {}",
+        trace!("  [STAMP] Voltage source: {}V from node {} to node {}",
                 vsrc.value, vsrc.p, vsrc.n);
         let idx_vsrc = self.c_nodes + vsrc.idx; // index in ampere vector
 
@@ -701,7 +714,7 @@ impl Engine {
 
 
     fn stamp_resistor(&self, m: &mut [Vec<f64>], r: &circuit::Resistor) {
-        println!("  [ELEMENT] Resistor {} Ohms between node {} and node {}",
+        trace!("  [STAMP] Resistor {} Ohms between node {} and node {}",
                 r.value, r.a, r.b);
         let over = 1.0 / r.value;
 
@@ -724,7 +737,7 @@ impl Engine {
 
 
     fn storage_stamp(&self, m: &mut [Vec<f64>], n: &[f64], t: f64) {
-        println!("*INFO* Stamping storage elements");
+        trace!("  [STAMP] storage elements");
         for el in &self.storage_elements {
             match *el {
                 circuit::Element::C(ref c) => {
@@ -757,7 +770,7 @@ impl Engine {
     // stamp a matrix with linearized companion models of all the nonlinear
     // devices listed in the SPICE netlist
     fn nonlinear_stamp(&self, m: &mut [Vec<f64>], n: &[f64], n_prev: &[f64] ) {
-        println!("*INFO* Stamping nonlinear elements");
+        trace!("  [STAMP] nonlinear elements");
         for el in &self.nonlinear_elements {
             match *el {
                 circuit::Element::D(ref d) => {
@@ -767,7 +780,7 @@ impl Engine {
                     let v_d_prev = n_prev[d.p] - n_prev[d.n];
                     let (g_eq, i_eq) = d.linearize(v_d, v_d_prev);
 
-                    println!("*INFO* {} {} {:?}", el, v_d, (g_eq, i_eq));
+                    trace!(" [STAMP] {} {} {:?}", el, v_d, (g_eq, i_eq));
 
                     // stamp
                     self.stamp_current_source(m, &circuit::CurrentSource{
@@ -792,12 +805,12 @@ impl Engine {
 
     // stamp independent sources
     fn independent_source_stamp(&self, m: &mut [Vec<f64>], t_now: f64) {
-        println!("*INFO* Stamping independent source elements");
-        println!("*INFO*  {} of them", &self.independent_sources.len());
+        trace!("  [STAMP] Stamping independent source elements");
+        trace!("  [STAMP] {} of them", &self.independent_sources.len());
         for el in &self.independent_sources {
             match *el {
                 circuit::Element::Isin(ref isrc) => {
-                    println!("*INFO* {}", el);
+                    trace!(" [STAMP] {}", el);
 
                     // evaluate at the present sim time
                     let i_now = isrc.evaluate(t_now);
@@ -811,7 +824,7 @@ impl Engine {
                 },
 
                 circuit::Element::Vsin(ref vsrc) => {
-                    println!("*INFO* {}", el);
+                    trace!("  [STAMP] {}", el);
 
                     // evaluate at the present sim time
                     let v_now = vsrc.evaluate(t_now);
@@ -856,12 +869,12 @@ impl Engine {
             };
 
             let this = (x - yv[i]).abs();
-            println!(" {} < {} = {}", this, limit, (this < limit));
+            trace!("  [CONVERGE] {} < {} = {}", this, limit, (this < limit));
             if this > limit {
                 res = Ok(false);
             }
         }
-        println!("*INFO* Convergence check: {:?}", res); 
+        trace!("  [CONVERGE] Convergence check: {:?}", res); 
         res
     }
 

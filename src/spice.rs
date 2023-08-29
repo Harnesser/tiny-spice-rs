@@ -25,10 +25,19 @@ use std::io::{BufReader, BufRead};
 use crate::circuit::{Circuit, Diode, CurrentSourceSine, VoltageSourceSine};
 use crate::analysis::{Configuration, Kind};
 
+macro_rules! trace {
+    ($fmt:expr $(, $($arg:tt)*)?) => {
+        // uncomment the line below for tracing prints
+        //println!(concat!("<spice> ", $fmt), $($($arg)*)?);
+    };
+}
+
+
 pub struct Reader {
     ckt: Circuit,
     cfg: Configuration,
 }
+
 
 impl Reader {
 
@@ -79,11 +88,11 @@ impl Reader {
                 bits.push(b);
             }
 
-            println!("Bits: {:?}", bits);
+            trace!("Bits: {:?}", bits);
 
             // let's go
             if in_control_block {
-                println!("*INFO* Parsing control '{}'", bits[0]);
+                trace!("*INFO* Parsing control '{}'", bits[0]);
                 if bits[0] == "op" {
                     self.cfg.kind = Some(Kind::DcOperatingPoint);
                     let wavefile = Path::new("waves")
@@ -120,11 +129,11 @@ impl Reader {
                     let node1 = extract_node(bits[1]);
                     let node2 = extract_node(bits[2]);
                     if bits.len() == 4 {
-                        println!("*INFO* Idc");
+                        trace!("*INFO* Idc");
                         let value = extract_value(bits[3]);
                         self.ckt.add_i(node1, node2, value.unwrap());
                     } else if bits[3].starts_with("SIN") {
-                        println!("*INFO* Isin");
+                        trace!("*INFO* Isin");
                         let src = self.extract_i_sine(&bits);
                         self.ckt.add_i_sin(src);
                     }
@@ -133,11 +142,11 @@ impl Reader {
                     let node1 = extract_node(bits[1]);
                     let node2 = extract_node(bits[2]);
                     if bits.len() == 4 {
-                        println!("*INFO* Vdc");
+                        trace!("*INFO* Vdc");
                         let value = extract_value(bits[3]);
                         self.ckt.add_v(node1, node2, value.unwrap());
                     } else if bits[3].starts_with("SIN(") {
-                        println!("*INFO* Vsin");
+                        trace!("*INFO* Vsin");
                         let src = self.extract_v_sine(&bits);
                         self.ckt.add_v_sin(src);
                     }
@@ -226,7 +235,7 @@ impl Reader {
         let offset = extract_value(all_bits[0]).unwrap();
         let amplitude = extract_value(all_bits[1]).unwrap();
         let frequency = extract_value(all_bits[2]).unwrap();
-        println!("*INFO* ISIN {} {} {}", offset, amplitude, frequency);
+        trace!("*INFO* ISIN {} {} {}", offset, amplitude, frequency);
 
         CurrentSourceSine {
             p: node1,
@@ -264,7 +273,7 @@ impl Reader {
         let offset = extract_value(all_bits[0]).unwrap();
         let amplitude = extract_value(all_bits[1]).unwrap();
         let frequency = extract_value(all_bits[2]).unwrap();
-        println!("*INFO* VSIN {} {} {}", offset, amplitude, frequency);
+        trace!("*INFO* VSIN {} {} {}", offset, amplitude, frequency);
 
         VoltageSourceSine {
             p: node1,
