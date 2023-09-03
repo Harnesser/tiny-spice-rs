@@ -26,6 +26,7 @@ fn main() {
     reader.read(spice_file);
 
     let ckt = reader.circuit();
+    ckt.show();
     let cfg = reader.configuration();
 
     // tmp analysis

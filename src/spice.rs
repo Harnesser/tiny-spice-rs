@@ -210,6 +210,7 @@ impl Reader {
             return;
         } 
 
+        // FIXME - might be "abstol=2e6" too - lower case, no spaces surrounding '='
         if bits[2] != "=" {
             println!("*ERROR* Expected '=' in option setting");
             return;

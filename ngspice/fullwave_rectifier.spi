@@ -9,14 +9,19 @@ D2 4 1
 D3 2 3
 D4 4 2
 
+* caps
+CD1 1 3 12pF
+CD2 4 1 12pF
+CD3 2 3 12pF
+CD4 4 2 12pF
+
 * Load
 Rl 3 4 1k
-*Cl 3 4 300n; anything greater causes convergence issues
+Cl 3 4 50nF ; anything greater causes convergence issues
 
 .control
-  option
-*  option reltol = 0.001
-*  option abstol = 1e-6
+  option reltol = 0.001
+  option abstol = 1e-12
 
   tran 100ns 2ms 
   option ; ngspice only shows new values after analysis
