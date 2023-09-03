@@ -156,7 +156,18 @@ impl Configuration {
         self.wavefile = filename.to_string();
     }
 
-
-
+    // Print the configuration settings
+    pub fn print_options(&self) { 
+        println!("*************************************************************");
+        println!("*OPTION* ITL3 = {}; ITL4 = {}",
+                 self.ITL3, self.ITL4);
+        println!("*OPTION* FS = {}; FT = {}",
+                 self.FS, self.FT);
+        println!("*OPTION* RMIN = {}; RMAX = {}",
+                 self.RMIN, self.RMAX);
+        println!("*OPTION* RELTOL = {:0.12}; VNTOL = {:0.12}; ABSTOL = {:0.12}",
+                 self.RELTOL, self.VNTOL, self.ABSTOL);
+        println!("*************************************************************\n");
+    }
 }
 

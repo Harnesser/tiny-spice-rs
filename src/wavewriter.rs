@@ -72,10 +72,10 @@ impl WaveWriter {
 
     pub fn dump_vector(&mut self, time: f64, vars: &[f64]) {
         if let Some(ref mut file) = self.file {
-            let mut line = format!("{}", time);
+            let mut line = format!("{:0.9}", time);
 
             for var in vars {
-                let bit = format!("\t{}", var);
+                let bit = format!("\t{:0.9}", var);
                 line += &bit;
             }
             line += "\n";

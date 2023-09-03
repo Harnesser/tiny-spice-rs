@@ -2,9 +2,10 @@
 """ Plot results from a regression
 
 Usage: 
-    r8n <path>             - plot all waveforms in directory
-    r8n -expr "1" <path>   - take col 1 from each data file
-    r8n -expr "3-2" <path> - plot col 3 - col 2 from each data file
+    r8n <path>                 - plot all waveforms in directory
+    r8n -expr "1" <path>       - take col 1 from each data file
+    r8n -expr "3-2" <path>     - plot (col 3 - col 2) from each data file
+    r8n -expr "1-2,3-4" <path> - plot (col 1 - col 2) and (col3 - col4) from each file
 
 
 Expected format of waveform files:
@@ -37,11 +38,11 @@ if len(sys.argv) < 2:
 
 # parse arguments
 expect_expr = False
-expr = "2"
+exprs = ["2"]
 for arg in sys.argv[1:]:
 
     if expect_expr:
-        expr = arg
+        exprs = arg.split(',')
         expect_expr = False
     else:
         if arg == '-expr':
@@ -92,12 +93,13 @@ colours = [
 
 # plot all the data
 for i in range( len(filenames) ):
+    for expr in exprs:
 #for i in range( 10 ):
-    filename = filenames[i]
-    wv = waveforms.load( os.path.join(dirname, filename), expr=expr )
-    colour = colours[i%len(colours)]
-    plt.plot(wv.x, wv.y, color=colour)
-    plt.plot(wv.x[-1], wv.y[-1], 'o', color=colour)
+        filename = filenames[i]
+        wv = waveforms.load( os.path.join(dirname, filename), expr=expr )
+        colour = colours[i%len(colours)]
+        plt.plot(wv.x, wv.y, color=colour)
+        plt.plot(wv.x[-1], wv.y[-1], 'o', color=colour)
 
 # show
 plt.show()

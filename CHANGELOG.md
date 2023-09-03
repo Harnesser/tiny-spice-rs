@@ -1,6 +1,6 @@
 # Changelog
 
-## [UNRELEASED]
+## [0.7.0] <<UNRELEASED>>
 
 ### Added
 - Toplevel program `tiny-spice` 
@@ -10,11 +10,12 @@
 
 ### Changed
 - Configuration object to hold parameters for analyses
-
+- More useful info in `README`
 
 ### Fixed
 - Sort `test_results.log`
 - Give tests unique names
+
 
 
 ## [0.6.0] Capacitors

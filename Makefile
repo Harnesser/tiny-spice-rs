@@ -13,9 +13,6 @@ debug:
 clippy:
 	cargo clippy
 
-spice_t: 
-	rm -rf ./spice; rustc --test src/spice.rs; ./spice --nocapture
-
 test: test_rust test_grep
 
 test_rust: waves/stamp log/stamp
@@ -44,6 +41,18 @@ diode_lin: diode_lin_run
 diode_lin_run:
 	cargo test curve_trace -- --nocapture > log/diode.log
 
+
+# Run the commands in the README
+readme: TC=fullwave_rectifier
+readme:
+	\rm -rf waves/${TC} && \
+	cargo run ngspice/${TC}.spi && \
+	head -10 waves/${TC}/tran.dat && \
+	python3 bin/r8n -expr "1-2, 3-4" waves/${TC}
+
+
+
+# not implemented yet.
 sweep_vrd:
 	cargo test --no-fail-fast \
 		--test test_sweep_v_rd \

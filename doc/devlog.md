@@ -2,9 +2,20 @@
 
     This is a personal project. It does not have to be rigourously tested.
 
-## 2023-08-28
-I think I have to decide how much `plot` and/or `print` support is enough for this
-release.
+
+## 2023-09-02
+I decided to not support `print` or `plot` yet (if ever) and to just dump waveform
+data. I'm not writing a waveform viewer too.
+
+I updated `r8n` to do simple plots from the waveform data.
+
+The fullwave rectifier doesn't simulate well. I thought I'd done a big loop of sims
+to test such a thing. It works in `ngspice`, but interestingly not if the cap load
+is > ~500 nF! So I've a correctness issue and a convergence issue, possibly. It
+may need some tweaks to `RELTOL` and the like. And for that - do I need to support 
+allowing these to change in the `.control` blocks?
+
+Prepping for a release of 0.7.0.
 
 ## 2023-08-21
 Still trying to figure out how much SPICE to support.

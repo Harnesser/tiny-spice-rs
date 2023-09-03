@@ -6,5 +6,5 @@ authors = ["Marty <harnesser+kartoffel@gmail.com>"]
 [dependencies]
 
 [[bin]]
-name = "tiny-spice"
+name = "tiny-spice-rs"
 path = "bin/tiny-spice.rs"

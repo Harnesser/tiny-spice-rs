@@ -28,7 +28,7 @@ use crate::analysis::{Configuration, Kind};
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints
-        //println!(concat!("<spice> ", $fmt), $($($arg)*)?);
+        println!(concat!("<spice> ", $fmt), $($($arg)*)?);
     };
 }
 
@@ -61,6 +61,7 @@ impl Reader {
             .file_stem().expect("can't get stem of SPICE file path")
             .to_str().expect("cant stringify SPICE filename");
         self.cfg.ckt_name = ckt_name.to_string();
+        println!("*INFO* Reading SPICE file: '{}'", filename.display());
 
         // first line is a comment and is ignored
         lines_iter.next();
@@ -116,6 +117,8 @@ impl Reader {
                     if bits.len() > 3 {
                         self.cfg.TSTART = extract_value(bits[3]).unwrap();
                     }
+                } else if bits[0] == "option" {
+                        self.extract_option(&bits);
                 } else if bits[0] == ".endc" {
                     in_control_block = false;
                 } else {
@@ -168,8 +171,8 @@ impl Reader {
                 } else if bits[0].starts_with('.') {
                     if bits[0] == ".control" {
                         in_control_block = true;
-                    } else if bits[0] == ".option" {
-                        self.extract_option(&bits);
+                    } else {
+                        println!("*ERROR* unsupported dot-command: {}", bits[0]);
                     }
                 }
             }
@@ -198,13 +201,29 @@ impl Reader {
         Diode::new(node1, node2, i_sat, tdegc)
     }
 
-    // only support one parameter per .option line
+    // only support one parameter per option line
     fn extract_option(&mut self, bits: &[&str]) {
+    
+        // just 'option' - print the options as they stand
+        if bits.len() == 1 {
+            self.cfg.print_options();
+            return;
+        } 
+
         if bits[2] != "=" {
-            println!("*ERROR* shite....");
+            println!("*ERROR* Expected '=' in option setting");
+            return;
         }
-        if bits[1] == "ABSTOL" {
-            self.cfg.ABSTOL = extract_value(bits[3]).unwrap();
+
+        match bits[1] {
+            "ABSTOL" => {
+                self.cfg.ABSTOL = extract_value(bits[3]).unwrap();
+            },
+            "RELTOL" => {
+                self.cfg.RELTOL = extract_value(bits[3]).unwrap();
+            },
+            _ => {
+            }
         }
     }
 

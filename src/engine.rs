@@ -190,16 +190,8 @@ impl Engine {
         // announce
         println!("*************************************************************");
         println!("*CONFIG* TRANSIENT ANALYSIS");
-        println!("*CONFIG* TIME {} to {} by {}",
+        println!("*CONFIG* TIME {} to {} by {:0.12}",
                  cfg.TSTART, cfg.TSTOP, cfg.TSTEP);
-        println!("*CONFIG* ITL3 = {}; ITL4 = {}",
-                 cfg.ITL3, cfg.ITL4);
-        println!("*CONFIG* FS = {}; FT = {}",
-                 cfg.FS, cfg.FT);
-        println!("*CONFIG* RMIN = {}; RMAX = {}",
-                 cfg.RMIN, cfg.RMAX);
-        println!("*CONFIG* RELTOL = {}; VNTOL = {}; ABSTOL = {}",
-                 cfg.RELTOL, cfg.VNTOL, cfg.ABSTOL);
         println!("*************************************************************");
 
         // open waveform database
