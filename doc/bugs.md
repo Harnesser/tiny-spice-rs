@@ -1,4 +1,5 @@
 ## Bugs ##
+[ ] Full-wave rectifiers are failing again
 [ ] test_ird comes up with a nonsense if Isat = 1e-12
 
 ## Fixed ##
