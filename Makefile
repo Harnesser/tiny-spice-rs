@@ -48,7 +48,7 @@ readme:
 	\rm -rf waves/${TC} && \
 	cargo run ngspice/${TC}.spi && \
 	head -10 waves/${TC}/tran.dat && \
-	python3 bin/r8n -expr "1-2, 3-4" waves/${TC} && \
+	python3 bin/r8n -expr "2-3, 4-5" waves/${TC} && \
 	ngspice ngspice/${TC}.spi
 
 

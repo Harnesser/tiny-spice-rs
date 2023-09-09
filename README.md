@@ -53,20 +53,33 @@ The circuit in `ngspice/fullwave_rectifier.spi` is this:
 ```spice
 Full-Wave Rectifier
 
-V1 1 2 SIN(0 3 1e3) ; input voltage
+V1 1 2 SIN(0 5 1e3) ; input voltage
 V2 2 0 0  ; ground, and current measure
 
 * full-wave rectifier
-D1 1 3 ; anode (a) cathode (k)
+D1 1 3
 D2 4 1
 D3 2 3
 D4 4 2
 
+* Small caps across the diodes to prevent time-step-too-small
+CD1 1 3 12pF
+CD2 4 1 12pF
+CD3 2 3 12pF
+CD4 4 2 12pF
+
 * Load
 Rl 3 4 1k
+Cl 3 4 1uF
 
 .control
-  tran 1us 2ms 
+*  option reltol = 0.001
+*  option abstol = 1e-12
+
+  tran 100ns 2ms 
+  option ; ngspice only shows new values after analysis
+
+  plot v(1,2) v(3,4) ; (ngspice)
 .endc
 ```
 
@@ -85,10 +98,14 @@ in floating-point format.
 ```TSV
 Time	v(0)	v(1)	v(2)	v(3)	v(4)	i(0)	i(1)
 s	V	V	V	V	V	A	A
-0	0	0	0	0	0	0	0
-0.0000005	0	0.004712387042492636	0	0.00235619598234572	
-0.0023561910601553058	-0.00000000014040504178809277	0.0000000000000000000005
-008837102950005
+0.000000000	0.000000000	0.000000000	0.000000000	0.000000000	0.000000000	0.000000000	0.000000000
+0.000000050	0.000000000	0.000785398	0.000000000	0.000392699	0.000392699	-0.000000377	0.000000000
+0.000000150	0.000000000	0.003141592	0.000000000	0.001570796	0.001570796	-0.000000566	-0.000000000
+0.000000350	0.000000000	0.007853978	0.000000000	0.003926989	0.003926989	-0.000000566	-0.000000000
+0.000000750	0.000000000	0.017278725	0.000000000	0.008639363	0.008639363	-0.000000566	-0.000000000
+0.000001250	0.000000000	0.036128001	0.000000000	0.018064001	0.018064001	-0.000000567	-0.000000000
+0.000001750	0.000000000	0.054976764	0.000000000	0.027488382	0.027488382	-0.000000454	0.000000000
+0.000002250	0.000000000	0.070683480	0.000000000	0.035341741	0.035341740	-0.000000379	-0.000000000
 ```
 
 To view the waveforms, load in a spreadsheet and chart some columns. For example, chart:
@@ -98,8 +115,9 @@ To view the waveforms, load in a spreadsheet and chart some columns. For example
 (If you have `python3` and `matplotlib` installed, try:
 
 ```bash
-python3 bin/r8n -expr "1-2,3-4" waves/fullwave_rectifier
+python3 bin/r8n -expr "2-3,4-5" waves/fullwave_rectifier
 ```
+)
 
 Tools Used
 ----------------------

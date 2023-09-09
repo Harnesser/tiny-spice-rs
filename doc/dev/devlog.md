@@ -2,6 +2,37 @@
 
     This is a personal project. It does not have to be rigourously tested.
 
+## 2023-09-09 Part 2
+Nevermind, I was looking at the wrong columns of the waveform data.
+
+## 2023-09-09
+The fact that my simulator can give the wrong answer for the diode bridge is a bit
+of a disappointment. Whatever about time-step-too-small, I'd much prefer that to
+giving the wrong answer.
+
+How do I attack this? Well, first of all, I don't really have any good checks on 
+transient simulations. The fullwave runs 2 cycles of sinewaves. I'd like to have
+spot-checks on the output voltage on each peak of the input (maybe the zero
+crossings too?). To do this, either a implement a `measure` command, or inspect
+the output waveform data somehow.
+
+### Implement `measure`?
+Say `measure` was implemented. Would `if` have to be implemented too so that the
+control block could be run in NGSPICE too? Can a measurement be checked (asserted)
+in NGSPICE somehow?
+
+Maybe this spot-checking has to be done on "constructed" simulation runs rather than
+SPICE-card runs? Is there a `continue to` command in NGSPICE? Can a transient
+simulation be run for longer?
+
+Should the main executable be changed to return different status values an 
+assert fails? Otherwise, we'd need to go grepping the logfile?
+
+### Interrogate Waveform Data
+Two options for this:
+* Post-processing: read the waveform data and do stuff
+* Investigate the data by peering into the analysis object at the end of a run
+
 
 ## 2023-09-02
 I decided to not support `print` or `plot` yet (if ever) and to just dump waveform
