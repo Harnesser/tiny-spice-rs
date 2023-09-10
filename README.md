@@ -119,6 +119,9 @@ python3 bin/r8n -expr "2-3,4-5" waves/fullwave_rectifier
 ```
 )
 
+![Fullwave rectifier waveforms from tiny-spice-rs](./doc/readme-images/tiny-spice_readme.png?raw=true)
+
+
 Tools Used
 ----------------------
 
