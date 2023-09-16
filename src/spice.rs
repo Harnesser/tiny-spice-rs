@@ -10,13 +10,15 @@
 //!   * Integers for now
 //! 4. Values:
 //!   * floating point with optional engineering scaler and unit
-//! 5. Options:
-//!   * `ABSTOL`
-//! 6. Control Blocks:
+//! 5. Control Blocks:
 //!   Only one operation for now - no sequences
 //!   * DC Operating Point `op`
 //!   * Transient : `trans <t_step> <t_stop> [t_start]`
 //!     * for now, `t_start` is ignored
+//! 6. Options (in Control Blocks)
+//!   * Options: `option <OPTION_NAME> = <value>`
+//!     * `ABSTOL`
+//!     * `RELTOL`
 
 use std::path::Path;
 use std::fs::File;
@@ -28,7 +30,7 @@ use crate::analysis::{Configuration, Kind};
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints
-        println!(concat!("<spice> ", $fmt), $($($arg)*)?);
+        //println!(concat!("<spice> ", $fmt), $($($arg)*)?);
     };
 }
 
@@ -204,7 +206,7 @@ impl Reader {
     // only support one parameter per option line
     fn extract_option(&mut self, bits: &[&str]) {
     
-        // just 'option' - print the options as they stand
+        // just 'option' with no arguments? - print the options as they stand
         if bits.len() == 1 {
             self.cfg.print_options();
             return;

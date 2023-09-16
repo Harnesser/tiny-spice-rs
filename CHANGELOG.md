@@ -1,6 +1,7 @@
 # Changelog
 
-## [0.7.0] <<UNRELEASED>>
+
+## [0.7.0] SPICE Deck Reader
 
 ### Added
 - Toplevel program `tiny-spice` 
