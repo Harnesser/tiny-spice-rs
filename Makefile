@@ -43,6 +43,7 @@ diode_lin_run:
 
 
 # Run the commands in the README
+#readme: TC=named_fullwave_rectifier
 readme: TC=subckt_fullwave_rectifier
 readme:
 	\rm -rf waves/${TC} && \

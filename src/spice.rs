@@ -39,10 +39,13 @@ macro_rules! trace {
 /// Datastructure to info parsed from the SPICE deck
 pub struct Reader {
     /// Circuit information
-    ckt: Circuit,
+    /// `ckts[0]` is the toplevel
+    ckts: Vec<Circuit>,
     /// Options and analysis commands
     cfg: Configuration,
-    /// 
+    /// Irack which (sub)circuit we're adding things too. 
+    c: usize,
+    /// Flag if problems were encountered during parsing
     there_are_errors: bool
 }
 
@@ -51,9 +54,11 @@ impl Reader {
 
     #[allow(clippy::new_without_default)]
     pub fn new() -> Reader {
+        let mut topckt = Circuit::new();
         Reader {
-            ckt: Circuit::new(),
+            ckts: vec![topckt],
             cfg: Configuration::new(),
+            c: 0, // toplevel
             there_are_errors: false,
         }
     }
@@ -67,11 +72,15 @@ impl Reader {
         let mut in_control_block = false;
         let mut in_subckt = false;
 
+        // Circuit index, default to toplevel
+        let mut c = 0;
+
         // circuit name is the SPICE name without any 
         let ckt_name = filename
             .file_stem().expect("can't get stem of SPICE file path")
             .to_str().expect("cant stringify SPICE filename");
         self.cfg.ckt_name = ckt_name.to_string();
+        self.ckts[0].name = ckt_name.to_string();
         println!("*INFO* Reading SPICE file: '{}'", filename.display());
 
         // first line is a comment and is ignored
@@ -136,26 +145,25 @@ impl Reader {
                 } else {
                     println!("*WARN* Ignoring unrecognised command '{}'", bits[0]);
                 }
-            } else if in_subckt {
-                if bits[0] == ".ends" {
-                    trace!("Leaving subcircuit");
-                    in_subckt = false;
-                }
             } else {
 
                 // find out what we're looking at
-                if bits[0].starts_with('I') {
+                if bits[0] == ".ends" {
+                    trace!("Leaving subcircuit");
+                    in_subckt = false;
+                    self.c = 0; // point back to toplevel
+                } else if bits[0].starts_with('I') {
                     let _ = extract_identifier(bits[0]);
                     let node1 = self.extract_node(bits[1]);
                     let node2 = self.extract_node(bits[2]);
                     if bits.len() == 4 {
                         trace!("*INFO* Idc");
                         let value = extract_value(bits[3]);
-                        self.ckt.add_i(node1, node2, value.unwrap());
+                        self.ckts[self.c].add_i(node1, node2, value.unwrap());
                     } else if bits[3].starts_with("SIN") {
                         trace!("*INFO* Isin");
                         let src = self.extract_i_sine(&bits);
-                        self.ckt.add_i_sin(src);
+                        self.ckts[self.c].add_i_sin(src);
                     }
                 } else if bits[0].starts_with('V') {
                     let _ = extract_identifier(bits[0]);
@@ -164,37 +172,56 @@ impl Reader {
                     if bits.len() == 4 {
                         trace!("*INFO* Vdc");
                         let value = extract_value(bits[3]);
-                        self.ckt.add_v(node1, node2, value.unwrap());
+                        self.ckts[self.c].add_v(node1, node2, value.unwrap());
                     } else if bits[3].starts_with("SIN(") {
                         trace!("*INFO* Vsin");
                         let src = self.extract_v_sine(&bits);
-                        self.ckt.add_v_sin(src);
+                        self.ckts[self.c].add_v_sin(src);
                     }
                 } else if bits[0].starts_with('R') {
                     let _ = extract_identifier(bits[0]);
                     let node1 = self.extract_node(bits[1]);
                     let node2 = self.extract_node(bits[2]);
                     let value = extract_value(bits[3]);
-                    self.ckt.add_r(node1, node2, value.unwrap());
+                    self.ckts[self.c].add_r(node1, node2, value.unwrap());
                 } else if bits[0].starts_with('C') {
                     let _ = extract_identifier(bits[0]);
                     let node1 = self.extract_node(bits[1]);
                     let node2 = self.extract_node(bits[2]);
                     let value = extract_value(bits[3]);
-                    self.ckt.add_c(node1, node2, value.unwrap());
+                    self.ckts[self.c].add_c(node1, node2, value.unwrap());
                 } else if bits[0].starts_with('D') {
                     let d = self.extract_diode(&bits);
-                    self.ckt.add_d(d);
+                    self.ckts[self.c].add_d(d);
                 } else if bits[0].starts_with('X') {
                     trace!("Found instantiation");
                     let inst = self.extract_instance(&bits);
-                    //self.ckt.add_instance(inst);
+                    self.ckts[self.c].add_instance(inst);
                 } else if bits[0].starts_with('.') {
                     if bits[0] == ".control" {
                         in_control_block = true;
                     } else if bits[0] == ".subckt" {
                         trace!("In subcircuit definition");
-                        // fixme ports
+
+                        if self.c != 0 {
+                            println!("*ERROR* Can't define a subckt in subckt");
+                            self.there_are_errors = true;
+                        }
+
+                        // create a new circuit object for the subcircuit we're
+                        // about to read in...
+                        let subckt = Circuit::new();
+                        self.ckts.push(subckt);
+                        self.c = self.ckts.len() - 1;
+
+                        self.ckts[self.c].name = bits[1].to_string();
+
+                        // the port names are nodes in the subckt 
+                        for nn in bits.iter().skip(2) {
+                            self.ckts[self.c].add_node(nn);
+                        }
+
+                        //self.ckts[0].add_subckt(subckt);
                         in_subckt = true;
                     } else {
                         println!("*ERROR* unsupported dot-command: {}", bits[0]);
@@ -210,7 +237,15 @@ impl Reader {
             //println!("{}", line);
         }
 
-        self.ckt.build_node_id_lut();
+        println!("Number of subcircuit definitions: {}", self.ckts.len()-1);
+        for ckt in &self.ckts {
+            println!("\nCircuit: {}", ckt.name);
+            ckt.list_nodes();
+            ckt.list_elements();
+            ckt.list_instantiations();
+        }
+        println!("");
+        self.ckts[self.c].build_node_id_lut();
         self.there_are_errors
     }
 
@@ -348,7 +383,7 @@ impl Reader {
 
         // Store the connections as NodeIds
         for conn in bits.iter().take(bits.len()-1).skip(1) {
-            let nid = self.ckt.add_node(conn);
+            let nid = self.ckts[self.c].add_node(conn);
             inst.add_connection(nid);
         }
         trace!("{}", inst);
@@ -382,14 +417,20 @@ impl Reader {
                 return 0;
         }
 
-        self.ckt.add_node(text)
+        self.ckts[self.c].add_node(text)
     }
 
 
-
-    /// Return reference to the completed circuit datastructure
+    /// Return reference to the completed circuit datastructures
+    /// Should I create the toplevel here?
+    /// I think I should create the toplevel here...
     pub fn circuit(&self) -> &Circuit {
-        &self.ckt
+        println!("-- Deal with subcircuits -----------------------");
+        for inst in &self.ckts[0].instances {
+            println!("{}", inst);
+        }
+        println!("------------------------------------------------");
+        &self.ckts[0]
     }
 
     /// Return reference to the completed configuration object
@@ -573,13 +614,31 @@ mod tests {
     fn simple_read_count_voltage_sources() {
         let mut rdr = Reader::new();
         rdr.read(Path::new("./ngspice/test_reader.spi"));
-        assert!(rdr.ckt.count_voltage_sources() == 1);
+        assert!(rdr.ckts[0].count_voltage_sources() == 1);
     }
 
     #[test]
     fn simple_read_count_nodes() {
         let mut rdr = Reader::new();
         rdr.read(Path::new("./ngspice/test_reader.spi"));
-        assert!(rdr.ckt.count_nodes() == 9);
+        assert!(rdr.ckts[0].count_nodes() == 9);
+    }
+
+    #[test]
+    fn simple_subckt_counts() {
+        let mut rdr = Reader::new();
+        rdr.read(Path::new("./ngspice/subckt_fullwave_rectifier.spi"));
+        assert!(rdr.ckts.len() == 3);
+
+        assert!(rdr.ckts[0].nodes.len() == 5);
+        assert!(rdr.ckts[0].instances.len() == 2);
+
+        // bridge
+        assert!(rdr.ckts[1].nodes.len() == 5);
+        assert!(rdr.ckts[1].instances.len() == 0);
+
+        // load
+        assert!(rdr.ckts[2].nodes.len() == 6);
+        assert!(rdr.ckts[2].instances.len() == 0);
     }
 }

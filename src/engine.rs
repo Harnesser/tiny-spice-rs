@@ -74,7 +74,10 @@ impl Engine {
         }
     }
 
-    // run the analysis that the engine is configured for
+    /// Run the selected circuit analysis
+    ///
+    /// This dispatches out to the different analysis routines (e.g. DC operating
+    /// point or transient) depending on the configuration.
     pub fn go(
         &mut self,
         ckt: &circuit::Circuit,
@@ -444,7 +447,7 @@ impl Engine {
     }
 
 
-    // Look at the circuit, and initialise linear version of the matrix
+    /// Look at the circuit, and initialise linear version of the matrix
     fn elaborate(&mut self, ckt: &circuit::Circuit) {
         // assume here that nodes have been indexed 0 -> N-1
         // where n is the number of nodes (including ground) in the circuit

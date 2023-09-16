@@ -4,6 +4,7 @@ test spice_irrrr ... ok
 test spice_reader ... ok
 test spice::tests::simple_read_count_nodes ... ok
 test spice::tests::simple_read_count_voltage_sources ... ok
+test spice::tests::simple_subckt_counts ... ok
 test test_dc_bridge_loaded_2v0 ... ok
 test test_dc_bridge_loaded_gnd ... ok
 test test_dc_ird_isat_1pA ... FAILED

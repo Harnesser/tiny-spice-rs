@@ -57,16 +57,16 @@ impl fmt::Display for Element {
     fn fmt (&self, f:&mut fmt::Formatter) -> fmt::Result {
         match *self {
             Element::I(ref el) => {
-                write!(f, "I p:{} n:{} {}A", el.p, el.n, el.value)
+                write!(f, "I p:{} n:{} {} A", el.p, el.n, el.value)
             },
             Element::R(ref el) => {
-                write!(f, "R a:{} b:{} {}Ohms", el.a, el.b, el.value)
+                write!(f, "R a:{} b:{} {} Ohms", el.a, el.b, el.value)
             },
             Element::V(ref el) => {
-                write!(f, "V a:{} b:{} {}Volts", el.p, el.n, el.value)
+                write!(f, "V a:{} b:{} {} Volts", el.p, el.n, el.value)
             },
             Element::D(ref el) => {
-                write!(f, "D p:{} n:{} I_sat={}A", el.p, el.n, el.i_sat)
+                write!(f, "D p:{} n:{} I_sat={} A", el.p, el.n, el.i_sat)
             },
             Element::Isin(ref el) => {
                 write!(f, "Isin p:{} n:{} = {} + {} * sin(2pi {})",
@@ -77,7 +77,7 @@ impl fmt::Display for Element {
                     el.p, el.n, el.vo, el.va, el.freq)
             },
             Element::C(ref el) => {
-                write!(f, "C a:{} b:{} {}Farads", el.a, el.b, el.value)
+                write!(f, "C a:{} b:{} {} Farads", el.a, el.b, el.value)
             },
         }
     }
@@ -119,10 +119,12 @@ impl fmt::Display for Instance {
 #[derive(Default)]
 /// A Collection of Circuit Elements describing a circuit
 pub struct Circuit {
+    pub name: String,
     pub elements: Vec<Element>,
     pub v_idx_next: usize,
     pub nodes: HashMap<String, NodeId>,
     pub node_id_lut: HashMap<NodeId, String>,
+    pub instances: Vec<Instance>,
 }
 
 impl Circuit {
@@ -133,24 +135,33 @@ impl Circuit {
         nodes.insert(String::from("gnd"), 0);
 
         Circuit {
+            name: String::from("<toplevel>"),
             elements: vec![],
             v_idx_next: 0,
             nodes,
             node_id_lut: HashMap::new(),
+            instances: vec![],
         }
     }
 
     /// List the elements of the circuit
     pub fn list_elements(&self) {
         for el in &self.elements {
-            println!("{}", el);
+            println!(" elem: {}", el);
         }
     }
 
     /// List the nodes and associated node indices
     pub fn list_nodes(&self) {
         for (name, id) in &self.nodes {
-            println!(" {} ({})", name, id);
+            println!(" node: {} ({})", name, id);
+        }
+    }
+
+    /// List the subcircuit instantiations
+    pub fn list_instantiations(&self) {
+        for inst in &self.instances {
+            println!(" inst: {}", inst);
         }
     }
 
@@ -311,7 +322,7 @@ impl Circuit {
 
     /// Add an instantiation
     pub fn add_instance(&mut self, inst:Instance) {
-        unimplemented!();
+        self.instances.push(inst);
     }
 
     /// Add a node

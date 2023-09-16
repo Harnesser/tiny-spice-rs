@@ -1,0 +1,16 @@
+A stack of Vsins to get a multi-frequency signal
+
+V1 1 0 SIN(0 5 1e3)
+V2 2 1 SIN(0 2 2e3)
+V3 out 2 SIN(0 2 3e3)
+
+Rl out gnd 1k
+
+.control
+
+  tran 100ns 2ms 
+  option ; ngspice only shows new values after analysis
+
+  plot v(out) ; (ngspice)
+.endc
+:
