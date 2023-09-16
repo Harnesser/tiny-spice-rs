@@ -23,7 +23,11 @@ fn main() {
     spice_file.try_exists().expect("Can't access spice file");
 
     let mut reader = spice::Reader::new();
-    reader.read(spice_file);
+    let errors_exist = reader.read(spice_file);
+    if errors_exist {
+        println!("*FATAL* Errors in SPICE Deck so not doing simulations");
+        return;
+    }
 
     let ckt = reader.circuit();
     ckt.show();

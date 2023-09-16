@@ -1,0 +1,30 @@
+Full-Wave Rectifier with nodenames
+
+V1 IN_p IN_n SIN(0 5 1e3) ; input voltage
+V2 IN_n gnd 0  ; ground, and current measure
+
+* full-wave rectifier
+D1 IN_p vp
+D2 vn   IN_p
+D3 IN_n vp
+D4 vn   IN_n
+
+* Small caps across the diodes to prevent time-step-too-small
+CD1 IN_p vp 12pF
+CD2 vn IN_p 12pF
+CD3 IN_n vp 12pF
+CD4 vn IN_n 12pF
+
+* Load
+Rl vp vn 1k
+Cl vp vn 1uF
+
+.control
+*  option reltol = 0.001
+*  option abstol = 1e-12
+
+  tran 100ns 2ms 
+  option ; ngspice only shows new values after analysis
+
+  plot v(IN_p,IN_n) v(vp,vn) ; (ngspice)
+.endc

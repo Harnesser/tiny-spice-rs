@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.8.0] Subcircuits <<Unreleased>>
+Allow nets to be named something other than integers. Subcircuits!
+
+### Added
+
+### Changed
+
+### Fixed
+
 
 ## [0.7.0] SPICE Deck Reader
 

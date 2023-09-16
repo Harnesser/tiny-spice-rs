@@ -3,9 +3,9 @@
 //! Supported:
 //! 1. Initial comment line
 //! 2. Components:
-//!   * Voltage source : V<ident> <n+> <n-> <value>
-//!   * Current source : I<ident> <n+> <n-> <value>
-//!   * Resistor : R<ident> <n1> <n2> <value>
+//!   * Voltage source : `V<ident> <n+> <n-> <value>`
+//!   * Current source : `I<ident> <n+> <n-> <value>`
+//!   * Resistor : `R<ident> <n1> <n2> <value>`
 //! 3. Node names:
 //!   * Integers for now
 //! 4. Values:
@@ -35,9 +35,14 @@ macro_rules! trace {
 }
 
 
+/// Datastructure to info parsed from the SPICE deck
 pub struct Reader {
+    /// Circuit information
     ckt: Circuit,
+    /// Options and analysis commands
     cfg: Configuration,
+    /// 
+    there_are_errors: bool
 }
 
 
@@ -48,10 +53,12 @@ impl Reader {
         Reader {
             ckt: Circuit::new(),
             cfg: Configuration::new(),
+            there_are_errors: false,
         }
     }
 
-    pub fn read(&mut self, filename :&Path) {
+    /// Open and read a SPICE deck
+    pub fn read(&mut self, filename :&Path) -> bool {
 
         let input = File::open(filename).unwrap();
         let buf = BufReader::new(input);
@@ -113,6 +120,7 @@ impl Reader {
                     // step stop <start>
                     if bits.len() < 3 {
                         println!("*ERROR* not enough trans info");
+                        self.there_are_errors = true;
                     }
                     self.cfg.TSTEP = extract_value(bits[1]).unwrap();
                     self.cfg.TSTOP = extract_value(bits[2]).unwrap();
@@ -131,8 +139,8 @@ impl Reader {
                 // find out what we're looking at
                 if bits[0].starts_with('I') {
                     let _ = extract_identifier(bits[0]);
-                    let node1 = extract_node(bits[1]);
-                    let node2 = extract_node(bits[2]);
+                    let node1 = self.extract_node(bits[1]);
+                    let node2 = self.extract_node(bits[2]);
                     if bits.len() == 4 {
                         trace!("*INFO* Idc");
                         let value = extract_value(bits[3]);
@@ -144,8 +152,8 @@ impl Reader {
                     }
                 } else if bits[0].starts_with('V') {
                     let _ = extract_identifier(bits[0]);
-                    let node1 = extract_node(bits[1]);
-                    let node2 = extract_node(bits[2]);
+                    let node1 = self.extract_node(bits[1]);
+                    let node2 = self.extract_node(bits[2]);
                     if bits.len() == 4 {
                         trace!("*INFO* Vdc");
                         let value = extract_value(bits[3]);
@@ -157,14 +165,14 @@ impl Reader {
                     }
                 } else if bits[0].starts_with('R') {
                     let _ = extract_identifier(bits[0]);
-                    let node1 = extract_node(bits[1]);
-                    let node2 = extract_node(bits[2]);
+                    let node1 = self.extract_node(bits[1]);
+                    let node2 = self.extract_node(bits[2]);
                     let value = extract_value(bits[3]);
                     self.ckt.add_r(node1, node2, value.unwrap());
                 } else if bits[0].starts_with('C') {
                     let _ = extract_identifier(bits[0]);
-                    let node1 = extract_node(bits[1]);
-                    let node2 = extract_node(bits[2]);
+                    let node1 = self.extract_node(bits[1]);
+                    let node2 = self.extract_node(bits[2]);
                     let value = extract_value(bits[3]);
                     self.ckt.add_c(node1, node2, value.unwrap());
                 } else if bits[0].starts_with('D') {
@@ -175,6 +183,7 @@ impl Reader {
                         in_control_block = true;
                     } else {
                         println!("*ERROR* unsupported dot-command: {}", bits[0]);
+                        self.there_are_errors = true;
                     }
                 }
             }
@@ -186,14 +195,16 @@ impl Reader {
             //println!("{}", line);
         }
 
+        self.there_are_errors
     }
 
-    fn extract_diode(&self, bits: &[&str]) -> Diode {
+    /// Parse a diode SPICE instantiation
+    fn extract_diode(&mut self, bits: &[&str]) -> Diode {
         let i_sat = 1e-9;
         let tdegc = 27.0;
         let _ = extract_identifier(bits[0]);
-        let node1 = extract_node(bits[1]);
-        let node2 = extract_node(bits[2]);
+        let node1 = self.extract_node(bits[1]);
+        let node2 = self.extract_node(bits[2]);
         //let value = extract_value(&bits[3]);
 
         #[allow(clippy::manual_range_contains)]
@@ -203,7 +214,9 @@ impl Reader {
         Diode::new(node1, node2, i_sat, tdegc)
     }
 
+
     // only support one parameter per option line
+    /// Parse a control block option command
     fn extract_option(&mut self, bits: &[&str]) {
     
         // just 'option' with no arguments? - print the options as they stand
@@ -230,11 +243,11 @@ impl Reader {
         }
     }
 
-    // extract the stuff from SIN()
+    /// Parse a Sine Current Source description from SPICE
     fn extract_i_sine(&mut self, bits: &[&str]) -> CurrentSourceSine {
         let _ = extract_identifier(bits[0]);
-        let node1 = extract_node(bits[1]);
-        let node2 = extract_node(bits[2]);
+        let node1 = self.extract_node(bits[1]);
+        let node2 = self.extract_node(bits[2]);
 
         // ugly stuff...
         // push all the remaining bits of the SPICE line into 1 string
@@ -271,8 +284,8 @@ impl Reader {
     // extract the stuff from SIN()
     fn extract_v_sine(&mut self, bits: &[&str]) -> VoltageSourceSine {
         let _ = extract_identifier(bits[0]);
-        let node1 = extract_node(bits[1]);
-        let node2 = extract_node(bits[2]);
+        let node1 = self.extract_node(bits[1]);
+        let node2 = self.extract_node(bits[2]);
 
         // ugly stuff...
         // push all the remaining bits of the SPICE line into 1 string
@@ -307,34 +320,50 @@ impl Reader {
         }
     }
 
+    /// Nodes are integers (for now)
+    ///
+    /// This:
+    /// * Parses the node name from the SPICE file
+    ///   * If the parsing fails, returns `None`.
+    /// * Looks the node name up in the nodelist
+    ///   * if it doesn't exist, creates an entry for it and assigns a NodeId
+    ///   * if it exists, gets the NodeId
+    ///
+    ///  So where are should the node_list and stuff be? In the `circuit`?
+    ///  What should happen in subcircuits?
+    fn extract_node(&mut self, text: &str) -> usize {
+        let mut node: usize = 0;
+
+        match text.parse::<usize>() {
+            Ok(n) => node = n,
+            Err(_) => {
+                println!("*ERROR* bad node name: '{}'", text);
+                self.there_are_errors = true;
+            },
+        
+        }
+        node
+    }
 
 
-    // Return reference to the completed circuit datastructure
+    /// Return reference to the completed circuit datastructure
     pub fn circuit(&self) -> &Circuit {
         &self.ckt
     }
 
-    // Return reference to the completed configuration object
+    /// Return reference to the completed configuration object
     pub fn configuration(&self) -> &Configuration {
         &self.cfg
     }
 
 }
 
-// just take the entire thing as an identifier
+/// Extract an element identifier from SPICE
+// Just take the entire thing as an identifier
 fn extract_identifier(text: &str) -> String {
     text.to_string()
 }
 
-/// Nodes are integers (for now)
-fn extract_node(text: &str) -> usize {
-    let mut node: usize = 0;
-    match text.parse::<usize>() {
-        Ok(n) => node = n,
-        Err(_) => println!("*ERROR* bad node name: '{}'", text),
-    }
-    node
-}
 
 #[derive(Debug)]
 enum ValueState {

@@ -1,3 +1,4 @@
+//! Datastructures for describing a Circuit
 use std::fmt;
 
 pub use crate::diode::Diode;
@@ -5,12 +6,14 @@ pub use crate::isine::CurrentSourceSine;
 pub use crate::vsine::VoltageSourceSine;
 pub use crate::capacitor::Capacitor;
 
+/// Index of a node in the matrix
 pub type NodeId = usize;
 
 pub const BOLTZMANN : f64 = 1.380_648_8e-23;
 pub const CHARGE : f64 = 1.603e-19;
 pub const GMIN : f64 = 1.0e-12;
 
+/// Resistor Implementation
 #[allow(dead_code)]
 pub struct Resistor {
     pub a: NodeId,
@@ -19,6 +22,7 @@ pub struct Resistor {
 }
 
 
+/// Current Source Implementation
 #[allow(dead_code)]
 pub struct CurrentSource {
     pub p: NodeId,
@@ -26,6 +30,7 @@ pub struct CurrentSource {
     pub value: f64, // Amperes
 }
 
+/// Voltage Source Implementation
 #[allow(dead_code)]
 pub struct VoltageSource {
     pub p: NodeId,
@@ -34,6 +39,7 @@ pub struct VoltageSource {
     pub idx: usize, // index of voltage source in "known" column
 }
 
+/// Circuit Elements that this simulator supports
 #[allow(dead_code)]
 pub enum Element {
     R(Resistor),
@@ -78,6 +84,7 @@ impl fmt::Display for Element {
 
 
 #[derive(Default)]
+/// A Collection of Circuit Elements describing a circuit
 pub struct Circuit {
     pub elements: Vec<Element>,
     pub v_idx_next: usize,
@@ -85,6 +92,7 @@ pub struct Circuit {
 
 impl Circuit {
 
+    /// Initialise a new circuit description
     pub fn new() -> Circuit {
         Circuit {
             elements: vec![],
@@ -92,12 +100,14 @@ impl Circuit {
         }
     }
 
+    /// List the elements of the circuit
     pub fn show(&self) {
         for el in &self.elements {
             println!("{}", el);
         }
     }
 
+    /// Count the nodes in the circuit
     pub fn count_nodes(&self) -> usize {
 
         // number of nodes in the circuit - there is always at least ground
@@ -185,6 +195,9 @@ impl Circuit {
 
 
     // FIXME - update for Vsin
+    /// Count the voltage sources in the circuit
+    ///
+    /// Counts both `V` and `VSIN`.
     pub fn count_voltage_sources(&self) -> usize {
 
         // number of voltage sources in the circuit

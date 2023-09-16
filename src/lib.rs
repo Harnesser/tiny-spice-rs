@@ -1,3 +1,4 @@
+//! Tiny-Spice-RS - A teeny weeny SPICE circuit simulator
 pub mod circuit;
 pub mod analysis;
 pub mod engine;
