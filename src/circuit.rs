@@ -1,5 +1,6 @@
 //! Datastructures for describing a Circuit
 use std::fmt;
+use std::collections::HashMap;
 
 pub use crate::diode::Diode;
 pub use crate::isine::CurrentSourceSine;
@@ -88,22 +89,36 @@ impl fmt::Display for Element {
 pub struct Circuit {
     pub elements: Vec<Element>,
     pub v_idx_next: usize,
+    pub nodes: HashMap<String, NodeId>,
+    pub node_id_lut: HashMap<NodeId, String>,
 }
 
 impl Circuit {
 
     /// Initialise a new circuit description
     pub fn new() -> Circuit {
+        let mut nodes = HashMap::new();
+        nodes.insert(String::from("gnd"), 0);
+
         Circuit {
             elements: vec![],
             v_idx_next: 0,
+            nodes,
+            node_id_lut: HashMap::new(),
         }
     }
 
     /// List the elements of the circuit
-    pub fn show(&self) {
+    pub fn list_elements(&self) {
         for el in &self.elements {
             println!("{}", el);
+        }
+    }
+
+    /// List the nodes and associated node indices
+    pub fn list_nodes(&self) {
+        for (name, id) in &self.nodes {
+            println!(" {} ({})", name, id);
         }
     }
 
@@ -193,8 +208,6 @@ impl Circuit {
         c_nodes
     } 
 
-
-    // FIXME - update for Vsin
     /// Count the voltage sources in the circuit
     ///
     /// Counts both `V` and `VSIN`.
@@ -262,6 +275,35 @@ impl Circuit {
     /// Add diode
     pub fn add_d(&mut self, d:Diode) {
         self.elements.push(Element::D(d));
+    }
+
+    /// Add a node
+    pub fn add_node(&mut self, name: &str) -> NodeId {
+        if let Some(node_id) = self.get_node_id(name) {
+            node_id
+        } else {
+            // the node dict is pre-seeded with 'gnd'
+            // puts the initial length at 1
+            let node_id: NodeId = self.nodes.len();
+            self.nodes.insert(String::from(name), node_id);
+            node_id
+        }
+    }
+
+    /// Look up the `NodeId` for a node name
+    pub fn get_node_id(&self, name: &str) -> Option<NodeId> {
+        match name {
+            "gnd" | "GND" | "0" => Some(0),
+            _ => self.nodes.get(name).copied()
+        }
+    }
+
+    /// Build NodeId lookup
+    /// Do this after reading in the SPICE circuit
+    pub fn build_node_id_lut(&mut self) {
+        for (name, id) in &self.nodes {
+            self.node_id_lut.insert(*id, String::from(name));
+        }
     }
 
 }

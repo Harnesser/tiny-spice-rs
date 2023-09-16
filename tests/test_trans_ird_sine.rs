@@ -91,6 +91,9 @@ fn test_trans_ir_sine_loop() {
 fn build( amp: f64, freq: f64, isat: f64 ) -> Circuit {
     let i_offset = 0.0;
     let mut ckt = Circuit::new();
+
+    ckt.add_node("1");
+
     ckt.elements.push(
         Element::Isin(CurrentSourceSine{p: 0, n: 1, vo: i_offset, va: amp, freq: freq}),
     );
@@ -100,6 +103,8 @@ fn build( amp: f64, freq: f64, isat: f64 ) -> Circuit {
     ckt.elements.push(
         Element::D(Diode::new(1, 0, isat, 27.0)),
     );
+
+    ckt.build_node_id_lut();
     ckt
 }
 

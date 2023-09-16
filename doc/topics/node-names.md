@@ -21,8 +21,7 @@ matrix:
 
 * `gnd` and `GND` are aliases for index 0?
 * Case sensitive: `n1` is not the same node as `N1`
-* Must start with an ascii letter `[a-zA-Z]`
-* Other letters then can be the usual `[_0-9a-zA-Z]`
+* Allow everything - `[_0-9a-zA-Z]` - this is not verilog
 
 ## Plan
 

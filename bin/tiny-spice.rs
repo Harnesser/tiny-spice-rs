@@ -30,7 +30,8 @@ fn main() {
     }
 
     let ckt = reader.circuit();
-    ckt.show();
+    ckt.list_elements();
+    ckt.list_nodes();
     let cfg = reader.configuration();
 
     // tmp analysis

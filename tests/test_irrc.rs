@@ -42,6 +42,8 @@ fn build() -> Circuit {
     ckt.elements.push(
         Element::C(Capacitor{a: 2, b: 0, value: 0.01e-6}),
     );
+
+    ckt.build_node_id_lut();
     ckt
 }
 

@@ -25,12 +25,17 @@ fn trans_ir() {
 
 fn build() -> circuit::Circuit {
     let mut ckt = circuit::Circuit::new();
+
+    ckt.add_node("1");
+
     ckt.elements.push(
         circuit::Element::I(circuit::CurrentSource{p: 0, n: 1, value: 3.0}),
     );
     ckt.elements.push(
         circuit::Element::R(circuit::Resistor{a: 1, b: 0, value: 10.0}),
     );
+
+    ckt.build_node_id_lut();
     ckt
 }
 

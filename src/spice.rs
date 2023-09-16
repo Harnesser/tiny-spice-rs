@@ -195,6 +195,7 @@ impl Reader {
             //println!("{}", line);
         }
 
+        self.ckt.build_node_id_lut();
         self.there_are_errors
     }
 
@@ -332,17 +333,22 @@ impl Reader {
     ///  So where are should the node_list and stuff be? In the `circuit`?
     ///  What should happen in subcircuits?
     fn extract_node(&mut self, text: &str) -> usize {
-        let mut node: usize = 0;
 
-        match text.parse::<usize>() {
-            Ok(n) => node = n,
-            Err(_) => {
+        // is this a well-formed node name?
+        let mut well_formed_node_name = true;
+        for c in text.chars() {
+            match c {
+                '_' | '0'..='9' | 'a'..='z' | 'A'..='Z' => {},
+                _ => { well_formed_node_name = false }
+            }
+        }
+        if !well_formed_node_name {
                 println!("*ERROR* bad node name: '{}'", text);
                 self.there_are_errors = true;
-            },
-        
+                return 0;
         }
-        node
+
+        self.ckt.add_node(text)
     }
 
 

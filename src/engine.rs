@@ -195,7 +195,7 @@ impl Engine {
         println!("*************************************************************");
 
         // open waveform database
-        let mut wavedb = WaveWriter::new(&cfg.wavefile).unwrap();
+        let mut wavedb = WaveWriter::new(&cfg.wavefile, &ckt.node_id_lut).unwrap();
         wavedb.header(self.c_nodes, self.c_vsrcs);
         wavedb.dump_vector(t_now, &unknowns); // DC solution
 

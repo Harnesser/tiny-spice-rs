@@ -96,6 +96,11 @@ fn build(amp: f64, freq: f64, cap: f64) -> Circuit {
     let isat = 1e-12;
     let mut ckt = Circuit::new();
 
+    ckt.add_node("1");
+    ckt.add_node("2");
+    ckt.add_node("3");
+    ckt.add_node("4");
+
     // bridge input voltage
     //ckt.elements.push(Element::V(VoltageSource{p: 1, n: 2, value: 10.0}));
     ckt.elements.push(
@@ -126,6 +131,7 @@ fn build(amp: f64, freq: f64, cap: f64) -> Circuit {
     ckt.elements.push( Element::R(Resistor{a: 3, b: 4, value: 1000.0}) );
     ckt.elements.push( Element::C(Capacitor{a: 3, b: 4, value: cap}) );
 
+    ckt.build_node_id_lut();
     ckt
 }
 

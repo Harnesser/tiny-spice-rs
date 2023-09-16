@@ -1,28 +1,39 @@
-/// Waveform writer routines
+//! Waveform writer routines
+//!
+//! Routines to open a file and dump all the data from the current timestep
+//! into it.
 
 use std::io::prelude::*;
 use std::fs::File;
 use std::path::Path;
 
-pub struct WaveWriter {
+// for handle to node id lookup table
+use std::collections::HashMap;
+use circuit::NodeId;
+
+pub struct WaveWriter<'hash>{
     file: Option<File>,
+    lut: &'hash HashMap<NodeId, String>,
 }
 
-impl WaveWriter {
+impl WaveWriter<'_> {
 
-    pub fn new(filename: &str) -> Option<WaveWriter> {
+    pub fn new<'hash>(filename: &str, lut: &'hash HashMap<NodeId, String>) 
+        -> Option<WaveWriter<'hash>>
+    {
 
         // open file
         let path = Path::new(filename);
         let display = path.display();
 
         // make all parent directories
-        let leadup = path.parent().expect("UIOPUPOIUPOIUPIOU");
-        std::fs::create_dir_all(leadup).expect("ASDFASDFASDFASF");
+        let leadup = path.parent().expect("Can't get path bit of waveform file");
+        std::fs::create_dir_all(leadup).expect("Can't make waveform directory");
 
         // wave writer
         let mut writer = WaveWriter {
             file: None,
+            lut,
         };
 
         // open the path to write
@@ -47,7 +58,8 @@ impl WaveWriter {
         let mut names = "Time".to_string();
 
         for i in 0..c_nodes {
-            names += &format!("\tv({})", i);
+            let name = &self.lut[&i];
+            names += &format!("\tv({})", name);
         }
         for j in 0..c_vsrcs {
             names += &format!("\ti({})", j);
@@ -68,7 +80,6 @@ impl WaveWriter {
             let _ = file.write_all(units.as_bytes());
         }
     }
-
 
     pub fn dump_vector(&mut self, time: f64, vars: &[f64]) {
         if let Some(ref mut file) = self.file {

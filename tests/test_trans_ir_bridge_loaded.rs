@@ -93,6 +93,11 @@ fn test_trans_ir_bridge_loaded_loop() {
 fn build(amp: f64, freq: f64, isat: f64) -> Circuit {
     let mut ckt = Circuit::new();
 
+    ckt.add_node("1");
+    ckt.add_node("2");
+    ckt.add_node("3");
+    ckt.add_node("4");
+
     // bridge input voltage
     ckt.elements.push(
         Element::Isin(CurrentSourceSine{p: 0, n: 1, vo: 0.0, va: amp, freq: freq}),
@@ -115,6 +120,7 @@ fn build(amp: f64, freq: f64, isat: f64) -> Circuit {
     // load
     ckt.elements.push( Element::R(Resistor{a: 3, b: 4, value: 1000.0}) );
 
+    ckt.build_node_id_lut();
     ckt
 }
 

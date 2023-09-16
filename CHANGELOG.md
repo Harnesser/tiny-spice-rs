@@ -4,6 +4,7 @@
 Allow nets to be named something other than integers. Subcircuits!
 
 ### Added
+- Nodes can have names now, but integers still work.
 
 ### Changed
 
