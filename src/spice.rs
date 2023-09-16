@@ -25,12 +25,13 @@ use std::fs::File;
 use std::io::{BufReader, BufRead};
 
 use crate::circuit::{Circuit, Diode, CurrentSourceSine, VoltageSourceSine};
+use crate::circuit::{Instance};
 use crate::analysis::{Configuration, Kind};
 
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints
-        //println!(concat!("<spice> ", $fmt), $($($arg)*)?);
+        println!(concat!("<spice> ", $fmt), $($($arg)*)?);
     };
 }
 
@@ -64,6 +65,7 @@ impl Reader {
         let buf = BufReader::new(input);
         let mut lines_iter = buf.lines();
         let mut in_control_block = false;
+        let mut in_subckt = false;
 
         // circuit name is the SPICE name without any 
         let ckt_name = filename
@@ -134,6 +136,11 @@ impl Reader {
                 } else {
                     println!("*WARN* Ignoring unrecognised command '{}'", bits[0]);
                 }
+            } else if in_subckt {
+                if bits[0] == ".ends" {
+                    trace!("Leaving subcircuit");
+                    in_subckt = false;
+                }
             } else {
 
                 // find out what we're looking at
@@ -178,9 +185,17 @@ impl Reader {
                 } else if bits[0].starts_with('D') {
                     let d = self.extract_diode(&bits);
                     self.ckt.add_d(d);
+                } else if bits[0].starts_with('X') {
+                    trace!("Found instantiation");
+                    let inst = self.extract_instance(&bits);
+                    //self.ckt.add_instance(inst);
                 } else if bits[0].starts_with('.') {
                     if bits[0] == ".control" {
                         in_control_block = true;
+                    } else if bits[0] == ".subckt" {
+                        trace!("In subcircuit definition");
+                        // fixme ports
+                        in_subckt = true;
                     } else {
                         println!("*ERROR* unsupported dot-command: {}", bits[0]);
                         self.there_are_errors = true;
@@ -321,6 +336,26 @@ impl Reader {
         }
     }
 
+
+    /// Parse an instantiation line
+    pub fn extract_instance(&mut self,  bits: &[&str]) -> Instance {
+        // If we're here, we know bits[0] starts with 'X'
+        // fuckit, we'll just leave the x in the inst name...
+        let ident = bits[0];
+        let subckt = bits[bits.len()-1]; // last identifier is a name
+
+        let mut inst = Instance::new(ident, subckt);
+
+        // Store the connections as NodeIds
+        for conn in bits.iter().take(bits.len()-1).skip(1) {
+            let nid = self.ckt.add_node(conn);
+            inst.add_connection(nid);
+        }
+        trace!("{}", inst);
+        inst
+    }
+
+
     /// Nodes are integers (for now)
     ///
     /// This:
@@ -330,8 +365,7 @@ impl Reader {
     ///   * if it doesn't exist, creates an entry for it and assigns a NodeId
     ///   * if it exists, gets the NodeId
     ///
-    ///  So where are should the node_list and stuff be? In the `circuit`?
-    ///  What should happen in subcircuits?
+    /// Ground aka `0`, `gnd` or `GND` is a global net.
     fn extract_node(&mut self, text: &str) -> usize {
 
         // is this a well-formed node name?
@@ -350,6 +384,7 @@ impl Reader {
 
         self.ckt.add_node(text)
     }
+
 
 
     /// Return reference to the completed circuit datastructure

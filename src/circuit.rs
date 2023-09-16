@@ -83,6 +83,38 @@ impl fmt::Display for Element {
     }
 }
 
+/// Subcircuit Instantiation
+pub struct Instance {
+    pub name: String,
+    pub subckt: String,
+    pub conns: Vec<NodeId>,
+}
+
+impl Instance {
+
+    pub fn new(name: &str, subckt: &str) -> Self {
+        Instance {
+            name: String::from(name),
+            subckt: String::from(subckt),
+            conns: vec![],
+        }
+    }
+
+    pub fn add_connection(&mut self, nid: NodeId) {
+        self.conns.push(nid);
+    }
+
+}
+
+impl fmt::Display for Instance {
+    fn fmt (&self, f:&mut fmt::Formatter) -> fmt::Result {
+        // I can't do a node-name lookup here yet as the LUT is only
+        // build at the end of a read...
+        write!(f, "Inst '{}' of subcircuit '{}' has connections {:?}",
+            self.name, self.subckt,
+            self.conns)
+    }
+}
 
 #[derive(Default)]
 /// A Collection of Circuit Elements describing a circuit
@@ -277,7 +309,14 @@ impl Circuit {
         self.elements.push(Element::D(d));
     }
 
+    /// Add an instantiation
+    pub fn add_instance(&mut self, inst:Instance) {
+        unimplemented!();
+    }
+
     /// Add a node
+    /// Returns a node id. Only really adds the node if it isn't already
+    /// on the list
     pub fn add_node(&mut self, name: &str) -> NodeId {
         if let Some(node_id) = self.get_node_id(name) {
             node_id
@@ -289,6 +328,7 @@ impl Circuit {
             node_id
         }
     }
+
 
     /// Look up the `NodeId` for a node name
     pub fn get_node_id(&self, name: &str) -> Option<NodeId> {
