@@ -98,10 +98,10 @@ fn build( amp: f64, freq: f64, isat: f64 ) -> Circuit {
         Element::Isin(CurrentSourceSine{p: 0, n: 1, vo: i_offset, va: amp, freq: freq}),
     );
     ckt.elements.push(
-        Element::R(Resistor{a: 1, b: 0, value: 10.0}),
+        Element::R(Resistor{ident: "r1".to_string(), a: 1, b: 0, value: 10.0}),
     );
     ckt.elements.push(
-        Element::D(Diode::new(1, 0, isat, 27.0)),
+        Element::D(Diode::new("D1234", 1, 0, isat, 27.0)),
     );
 
     ckt.build_node_id_lut();

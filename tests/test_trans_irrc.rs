@@ -119,15 +119,15 @@ fn build( freq: f64 ) -> Circuit {
         Element::Isin(CurrentSourceSine{p: 0, n: 1, vo: 0.0, va: 10.0, freq: freq}),
     );
     ckt.elements.push(
-        Element::R(Resistor{a: 1, b: 0, value: 1.0}),
+        Element::R(Resistor{ident: "r1".to_string(), a: 1, b: 0, value: 1.0}),
     );
 
     // Lowpass filter - 5kHz cut-off
     ckt.elements.push(
-        Element::R(Resistor{a: 1, b: 2, value: 1.0e3}),
+        Element::R(Resistor{ident: "r2".to_string(), a: 1, b: 2, value: 1.0e3}),
     );
     ckt.elements.push(
-        Element::C(Capacitor{a: 2, b: 0, value: 0.032e-6}),
+        Element::C(Capacitor{ident: "c1".to_string(), a: 2, b: 0, value: 0.032e-6}),
     );
 
     ckt.build_node_id_lut();

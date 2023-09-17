@@ -2,6 +2,7 @@ use crate::circuit::{NodeId};
 
 #[derive(Clone)]
 pub struct Capacitor {
+    pub ident: String,
     pub a: NodeId,
     pub b: NodeId,
     pub value: f64, // Farads
@@ -9,8 +10,9 @@ pub struct Capacitor {
 
 impl Capacitor {
 
-    pub fn new(a: NodeId, b: NodeId, value: f64) -> Capacitor {
+    pub fn new(ident: &str, a: NodeId, b: NodeId, value: f64) -> Capacitor {
         Capacitor {
+            ident: ident.to_string(),
             a,
             b,
             value,

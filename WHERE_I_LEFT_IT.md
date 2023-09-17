@@ -1,4 +1,5 @@
-Trying to figure out what's wrong with my fullwave bridge sim.
-- I was looking at the wrong waveforms...
+Trying to figure out how to include subcircuits.
 
-Do a 0.7.0 release and decide what to do next.
+I'm doing the subcircuit elaboration in the `Reader::circuit()` call so that 
+the "API" stays the same.
+

@@ -10,6 +10,7 @@ macro_rules! trace {
 
 #[derive(Clone)]
 pub struct Diode {
+    pub ident: String,
     pub p: NodeId,
     pub n: NodeId,
     pub i_sat: f64,
@@ -23,8 +24,9 @@ pub struct Diode {
 
 impl Diode {
 
-    pub fn new(p :NodeId, n :NodeId, i_sat :f64, tdegc: f64) -> Diode {
+    pub fn new(ident: &str, p: NodeId, n: NodeId, i_sat: f64, tdegc: f64) -> Diode {
         let mut d = Diode {
+            ident: ident.to_string(),
             p,
             n,
             i_sat,
@@ -131,7 +133,7 @@ mod tests {
     fn curve_trace() {
         const VMAX: f64 = 5.0;
         const POINTS: i32 = 100;
-        let diode = Diode::new(0, 1, 1e-12, 27.0);
+        let diode = Diode::new("Dtrace", 0, 1, 1e-12, 27.0);
         println!("DATA pt Vd G_eq I_eq I_d");
         println!("DATA int V S A A");
         for pt in -POINTS..POINTS {

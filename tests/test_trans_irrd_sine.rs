@@ -87,13 +87,13 @@ fn build( freq: f64 ) -> Circuit {
         Element::Isin(CurrentSourceSine{p: 0, n: 1, vo: 0.0, va: 0.3, freq: freq}),
     );
     ckt.elements.push(
-        Element::R(Resistor{a: 1, b: 0, value: 10.0}),
+        Element::R(Resistor{ident: "r123".to_string(), a: 1, b: 0, value: 10.0}),
     );
     ckt.elements.push(
-        Element::D(Diode::new(1, 2, 1e-9, 27.0)),
+        Element::D(Diode::new("D15412", 1, 2, 1e-9, 27.0)),
     );
     ckt.elements.push(
-        Element::R(Resistor{a: 2, b: 0, value: 1e3}),
+        Element::R(Resistor{ident: "r345".to_string(), a: 2, b: 0, value: 1e3}),
     );
 
     ckt.build_node_id_lut();

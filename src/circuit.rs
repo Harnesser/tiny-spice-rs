@@ -79,7 +79,8 @@ impl fmt::Display for Element {
                 write!(f, "V a:{} b:{} {} Volts", el.p, el.n, el.value)
             },
             Element::D(ref el) => {
-                write!(f, "D p:{} n:{} I_sat={} A", el.p, el.n, el.i_sat)
+                write!(f, "D p:{} n:{} I_sat={} A ({})",
+                    el.p, el.n, el.i_sat, el.ident)
             },
             Element::Isin(ref el) => {
                 write!(f, "Isin p:{} n:{} = {} + {} * sin(2pi {})",
@@ -90,7 +91,8 @@ impl fmt::Display for Element {
                     el.p, el.n, el.vo, el.va, el.freq)
             },
             Element::C(ref el) => {
-                write!(f, "C a:{} b:{} {} Farads", el.a, el.b, el.value)
+                write!(f, "C a:{} b:{} {} Farads ({})",
+                    el.a, el.b, el.value, el.ident)
             },
         }
     }
@@ -325,9 +327,9 @@ impl Circuit {
     }
 
     /// Add capacitor
-    pub fn add_c(&mut self, a: NodeId, b: NodeId, value: f64) {
+    pub fn add_c(&mut self, ident: String, a: NodeId, b: NodeId, value: f64) {
         self.elements.push(
-            Element::C(Capacitor{a, b, value})
+            Element::C(Capacitor{ident, a, b, value})
         );
     }
 

@@ -236,13 +236,12 @@ impl Engine {
             let mut unknowns_solve_prev : Vec<f64> = vec![0.0; c_mna];
             let mut geared = false;
 
-            #[allow(unused_variables)]
-            let mut mse :f64 = 0.0; // not used if trace! is empty
+            let mut _mse :f64 = 0.0; // not used if trace! is empty
 
             loop {
 
                 trace!("*METRIC* {} {} {} {} {} {}",
-                         c_step, t_now, t_delta, c_iteration, c_itl, mse);
+                         c_step, t_now, t_delta, c_iteration, c_itl, _mse);
 
                 // copy the base matrix, cos we're going to change it a lot:
                 // * stamp nonlinear element companion models
@@ -260,7 +259,7 @@ impl Engine {
 
                 // Solve
                 unknowns = self.solve(v);
-                mse = self.mean_squared_error(&unknowns_solve, &unknowns);
+                _mse = self.mean_squared_error(&unknowns_solve, &unknowns);
 
                 // enable this to plot delta-time
                 //wavedb.dump_vector(t_now, &unknowns);

@@ -32,15 +32,15 @@ fn build() -> Circuit {
         Element::I(CurrentSource{p: 0, n: 1, value: 1.0}),
     );
     ckt.elements.push(
-        Element::R(Resistor{a: 1, b: 0, value: 10.0}),
+        Element::R(Resistor{ident: "r1".to_string(), a: 1, b: 0, value: 10.0}),
     );
 
     // Lowpass filter
     ckt.elements.push(
-        Element::R(Resistor{a: 1, b: 2, value: 1.0e-3}),
+        Element::R(Resistor{ident: "r2".to_string(), a: 1, b: 2, value: 1.0e-3}),
     );
     ckt.elements.push(
-        Element::C(Capacitor{a: 2, b: 0, value: 0.01e-6}),
+        Element::C(Capacitor{ident: "c1".to_string(), a: 2, b: 0, value: 0.01e-6}),
     );
 
     ckt.build_node_id_lut();

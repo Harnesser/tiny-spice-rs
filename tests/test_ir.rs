@@ -30,7 +30,7 @@ fn build() -> circuit::Circuit {
         circuit::Element::I(circuit::CurrentSource{p: 0, n: 1, value: 3.0}),
     );
     ckt.elements.push(
-        circuit::Element::R(circuit::Resistor{a: 1, b: 0, value: 10.0}),
+        circuit::Element::R(circuit::Resistor{ident: "R100".to_string(), a: 1, b: 0, value: 10.0}),
     );
     ckt
 }

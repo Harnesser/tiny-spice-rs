@@ -29,9 +29,9 @@ fn build() -> Circuit {
     let mut ckt = Circuit::new();
     ckt.elements.push( Element::V(VoltageSource{p: 1, n: 0, value: 5.0, idx:0}) );
     // 'forward' biased
-    ckt.elements.push( Element::D(Diode::new(1, 2, 1e-9, 27.0)) );
+    ckt.elements.push( Element::D(Diode::new("D1", 1, 2, 1e-9, 27.0)) );
     // reversed bias
-    ckt.elements.push( Element::D(Diode::new(0, 2, 1e-9, 27.0)) );
+    ckt.elements.push( Element::D(Diode::new("D2", 0, 2, 1e-9, 27.0)) );
     ckt
 }
 

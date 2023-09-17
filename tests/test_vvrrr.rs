@@ -40,16 +40,16 @@ fn test_vvrrr() {
 fn build() -> circuit::Circuit {
     let mut ckt = circuit::Circuit::new();
     ckt.elements.push(
-        circuit::Element::R(circuit::Resistor{a: 0, b: 1, value: 2.0}),
+        circuit::Element::R(circuit::Resistor{ident: "r1".to_string(), a: 0, b: 1, value: 2.0}),
     );
     ckt.elements.push(
         circuit::Element::V(circuit::VoltageSource{p: 2, n: 1, value: 32.0, idx: 0}),
     );
     ckt.elements.push(
-        circuit::Element::R(circuit::Resistor{a: 2, b: 3, value: 4.0}),
+        circuit::Element::R(circuit::Resistor{ident: "r2".to_string(), a: 2, b: 3, value: 4.0}),
     );
     ckt.elements.push(
-        circuit::Element::R(circuit::Resistor{a: 2, b: 0, value: 8.0}),
+        circuit::Element::R(circuit::Resistor{ident: "r3".to_string(), a: 2, b: 0, value: 8.0}),
     );
     ckt.elements.push(
         circuit::Element::V(circuit::VoltageSource{p: 3, n: 0, value: 20.0, idx: 1}),

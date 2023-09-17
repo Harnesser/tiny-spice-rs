@@ -51,13 +51,13 @@ fn build_v() -> Circuit {
     // Diode bridge
     //  (1) is top
     //  (2) is bottom
-    ckt.elements.push( Element::D(Diode::new(1, 3, 1e-9, 27.0)) );
-    ckt.elements.push( Element::D(Diode::new(4, 1, 1e-9, 27.0)) );
-    ckt.elements.push( Element::D(Diode::new(2, 3, 1e-9, 27.0)) );
-    ckt.elements.push( Element::D(Diode::new(4, 2, 1e-9, 27.0)) );
+    ckt.elements.push( Element::D(Diode::new("D1", 1, 3, 1e-9, 27.0)) );
+    ckt.elements.push( Element::D(Diode::new("D2", 4, 1, 1e-9, 27.0)) );
+    ckt.elements.push( Element::D(Diode::new("D3", 2, 3, 1e-9, 27.0)) );
+    ckt.elements.push( Element::D(Diode::new("D4", 4, 2, 1e-9, 27.0)) );
 
     // load
-    ckt.elements.push( Element::R(Resistor{a: 3, b: 4, value: 1000.0}) );
+    ckt.elements.push( Element::R(Resistor{ident: "R1".to_string(), a: 3, b: 4, value: 1000.0}) );
 
     ckt
 }
@@ -72,13 +72,13 @@ fn build_vv() -> Circuit {
     // Diode bridge
     //  (1) is top
     //  (2) is bottom
-    ckt.elements.push( Element::D(Diode::new(1, 3, 1e-9, 27.0)) );
-    ckt.elements.push( Element::D(Diode::new(2, 1, 1e-9, 27.0)) );
-    ckt.elements.push( Element::D(Diode::new(0, 3, 1e-9, 27.0)) );
-    ckt.elements.push( Element::D(Diode::new(2, 0, 1e-9, 27.0)) );
+    ckt.elements.push( Element::D(Diode::new("D1", 1, 3, 1e-9, 27.0)) );
+    ckt.elements.push( Element::D(Diode::new("D2", 2, 1, 1e-9, 27.0)) );
+    ckt.elements.push( Element::D(Diode::new("D3", 0, 3, 1e-9, 27.0)) );
+    ckt.elements.push( Element::D(Diode::new("D4", 2, 0, 1e-9, 27.0)) );
 
     // load
-    ckt.elements.push( Element::R(Resistor{a: 3, b: 2, value: 1000.0}) );
+    ckt.elements.push( Element::R(Resistor{ident: "r1".to_string(), a: 3, b: 2, value: 1000.0}) );
 
     ckt
 }

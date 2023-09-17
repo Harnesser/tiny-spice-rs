@@ -38,16 +38,16 @@ fn build() -> circuit::Circuit {
         circuit::Element::I(circuit::CurrentSource{p: 0, n: 1, value: 3.0}),
     );
     ckt.elements.push(
-        circuit::Element::R(circuit::Resistor{a: 1, b: 2, value: 5.0}),
+        circuit::Element::R(circuit::Resistor{ident: "r1".to_string(), a: 1, b: 2, value: 5.0}),
     );
     ckt.elements.push(
-        circuit::Element::R(circuit::Resistor{a: 2, b: 3, value: 5.0}),
+        circuit::Element::R(circuit::Resistor{ident: "r2".to_string(), a: 2, b: 3, value: 5.0}),
     );
     ckt.elements.push(
-        circuit::Element::R(circuit::Resistor{a: 2, b: 0, value: 10.0}),
+        circuit::Element::R(circuit::Resistor{ident: "r3".to_string(), a: 2, b: 0, value: 10.0}),
     );
     ckt.elements.push(
-        circuit::Element::R(circuit::Resistor{a: 3, b: 0, value: 10.0}),
+        circuit::Element::R(circuit::Resistor{ident: "r4".to_string(), a: 3, b: 0, value: 10.0}),
     );
     ckt
 }
