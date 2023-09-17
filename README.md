@@ -22,7 +22,6 @@ Analyses supported:
 In SPICE decks:
 * The 'first-line is a title' behaviour is supported
 * Engineering notation is supported, e.g. `1k` is 1000
-* Node names must be integers
 * A control block with a small list of commands between `.control` and `.endc` is
   supported
 

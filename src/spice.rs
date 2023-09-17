@@ -31,7 +31,7 @@ use crate::analysis::{Configuration, Kind};
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints
-        println!(concat!("<spice> ", $fmt), $($($arg)*)?);
+        //println!(concat!("<spice> ", $fmt), $($($arg)*)?);
     };
 }
 

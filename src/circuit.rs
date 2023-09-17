@@ -10,7 +10,7 @@ pub use crate::capacitor::Capacitor;
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints
-        println!(concat!("<circuit> ", $fmt), $($($arg)*)?);
+        //println!(concat!("<circuit> ", $fmt), $($($arg)*)?);
     };
 }
 

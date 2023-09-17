@@ -2,6 +2,29 @@
 
     This is a personal project. It does not have to be rigourously tested.
 
+## 2023-09-17 Subcircuits
+Node names don't have to be integers any more.
+
+There is some limited support for subcircuits now. The simulator can handle 1 level
+deep of subcircuits, but only for resistors, capacitors and diodes. There's a
+version of the fullwave rectifier that has both the RC load in a subcircuit and the
+diode bridge in another, and it simulates like flattened one!
+
+The R, C and Ds now have an identifier now. The other circuit elements do not. This
+caused lots of testmode reflow, and I'm not sure if they really need identifiers...
+
+I'm surprised the waveform dumping still works though - I thought the matrix would 
+be a mix of Vs and Node voltages now, and not partitioned off nicely.
+
+The subckt code is _very_ copy-pasty. It also doesn't "cache" subcircuits it'll
+build everything from scratch each time its instantiated. Good enough for this
+exercise. The code is in `spice::Reader::circuit()`. I dunno if this is a great
+place for it.
+
+For a 0.8.0 release, I'd want to:
+* allow all currently-supported circuit elements
+* allow more than one level of hierarchy
+
 ## 2023-09-09 Part 2
 Nevermind, I was looking at the wrong columns of the waveform data.
 
