@@ -8,18 +8,18 @@ V1 IN_p IN_n SIN(0 5 1e3) ; input voltage
 V2 IN_n gnd 0  ; ground, and current measure
 
 * full-wave rectifier
-.subckt bridge p n a b 
+.subckt bridge bp bn ba bb 
 
-  D1 p a
-  D2 b p
-  D3 n a
-  D4 b n
+  D1 bp ba
+  D2 bb bp
+  D3 bn ba
+  D4 bb bn
   
   * Small caps across the diodes to prevent time-step-too-small
-  CD1 p a 12pF
-  CD2 b p 12pF
-  CD3 n a 12pF
-  CD4 b n 12pF
+  CD1 bp ba 12pF
+  CD2 bb bp 12pF
+  CD3 bn ba 12pF
+  CD4 bb bn 12pF
 
 .ends
 
@@ -29,10 +29,10 @@ Xload vp vn  rc_load
 * Load
 .subckt rc_load in1 in2
 * Split R so we have internal nodes
-  Rl1 in1 a 200
-  Rl2 a b 300
-  Rl3 b c 400
-  Rl4 c in2 100
+  Rl1 in1 la 200
+  Rl2 la lb 300
+  Rl3 lb lc 400
+  Rl4 lc in2 100
   Cl in1 in2 1uF
 .ends
 

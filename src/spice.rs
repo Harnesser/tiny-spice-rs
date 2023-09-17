@@ -1,4 +1,4 @@
-//! Read a SPICE Deck 
+//! Read a SPICE Deck
 //!
 //! Supported:
 //! 1. Initial comment line
@@ -25,7 +25,8 @@ use std::fs::File;
 use std::io::{BufReader, BufRead};
 
 use crate::circuit::{Circuit, Diode, CurrentSourceSine, VoltageSourceSine};
-use crate::circuit::{Instance};
+use crate::circuit::{Resistor};
+use crate::circuit::{Instance, Element};
 use crate::analysis::{Configuration, Kind};
 
 macro_rules! trace {
@@ -43,7 +44,7 @@ pub struct Reader {
     ckts: Vec<Circuit>,
     /// Options and analysis commands
     cfg: Configuration,
-    /// Irack which (sub)circuit we're adding things too. 
+    /// Irack which (sub)circuit we're adding things too.
     c: usize,
     /// Flag if problems were encountered during parsing
     there_are_errors: bool
@@ -54,7 +55,7 @@ impl Reader {
 
     #[allow(clippy::new_without_default)]
     pub fn new() -> Reader {
-        let mut topckt = Circuit::new();
+        let topckt = Circuit::new();
         Reader {
             ckts: vec![topckt],
             cfg: Configuration::new(),
@@ -72,10 +73,8 @@ impl Reader {
         let mut in_control_block = false;
         let mut in_subckt = false;
 
-        // Circuit index, default to toplevel
-        let mut c = 0;
 
-        // circuit name is the SPICE name without any 
+        // circuit name is the SPICE name without any
         let ckt_name = filename
             .file_stem().expect("can't get stem of SPICE file path")
             .to_str().expect("cant stringify SPICE filename");
@@ -150,6 +149,10 @@ impl Reader {
                 // find out what we're looking at
                 if bits[0] == ".ends" {
                     trace!("Leaving subcircuit");
+                    if !in_subckt {
+                        println!("*ERROR* .ends without a .subckt");
+                        self.there_are_errors = true;
+                    }
                     in_subckt = false;
                     self.c = 0; // point back to toplevel
                 } else if bits[0].starts_with('I') {
@@ -179,11 +182,11 @@ impl Reader {
                         self.ckts[self.c].add_v_sin(src);
                     }
                 } else if bits[0].starts_with('R') {
-                    let _ = extract_identifier(bits[0]);
+                    let ident = extract_identifier(bits[0]);
                     let node1 = self.extract_node(bits[1]);
                     let node2 = self.extract_node(bits[2]);
                     let value = extract_value(bits[3]);
-                    self.ckts[self.c].add_r(node1, node2, value.unwrap());
+                    self.ckts[self.c].add_r(ident, node1, node2, value.unwrap());
                 } else if bits[0].starts_with('C') {
                     let _ = extract_identifier(bits[0]);
                     let node1 = self.extract_node(bits[1]);
@@ -216,10 +219,13 @@ impl Reader {
 
                         self.ckts[self.c].name = bits[1].to_string();
 
-                        // the port names are nodes in the subckt 
+                        // the port names are nodes in the subckt
+                        let mut num_ports = 0;
                         for nn in bits.iter().skip(2) {
                             self.ckts[self.c].add_node(nn);
+                            num_ports += 1;
                         }
+                        self.ckts[self.c].num_ports = num_ports;
 
                         //self.ckts[0].add_subckt(subckt);
                         in_subckt = true;
@@ -240,12 +246,19 @@ impl Reader {
         println!("Number of subcircuit definitions: {}", self.ckts.len()-1);
         for ckt in &self.ckts {
             println!("\nCircuit: {}", ckt.name);
+            println!(" Ports: {}", ckt.num_ports);
             ckt.list_nodes();
             ckt.list_elements();
             ckt.list_instantiations();
         }
         println!("");
-        self.ckts[self.c].build_node_id_lut();
+
+        // build the `NodeId` -> name lookup tables for the toplevel circuit
+        // and the all the subcircuits.
+        for ckt in &mut self.ckts {
+            ckt.build_node_id_lut();
+        }
+
         self.there_are_errors
     }
 
@@ -269,12 +282,12 @@ impl Reader {
     // only support one parameter per option line
     /// Parse a control block option command
     fn extract_option(&mut self, bits: &[&str]) {
-    
+
         // just 'option' with no arguments? - print the options as they stand
         if bits.len() == 1 {
             self.cfg.print_options();
             return;
-        } 
+        }
 
         // FIXME - might be "abstol=2e6" too - lower case, no spaces surrounding '='
         if bits[2] != "=" {
@@ -420,17 +433,133 @@ impl Reader {
         self.ckts[self.c].add_node(text)
     }
 
+    /// Find the index of the subcircuit called `name`.
+    pub fn find_subckt_index(&self, name: &str) -> Option<usize> {
+        for (i, ckt) in self.ckts.iter().enumerate() {
+            if ckt.name == name {
+                return Some(i);
+            }
+        }
+        None
+    }
 
     /// Return reference to the completed circuit datastructures
     /// Should I create the toplevel here?
     /// I think I should create the toplevel here...
-    pub fn circuit(&self) -> &Circuit {
+    // I can't figure out how to implement `Copy`, so can I update
+    // the toplevel circuit directly? I needed to make things `Clone`.
+    pub fn circuit(&self) -> Circuit {
+
+        let mut ckt = self.ckts[0].clone();
+        let mut subckt_id = 0;
+        let mut hier: Vec<String> = vec![];
+
         println!("-- Deal with subcircuits -----------------------");
-        for inst in &self.ckts[0].instances {
+        let insts: &Vec<Instance> = &ckt.instances.clone();
+        for inst in insts {
             println!("{}", inst);
+            hier.push(inst.name.to_string());
+
+            // find the subckt definition index
+            if let Some(ckt_id) = self.find_subckt_index(&inst.subckt) {
+                trace!("Found definition for {}", inst.subckt);
+                subckt_id = ckt_id;
+            } else {
+                println!("*ERROR* Can't find a definition for subcircuit {}",
+                    inst.subckt);
+            }
+
+            // check that the instantiation and the subckt agree on the
+            // number of ports
+            //dbg!(self.ckts[subckt_id].num_ports, inst.conns.len());
+            if self.ckts[subckt_id].num_ports != inst.conns.len() {
+                println!("*ERROR* Instantiation and subcircuit definitions {}",
+                    "have different port sizes");
+            }
+
+            trace!("Subcircuit index: {}", subckt_id);
+
+            // add all the elements from the subcircuit, but translate (or add)
+            // the node names they're connected to.
+            // * If the node is a port on the subcircuit, then the node
+            //   index already exists in the upper-level circuit.
+            // * If the node name is not a port, it needs to be a new
+            //   node name
+
+            // What are the port nets/ids in this subcircuit?
+
+            // We know that ports are pushed onto the nodelist first.
+            // 0 a b
+            // 0 a b int1 int2 int3
+            //
+            // a and b - look up the nodeid in the instantiation line
+            // int1,2,3 - add these as new nodes at the toplevel
+            //
+            // either way, update the NodeIds for the new element
+            for subckt_el in &self.ckts[subckt_id].elements {
+                    trace!(" Element: {}", subckt_el);
+                    let mut el = subckt_el.clone();
+
+                    match subckt_el {
+
+                        Element::R(subckt_res) => {
+                            println!("Found a resistor subcircuit element");
+
+                            // Copy R, cos we have to tweak the nodeids for its ports
+                            let mut res = subckt_res.clone();
+                            hier.push(res.ident);
+                            res.ident = hier.join(".");
+                            hier.pop();
+
+                            let akind = if subckt_res.a > self.ckts[subckt_id].num_ports {
+                                let local_node_name = &self.ckts[subckt_id].node_id_lut[&subckt_res.a];
+                                hier.push(local_node_name.to_string());
+                                let node_name = hier.join(".");
+                                let nid = ckt.add_node(&node_name);
+                                res.a = nid;
+                                _ = hier.pop();
+                                "internal node, so replicate"
+                            } else {
+                                // we have a port
+                                // Find out what node it is connected to above
+                                // ports are added first to subckts, so they have NodeIds of 1..P
+                                // where there are P ports.
+                                // We can use the instantiation to get at the NodeId. 
+                                let nid = inst.conns[subckt_res.a-1];
+                                res.a = nid;
+                                "port node, look up in circuit above"
+                            };
+
+                            let bkind = if subckt_res.b > self.ckts[subckt_id].num_ports {
+                                let local_node_name = &self.ckts[subckt_id].node_id_lut[&subckt_res.b];
+                                hier.push(local_node_name.to_string());
+                                let node_name = hier.join(".");
+                                let nid = ckt.add_node(&node_name);
+                                res.b = nid;
+                                _ = hier.pop();
+                                "internal node, so replicate"
+                            } else {
+                                let nid = inst.conns[subckt_res.b-1];
+                                res.b = nid;
+                                "port node, look up in circuit above"
+                            };
+
+                            println!("  local a: {} ({})", subckt_res.a, akind);
+                            println!("  local b: {} ({})", subckt_res.b, bkind);
+                            // how do i know if a or b are ports or internal
+                            // nodes in the circuit?
+
+                            ckt.elements.push(Element::R(res));
+                        },
+                        _ => {},
+                    }
+
+            }
+            _ = hier.pop();
         }
         println!("------------------------------------------------");
-        &self.ckts[0]
+        ckt.build_node_id_lut();
+        ckt
     }
 
     /// Return reference to the completed configuration object

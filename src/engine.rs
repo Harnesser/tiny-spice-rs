@@ -748,6 +748,7 @@ impl Engine {
                         value: i_eq
                     });
                     self.stamp_resistor(m, &circuit::Resistor{
+                        ident: "asdfa".to_string(),
                         a: c.a,
                         b: c.b,
                         value: 1.0/g_eq
@@ -784,6 +785,7 @@ impl Engine {
                         value: i_eq
                     });
                     self.stamp_resistor(m, &circuit::Resistor{
+                        ident: "nl_something".to_string(),
                         a: d.p,
                         b: d.n,
                         value: 1.0/g_eq

@@ -35,7 +35,7 @@ fn main() {
     let cfg = reader.configuration();
 
     // tmp analysis
-    if let Some(_stats) = eng.go(ckt, cfg) {
+    if let Some(_stats) = eng.go(&ckt, cfg) {
         println!("\n*INFO* Done");
     } else {
         println!("\n*ERROR* Bad, bad bad... '{}'", &args[1]);

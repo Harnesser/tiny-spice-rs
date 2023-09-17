@@ -7,6 +7,13 @@ pub use crate::isine::CurrentSourceSine;
 pub use crate::vsine::VoltageSourceSine;
 pub use crate::capacitor::Capacitor;
 
+macro_rules! trace {
+    ($fmt:expr $(, $($arg:tt)*)?) => {
+        // uncomment the line below for tracing prints
+        println!(concat!("<circuit> ", $fmt), $($($arg)*)?);
+    };
+}
+
 /// Index of a node in the matrix
 pub type NodeId = usize;
 
@@ -16,7 +23,9 @@ pub const GMIN : f64 = 1.0e-12;
 
 /// Resistor Implementation
 #[allow(dead_code)]
+#[derive(Clone)]
 pub struct Resistor {
+    pub ident: String,
     pub a: NodeId,
     pub b: NodeId,
     pub value: f64, // Ohms
@@ -25,6 +34,7 @@ pub struct Resistor {
 
 /// Current Source Implementation
 #[allow(dead_code)]
+#[derive(Clone)]
 pub struct CurrentSource {
     pub p: NodeId,
     pub n: NodeId,
@@ -33,6 +43,7 @@ pub struct CurrentSource {
 
 /// Voltage Source Implementation
 #[allow(dead_code)]
+#[derive(Clone)]
 pub struct VoltageSource {
     pub p: NodeId,
     pub n: NodeId,
@@ -42,6 +53,7 @@ pub struct VoltageSource {
 
 /// Circuit Elements that this simulator supports
 #[allow(dead_code)]
+#[derive(Clone)]
 pub enum Element {
     R(Resistor),
     I(CurrentSource),
@@ -60,7 +72,8 @@ impl fmt::Display for Element {
                 write!(f, "I p:{} n:{} {} A", el.p, el.n, el.value)
             },
             Element::R(ref el) => {
-                write!(f, "R a:{} b:{} {} Ohms", el.a, el.b, el.value)
+                write!(f, "R a:{} b:{} {} Ohms ({})",
+                    el.a, el.b, el.value, el.ident)
             },
             Element::V(ref el) => {
                 write!(f, "V a:{} b:{} {} Volts", el.p, el.n, el.value)
@@ -84,6 +97,7 @@ impl fmt::Display for Element {
 }
 
 /// Subcircuit Instantiation
+#[derive(Clone)]
 pub struct Instance {
     pub name: String,
     pub subckt: String,
@@ -116,7 +130,7 @@ impl fmt::Display for Instance {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 /// A Collection of Circuit Elements describing a circuit
 pub struct Circuit {
     pub name: String,
@@ -125,6 +139,7 @@ pub struct Circuit {
     pub nodes: HashMap<String, NodeId>,
     pub node_id_lut: HashMap<NodeId, String>,
     pub instances: Vec<Instance>,
+    pub num_ports: usize,
 }
 
 impl Circuit {
@@ -141,6 +156,7 @@ impl Circuit {
             nodes,
             node_id_lut: HashMap::new(),
             instances: vec![],
+            num_ports: 0,
         }
     }
 
@@ -302,9 +318,9 @@ impl Circuit {
     }
 
     /// Add resistor
-    pub fn add_r(&mut self, a: NodeId, b: NodeId, value: f64) {
+    pub fn add_r(&mut self, ident: String, a: NodeId, b: NodeId, value: f64) {
         self.elements.push(
-            Element::R(Resistor{a, b, value})
+            Element::R(Resistor{ident, a, b, value})
         );
     }
 
@@ -336,6 +352,7 @@ impl Circuit {
             // puts the initial length at 1
             let node_id: NodeId = self.nodes.len();
             self.nodes.insert(String::from(name), node_id);
+            trace!("Add node '{}' with id {}", name, node_id);
             node_id
         }
     }
