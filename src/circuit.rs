@@ -10,7 +10,7 @@ pub use crate::capacitor::Capacitor;
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints
-        //println!(concat!("<circuit> ", $fmt), $($($arg)*)?);
+        println!(concat!("<circuit> ", $fmt), $($($arg)*)?);
     };
 }
 
@@ -137,6 +137,7 @@ impl fmt::Display for Instance {
 pub struct Circuit {
     pub name: String,
     pub elements: Vec<Element>,
+    pub nid_next: usize,
     pub v_idx_next: usize,
     pub nodes: HashMap<String, NodeId>,
     pub node_id_lut: HashMap<NodeId, String>,
@@ -154,6 +155,7 @@ impl Circuit {
         Circuit {
             name: String::from("<toplevel>"),
             elements: vec![],
+            nid_next: 1, // skip 0 cos its gnd
             v_idx_next: 0,
             nodes,
             node_id_lut: HashMap::new(),
@@ -350,13 +352,25 @@ impl Circuit {
         if let Some(node_id) = self.get_node_id(name) {
             node_id
         } else {
-            // the node dict is pre-seeded with 'gnd'
-            // puts the initial length at 1
-            let node_id: NodeId = self.nodes.len();
-            self.nodes.insert(String::from(name), node_id);
-            trace!("Add node '{}' with id {}", name, node_id);
-            node_id
+            self.nodes.insert(String::from(name), self.nid_next);
+            trace!("Add node '{}' with id {}", name, self.nid_next);
+            self.nid_next += 1;
+            self.nid_next - 1
         }
+    }
+
+
+    /// add a node alias
+    pub fn add_node_alias(&mut self, name: &str, nid: NodeId) {
+
+        trace!("Add node alias '{}' with id {}", name, nid);
+        if let Some(node_id) = self.get_node_id(name) {
+            if node_id != nid {
+                println!("*ERROR* Can't add a node alias for a nonexisting NodeId");
+                panic!();
+            }
+        }
+        self.nodes.insert(String::from(name), nid);
     }
 
 

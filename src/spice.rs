@@ -25,13 +25,13 @@ use std::fs::File;
 use std::io::{BufReader, BufRead};
 
 use crate::circuit::{Circuit, Diode, CurrentSourceSine, VoltageSourceSine};
-use crate::circuit::{Instance, Element};
+use crate::circuit::{Instance, Element, NodeId};
 use crate::analysis::{Configuration, Kind};
 
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints
-        //println!(concat!("<spice> ", $fmt), $($($arg)*)?);
+        println!(concat!("<spice> ", $fmt), $($($arg)*)?);
     };
 }
 
@@ -450,13 +450,70 @@ impl Reader {
     pub fn circuit(&self) -> Circuit {
 
         let mut ckt = self.ckts[0].clone();
-        let mut subckt_id = 0;
         let mut hier: Vec<String> = vec![];
 
+        self.expand_subckts(&mut ckt, 0, &hier);
+
+        println!("------------------------------------------------");
+        ckt.build_node_id_lut();
+        ckt
+    }
+
+    /// Connect a subcircuit element port
+    /// Find out if there's an existing node that should be connected to,
+    /// (port) or create a new node to connect to (internal node).
+    fn connect(&self,
+        ckt: &mut Circuit,
+        inst: &Instance,
+        host_ckt_id: usize,
+        subckt_id: usize,
+        inhier: &Vec<String>,
+        subckt_nid: NodeId,
+    ) -> NodeId {
+
+        let mut hier = inhier.clone();
+
+        if subckt_nid > self.ckts[subckt_id].num_ports {
+            let local_node_name = &self.ckts[subckt_id].node_id_lut[&subckt_nid];
+            hier.push(local_node_name.to_string());
+            let node_name = hier.join(".");
+            _ = hier.pop();
+
+            let nid = ckt.add_node(&node_name);
+            trace!("Connected an internal subckt node: '{}' -> {}", node_name, nid);
+            nid
+        } else {
+            // we have a port
+            // create a node alias to the port
+            // 1. find the netname in the host circuit
+            let hnid = inst.conns[subckt_nid-1];
+            hier.pop();
+            let local_node_name = &self.ckts[host_ckt_id].node_id_lut[&hnid];
+            hier.push(local_node_name.to_string());
+            let node_name = hier.join(".");
+            _ = hier.pop();
+            hier.push(inst.name.to_string());
+
+            let nid = ckt.add_node(&node_name); // should exist
+            trace!("Connected a subckt port: '{}' -> {}", node_name, nid);
+            nid
+        }
+
+    }
+
+
+    /// Expand a subcircuit instantiation
+    /// Use this recursively
+    fn expand_subckts(&self, ckt: &mut Circuit, host_ckt_id: usize, inhier: &Vec<String>) {
+
+        let mut hier = inhier.clone();
+
         println!("-- Deal with subcircuits -----------------------");
-        let insts: &Vec<Instance> = &ckt.instances.clone();
+        let insts: &Vec<Instance> = &self.ckts[host_ckt_id].instances.clone();
         for inst in insts {
             println!("{}", inst);
+            let mut subckt_id = 0;
+
             hier.push(inst.name.to_string());
 
             // find the subckt definition index
@@ -477,6 +534,42 @@ impl Reader {
             }
 
             trace!("Subcircuit index: {}", subckt_id);
+
+            // Add node aliases for all the ports
+            for (n, hnid) in inst.conns.iter().enumerate() {
+                let nid = n + 1;
+                let port = &self.ckts[subckt_id].node_id_lut[&nid];
+
+                hier.push(port.to_string());
+                let full_port_name = hier.join(".").to_string();
+                hier.pop();
+
+                let host_net_name = &self.ckts[host_ckt_id].node_id_lut[&hnid];
+                hier.pop();
+                hier.push(host_net_name.to_string());
+                let full_host_net_name = hier.join(".").to_string();
+                hier.pop();
+                hier.push(inst.name.to_string());
+
+                println!("  '{}' -> '{}' ", full_port_name, full_host_net_name);
+                let top_nid = ckt.nodes[&full_host_net_name];
+                println!(" '{}' -> {} -> '{}'", full_port_name, top_nid, full_host_net_name);
+                ckt.add_node_alias(&full_port_name, top_nid);
+
+                /*
+                let hnid = inst.conns[subckt_nid-1];
+                hier.pop();
+                let local_node_name = &self.ckts[host_ckt_id].node_id_lut[&hnid];
+                hier.push(local_node_name.to_string());
+                let node_name = hier.join(".");
+                _ = hier.pop();
+                hier.push(inst.name.to_string());
+
+                let nid = ckt.add_node(&node_name); // should exist
+                trace!("Connected a subckt port: '{}' -> {}", node_name, nid);
+                nid
+                */
+            }
 
             // add all the elements from the subcircuit, but translate (or add)
             // the node names they're connected to.
@@ -509,37 +602,8 @@ impl Reader {
                             res.ident = hier.join(".");
                             hier.pop();
 
-                            if subckt_res.a > self.ckts[subckt_id].num_ports {
-                                let local_node_name = &self.ckts[subckt_id].node_id_lut[&subckt_res.a];
-                                hier.push(local_node_name.to_string());
-                                let node_name = hier.join(".");
-                                let nid = ckt.add_node(&node_name);
-                                res.a = nid;
-                                _ = hier.pop();
-                                "internal node, so replicate"
-                            } else {
-                                // we have a port
-                                // Find out what node it is connected to above
-                                // ports are added first to subckts, so they have NodeIds of 1..P
-                                // where there are P ports.
-                                // We can use the instantiation to get at the NodeId. 
-                                let nid = inst.conns[subckt_res.a-1];
-                                res.a = nid;
-                                "port node, look up in circuit above"
-                            };
-
-                            if subckt_res.b > self.ckts[subckt_id].num_ports {
-                                let local_node_name = &self.ckts[subckt_id].node_id_lut[&subckt_res.b];
-                                hier.push(local_node_name.to_string());
-                                let node_name = hier.join(".");
-                                let nid = ckt.add_node(&node_name);
-                                res.b = nid;
-                                _ = hier.pop();
-                            } else {
-                                let nid = inst.conns[subckt_res.b-1];
-                                res.b = nid;
-                            };
-
+                            res.a = self.connect(ckt, inst, host_ckt_id, subckt_id, &hier, subckt_res.a);
+                            res.b = self.connect(ckt, inst, host_ckt_id, subckt_id, &hier, subckt_res.b);
                             ckt.elements.push(Element::R(res));
                         },
 
@@ -552,76 +616,22 @@ impl Reader {
                             cap.ident = hier.join(".");
                             hier.pop();
 
-                            if subckt_cap.a > self.ckts[subckt_id].num_ports {
-                                let local_node_name = &self.ckts[subckt_id].node_id_lut[&subckt_cap.a];
-                                hier.push(local_node_name.to_string());
-                                let node_name = hier.join(".");
-                                let nid = ckt.add_node(&node_name);
-                                cap.a = nid;
-                                _ = hier.pop();
-                            } else {
-                                // we have a port
-                                // Find out what node it is connected to above
-                                // ports are added first to subckts, so they have NodeIds of 1..P
-                                // where there are P ports.
-                                // We can use the instantiation to get at the NodeId. 
-                                let nid = inst.conns[subckt_cap.a-1];
-                                cap.a = nid;
-                            };
-
-                            if subckt_cap.b > self.ckts[subckt_id].num_ports {
-                                let local_node_name = &self.ckts[subckt_id].node_id_lut[&subckt_cap.b];
-                                hier.push(local_node_name.to_string());
-                                let node_name = hier.join(".");
-                                let nid = ckt.add_node(&node_name);
-                                cap.b = nid;
-                                _ = hier.pop();
-                            } else {
-                                let nid = inst.conns[subckt_cap.b-1];
-                                cap.b = nid;
-                            };
-
+                            cap.a = self.connect(ckt, inst, host_ckt_id, subckt_id, &hier, subckt_cap.a);
+                            cap.b = self.connect(ckt, inst, host_ckt_id, subckt_id, &hier, subckt_cap.b);
                             ckt.elements.push(Element::C(cap));
                         },
 
                         Element::D(subckt_diode) => {
                             trace!("Found a diode subcircuit element");
 
-                            // Copy R, cos we have to tweak the nodeids for its ports
+                            // Copy element, cos we have to tweak the nodeids for its ports
                             let mut diode = subckt_diode.clone();
                             hier.push(diode.ident);
                             diode.ident = hier.join(".");
                             hier.pop();
 
-                            if subckt_diode.p > self.ckts[subckt_id].num_ports {
-                                let local_node_name = &self.ckts[subckt_id].node_id_lut[&subckt_diode.p];
-                                hier.push(local_node_name.to_string());
-                                let node_name = hier.join(".");
-                                let nid = ckt.add_node(&node_name);
-                                diode.p = nid;
-                                _ = hier.pop();
-                            } else {
-                                // we have a port
-                                // Find out what node it is connected to above
-                                // ports are added first to subckts, so they have NodeIds of 1..P
-                                // where there are P ports.
-                                // We can use the instantiation to get at the NodeId. 
-                                let nid = inst.conns[subckt_diode.p-1];
-                                diode.p = nid;
-                            };
-
-                            if subckt_diode.n > self.ckts[subckt_id].num_ports {
-                                let local_node_name = &self.ckts[subckt_id].node_id_lut[&subckt_diode.n];
-                                hier.push(local_node_name.to_string());
-                                let node_name = hier.join(".");
-                                let nid = ckt.add_node(&node_name);
-                                diode.n = nid;
-                                _ = hier.pop();
-                            } else {
-                                let nid = inst.conns[subckt_diode.n-1];
-                                diode.n = nid;
-                            };
-
+                            diode.p = self.connect(ckt, inst, host_ckt_id, subckt_id, &hier, subckt_diode.p);
+                            diode.n = self.connect(ckt, inst, host_ckt_id, subckt_id, &hier, subckt_diode.n);
                             ckt.elements.push(Element::D(diode));
                         },
 
@@ -630,11 +640,10 @@ impl Reader {
                     }
 
             }
+
+            self.expand_subckts(ckt, subckt_id, &hier);
             _ = hier.pop();
         }
-        println!("------------------------------------------------");
-        ckt.build_node_id_lut();
-        ckt
     }
 
     /// Return reference to the completed configuration object
@@ -844,6 +853,32 @@ mod tests {
         // load
         assert!(rdr.ckts[2].nodes.len() == 6);
         assert!(rdr.ckts[2].instances.len() == 0);
+
+        // elaborated circuit
+        let ckt = rdr.circuit();
+        assert!(ckt.nodes.len() == 8);
+    }
+
+    #[test]
+    fn multilevel_subckt_counts() {
+        let mut rdr = Reader::new();
+        rdr.read(Path::new("./ngspice/multilevel_subckt_fullwave_rectifier.spi"));
+        assert!(rdr.ckts.len() == 3);
+
+        assert!(rdr.ckts[0].nodes.len() == 5);
+        assert!(rdr.ckts[0].instances.len() == 2);
+
+        // bridge
+        assert!(rdr.ckts[1].nodes.len() == 5);
+        assert!(rdr.ckts[1].instances.len() == 0);
+
+        // load
+        assert!(rdr.ckts[2].nodes.len() == 6);
+        assert!(rdr.ckts[2].instances.len() == 0);
+
+        // system
+        assert!(rdr.ckts[3].nodes.len() == 6);
+        assert!(rdr.ckts[3].instances.len() == 0);
 
         // elaborated circuit
         let ckt = rdr.circuit();

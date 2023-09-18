@@ -2,6 +2,14 @@
 
     This is a personal project. It does not have to be rigourously tested.
 
+## 2023-09-18 Recursive Subcircuits
+I think I've recursive subckts working. I needed to add node aliases for all
+subckt ports as I'm decending, so if I'm connecting to a port above, I can get
+the `NodeId`.
+
+Need to add support for all devices, and tidy up tests and clippy, and I think 
+that's 0.8.0
+
 ## 2023-09-17 Subcircuits
 Node names don't have to be integers any more.
 

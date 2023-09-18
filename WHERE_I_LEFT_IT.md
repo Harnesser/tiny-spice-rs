@@ -1,5 +1,3 @@
-Trying to figure out how to include subcircuits.
-
-I'm doing the subcircuit elaboration in the `Reader::circuit()` call so that 
-the "API" stays the same.
+I've a recursive subckt handler working I think. Need tidy up and
+support all devices.
 

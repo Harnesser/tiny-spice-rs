@@ -44,14 +44,21 @@ diode_lin_run:
 
 # Run the commands in the README
 #readme: TC=named_fullwave_rectifier
-readme: TC=subckt_fullwave_rectifier
+#readme: TC=subckt_fullwave_rectifier
+subckt: TC=multilevel_subckt_fullwave_rectifier
+subckt:
+	\rm -rf waves/${TC} && \
+	cargo run ngspice/${TC}.spi && \
+	head -10 waves/${TC}/tran.dat && \
+	python3 bin/r8n -expr "2, 3-4" waves/${TC}
+
+readme: TC=fullwave_rectifier
 readme:
 	\rm -rf waves/${TC} && \
 	cargo run ngspice/${TC}.spi && \
 	head -10 waves/${TC}/tran.dat && \
 	python3 bin/r8n -expr "2-3, 4-5" waves/${TC}
-
-#	ngspice ngspice/${TC}.spi
+	ngspice ngspice/${TC}.spi
 
 
 # not implemented yet.
