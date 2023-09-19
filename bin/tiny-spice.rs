@@ -29,7 +29,7 @@ fn main() {
         return;
     }
 
-    let ckt = reader.circuit();
+    let ckt = reader.get_expanded_circuit();
     ckt.list_elements();
     ckt.list_nodes();
     let cfg = reader.configuration();

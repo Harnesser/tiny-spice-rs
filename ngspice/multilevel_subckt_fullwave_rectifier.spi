@@ -4,7 +4,9 @@ Full-Wave Rectifier with subcircuits
 * The load is instantiated before it is defined
 * ngspice is happy with both orderings
 
-V1 IN_p gnd SIN(0 5 1e3) ; input voltage
+V1 vstack1 gnd     SIN(0 5 1e3) ; input voltage
+V2 vstack2 vstack1 SIN(0 2 2e3)
+V3 IN_p vstack2    SIN(0 1 3e3)
 
 * full-wave rectifier
 .subckt bridge bp bn ba bb 
@@ -40,6 +42,12 @@ V1 IN_p gnd SIN(0 5 1e3) ; input voltage
 
 Xsystem IN_p gnd vp vn system
 
+Xbridge2 IN_p gnd vp2 vn2 bridge
+Rload2 vp2 vn2 1k
+
+Xbridge3 IN_p gnd vp3 vn3 bridge
+Rload3 vp3 vn3 2k
+
 .control
 *  option reltol = 0.001
 *  option abstol = 1e-12
@@ -47,5 +55,5 @@ Xsystem IN_p gnd vp vn system
   tran 100ns 2ms 
   option ; ngspice only shows new values after analysis
 
-  plot v(IN_p) v(vp,vn) ; (ngspice)
+  plot v(IN_p) v(vp,vn) v(vp2,vn2) v(vp3,vn3); (ngspice)
 .endc

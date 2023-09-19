@@ -1,6 +1,8 @@
 A Tiny SPICE Simulator
 ======================
 
+Ionsamhlóir ciorcaid an-bheag.
+
 A teeny-weeny SPICE simulator implemented in Rust. It can read a (simple) SPICE
 deck, perform the (limited) analyses listed in the `.control` section and write
 some waveform data to a file.

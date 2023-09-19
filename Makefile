@@ -50,7 +50,7 @@ subckt:
 	\rm -rf waves/${TC} && \
 	cargo run ngspice/${TC}.spi && \
 	head -10 waves/${TC}/tran.dat && \
-	python3 bin/r8n -expr "2, 3-4" waves/${TC}
+	python3 bin/r8n -expr "4, 5-6, 7-8, 9-10" waves/${TC}
 
 readme: TC=fullwave_rectifier
 readme:
