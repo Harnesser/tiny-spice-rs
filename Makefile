@@ -43,15 +43,6 @@ diode_lin_run:
 
 
 # Run the commands in the README
-#readme: TC=named_fullwave_rectifier
-#readme: TC=subckt_fullwave_rectifier
-subckt: TC=multilevel_subckt_fullwave_rectifier
-subckt:
-	\rm -rf waves/${TC} && \
-	cargo run ngspice/${TC}.spi && \
-	head -10 waves/${TC}/tran.dat && \
-	python3 bin/r8n -expr "4, 5-6, 7-8, 9-10" waves/${TC}
-
 readme: TC=fullwave_rectifier
 readme:
 	\rm -rf waves/${TC} && \
@@ -59,6 +50,27 @@ readme:
 	head -10 waves/${TC}/tran.dat && \
 	python3 bin/r8n -expr "2-3, 4-5" waves/${TC}
 	ngspice ngspice/${TC}.spi
+
+
+
+#subckt: TC=named_fullwave_rectifier
+#subckt: TC=subckt_fullwave_rectifier
+subckt: TC=multilevel_subckt_fullwave_rectifier
+subckt:
+	\rm -rf waves/${TC} && \
+	cargo run ngspice/${TC}.spi && \
+	head -10 waves/${TC}/tran.dat && \
+	python3 bin/r8n -expr "4, 5-6, 7-8, 9-10" waves/${TC}
+
+
+param: TC=param_fullwave_rectifier
+param:
+	\rm -rf waves/${TC} && \
+	cargo run ngspice/${TC}.spi && \
+	head -10 waves/${TC}/tran.dat && \
+	python3 bin/r8n -expr "4, 7-6, 10-9" waves/${TC}
+
+
 
 
 # not implemented yet.
@@ -136,6 +148,10 @@ log/stamp:
 
 dot:
 	dot doc/value.dot -Tsvg > doc/value.svg
+
+gdb:
+	env RUST_BACKTRACE=1 rust-gdb target/debug/tiny-spice-rs
+
 
 clean:
 	cargo clean

@@ -1,0 +1,49 @@
+Full-Wave Rectifier with parametised subcircuits
+
+* The bridge is defined before it is instantiated
+* The load is instantiated before it is defined
+* ngspice is happy with both orderings
+
+V1 vstack1 gnd     SIN(0 5 1e3) ; input voltage
+V2 vstack1 vstack2 SIN(0 2 2e3)
+V3 IN_p vstack2    SIN(0 1 3e3)
+
+* full-wave rectifier
+.subckt bridge bp bn ba bb 
+
+  D1 bp ba
+  D2 bb bp
+  D3 bn ba
+  D4 bb bn
+  
+  * Small caps across the diodes to prevent time-step-too-small
+  CD1 bp ba 12pF
+  CD2 bb bp 12pF
+  CD3 bn ba 12pF
+  CD4 bb bn 12pF
+
+.ends
+
+
+* Load
+.subckt load in1 in2 out cval=1uF rtval=100 rbval=1k
+  Cl in1 in2 1uF ; {cval}
+  Rtop in1 out 100 ;{rtval}
+  Rbot out in2 1k  ;{rbval}
+.ends
+
+Xbrigde1 IN_p gnd vp1 vn1 bridge
+Xload1 vp1 vn1 o1 load cval=10uF rtval=10 rbval=10000000
+
+Xbridge2 IN_p gnd vp2 vn2 bridge
+Xload2 vp2 vn2 o2 load
+
+.control
+*  option reltol = 0.001
+*  option abstol = 1e-12
+
+  tran 100ns 2ms 
+  option ; ngspice only shows new values after analysis
+
+  plot v(IN_p) v(o1,vn1) v(o2,vn2); (ngspice)
+.endc

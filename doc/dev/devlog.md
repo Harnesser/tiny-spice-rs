@@ -2,6 +2,10 @@
 
     This is a personal project. It does not have to be rigourously tested.
 
+## 2023-09-19 Parameters
+Parameters would be a nice addition to subcircuits. Maybe just allow 1 term
+in the expressions?
+
 ## 2023-09-18 Recursive Subcircuits
 I think I've recursive subckts working. I needed to add node aliases for all
 subckt ports as I'm decending, so if I'm connecting to a port above, I can get

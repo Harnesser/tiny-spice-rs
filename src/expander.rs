@@ -84,9 +84,9 @@ fn expand_subckt(
             hier.pop();
             hier.push(inst.name.to_string());
 
-            println!("  '{}' -> '{}' ", full_port_name, full_host_net_name);
+            //println!("  '{}' -> '{}' ", full_port_name, full_host_net_name);
             let top_nid = ckt.nodes[&full_host_net_name];
-            println!(" '{}' -> {} -> '{}'", full_port_name, top_nid, full_host_net_name);
+            //println!(" '{}' -> {} -> '{}'", full_port_name, top_nid, full_host_net_name);
             ckt.add_node_alias(&full_port_name, top_nid);
         }
 

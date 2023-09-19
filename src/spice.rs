@@ -19,6 +19,9 @@
 //!   * Options: `option <OPTION_NAME> = <value>`
 //!     * `ABSTOL`
 //!     * `RELTOL`
+//! 7. Subcircuits
+//!   * Subcircuit definitions with `.subckt` and `.ends`
+//!   * Instantiations with `X....`
 
 use std::path::Path;
 use std::fs::File;
@@ -222,6 +225,10 @@ impl Reader {
                         // the port names are nodes in the subckt
                         let mut num_ports = 0;
                         for nn in bits.iter().skip(2) {
+                            if nn.contains("=") {
+                                trace!("Found parameter: {}", nn);
+                                continue; // FIXME: should be a break
+                            }
                             self.ckts[self.c].add_node(nn);
                             num_ports += 1;
                         }
@@ -386,19 +393,36 @@ impl Reader {
 
 
     /// Parse an instantiation line
+    ///
+    /// 2nd last non-<ident>=<value> bit is the subcircuit name
     pub fn extract_instance(&mut self,  bits: &[&str]) -> Instance {
         // If we're here, we know bits[0] starts with 'X'
         // fuckit, we'll just leave the x in the inst name...
         let ident = bits[0];
-        let subckt = bits[bits.len()-1]; // last identifier is a name
 
-        let mut inst = Instance::new(ident, subckt);
+        let mut inst = Instance::new(ident, "(not-found)");
+
+        // Paramters, if there are any
+        // Search back from the end of the `bits` list until we find the first 
+        // text section without an "=" sign. This is the subcircuit name.
+        // This all assumes that there are no spaces around the equals sign in 
+        // "<ident>=<expr>".
+        let mut subckt_id = 0;
+        for i in (0..bits.len()).rev() {
+            println!(" asdf> {} -> '{}'", i, bits[i]);
+            if !bits[i].contains("=") {
+                subckt_id = i;
+                break;
+            }
+        }
+        inst.subckt = bits[subckt_id].to_string();
 
         // Store the connections as NodeIds
-        for conn in bits.iter().take(bits.len()-1).skip(1) {
+        for conn in bits.iter().take(subckt_id).skip(1) {
             let nid = self.ckts[self.c].add_node(conn);
             inst.add_connection(nid);
         }
+
         trace!("{}", inst);
         inst
     }
