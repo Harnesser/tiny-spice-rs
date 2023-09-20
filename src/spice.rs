@@ -29,6 +29,7 @@ use std::io::{BufReader, BufRead};
 
 use crate::circuit::{Circuit, Diode, CurrentSourceSine, VoltageSourceSine};
 use crate::circuit::{Instance};
+use crate::circuit::{Parameter, Expression};
 use crate::analysis::{Configuration, Kind};
 use crate::expander;
 
@@ -227,6 +228,8 @@ impl Reader {
                         for nn in bits.iter().skip(2) {
                             if nn.contains("=") {
                                 trace!("Found parameter: {}", nn);
+                                let param = self.extract_parameter(nn);
+                                self.ckts[self.c].params.push(param);
                                 continue; // FIXME: should be a break
                             }
                             self.ckts[self.c].add_node(nn);
@@ -254,6 +257,7 @@ impl Reader {
         for ckt in &self.ckts {
             println!("\nCircuit: {}", ckt.name);
             println!(" Ports: {}", ckt.num_ports);
+            ckt.list_parameters();
             ckt.list_nodes();
             ckt.list_elements();
             ckt.list_instantiations();
@@ -456,6 +460,39 @@ impl Reader {
 
         self.ckts[self.c].add_node(text)
     }
+
+    /// Extract a parameter definition from a `.subckt` line
+    pub fn extract_parameter(&mut self, text: &str) -> Parameter {
+        // mut is for `there are errors`
+        let bits: Vec<_> = text.split("=").collect();
+        if bits.len() != 2 {
+            println!("*ERROR* expected <ident>=<expr>");
+            self.there_are_errors = true;
+        }
+        let name = extract_identifier(bits[0]);
+        let expr = self.extract_expression(bits[1]);
+        Parameter::from_declaration(&name, &expr)
+    }
+
+
+    pub fn extract_expression(&mut self, text: &str) -> Expression {
+        println!("<ASDFASDFASDFASDF> '{}'", text);
+        if text.starts_with("{") {
+            println!("*ERROR* bracket expressions not supported yet");
+            self.there_are_errors = true;
+            return Expression::Literal(9.987654321)
+        }
+
+        let val = extract_value(text);
+        if let Some(n) = val {
+            Expression::Literal(n)
+        } else {
+            println!("*ERROR* can't decode numerical literal in parameter");
+            Expression::Literal(9.9988776655)
+        }
+
+    }
+
 
     /// Return reference to the completed circuit datastructures
     /// Should I create the toplevel here?

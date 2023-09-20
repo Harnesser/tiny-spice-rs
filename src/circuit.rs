@@ -98,12 +98,60 @@ impl fmt::Display for Element {
     }
 }
 
+/// Expression
+#[derive(Clone)]
+pub enum Expression {
+    Literal(f64),
+    Identifier(String),
+}
+
+impl fmt::Display for Expression {
+    fn fmt (&self, f:&mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Expression::Literal(ref p) => {
+                write!(f, "{}", p)
+            },
+            Expression::Identifier(ref p) => {
+                write!(f, "Identifier({})", p)
+            },
+        }
+    }
+}
+
+
+
+
+/// Parameter
+#[derive(Clone)]
+pub struct Parameter {
+    pub name: String,
+    pub defval: f64,
+    pub expr: Expression,
+    pub value: f64,
+}
+
+impl Parameter {
+
+    pub fn from_declaration(name: &str, expr:&Expression) -> Self {
+        Parameter {
+            name: name.to_string(),
+            defval: 234.0,
+            expr: expr.clone(),
+            value: 0.0
+        }
+
+    }
+
+}
+
+
 /// Subcircuit Instantiation
 #[derive(Clone)]
 pub struct Instance {
     pub name: String,
     pub subckt: String,
     pub conns: Vec<NodeId>,
+    pub params: Vec<Parameter>,
 }
 
 impl Instance {
@@ -113,6 +161,7 @@ impl Instance {
             name: String::from(name),
             subckt: String::from(subckt),
             conns: vec![],
+            params: vec![],
         }
     }
 
@@ -143,6 +192,7 @@ pub struct Circuit {
     pub node_id_lut: HashMap<NodeId, String>,
     pub instances: Vec<Instance>,
     pub num_ports: usize,
+    pub params: Vec<Parameter>,
 }
 
 impl Circuit {
@@ -161,6 +211,14 @@ impl Circuit {
             node_id_lut: HashMap::new(),
             instances: vec![],
             num_ports: 0,
+            params: vec![],
+        }
+    }
+
+    /// List the parameters of the circuit
+    pub fn list_parameters(&self) {
+        for param in &self.params {
+            println!(" param: {} = {} ", param.name, param.expr);
         }
     }
 
@@ -269,7 +327,7 @@ impl Circuit {
                 }
         }
         c_nodes
-    } 
+    }
 
     /// Count the voltage sources in the circuit
     ///
@@ -291,7 +349,7 @@ impl Circuit {
             }
         }
         c_vsrc
-    } 
+    }
 
     /// Add DC current source
     pub fn add_i(&mut self, p: NodeId, n: NodeId, value: f64) {
