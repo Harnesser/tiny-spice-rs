@@ -413,8 +413,10 @@ impl Reader {
         // "<ident>=<expr>".
         let mut subckt_id = 0;
         for i in (0..bits.len()).rev() {
-            println!(" asdf> {} -> '{}'", i, bits[i]);
-            if !bits[i].contains("=") {
+            if bits[i].contains("=") {
+                let param = self.extract_parameter(bits[i]);
+                inst.add_parameter(&param);
+            } else {
                 subckt_id = i;
                 break;
             }
@@ -475,12 +477,12 @@ impl Reader {
     }
 
 
+    /// Extract a bracket expression
     pub fn extract_expression(&mut self, text: &str) -> Expression {
-        println!("<ASDFASDFASDFASDF> '{}'", text);
         if text.starts_with("{") {
             println!("*ERROR* bracket expressions not supported yet");
             self.there_are_errors = true;
-            return Expression::Literal(9.987654321)
+            return Expression::Literal(1.111111111)
         }
 
         let val = extract_value(text);
@@ -488,9 +490,8 @@ impl Reader {
             Expression::Literal(n)
         } else {
             println!("*ERROR* can't decode numerical literal in parameter");
-            Expression::Literal(9.9988776655)
+            Expression::Literal(2.2222222222)
         }
-
     }
 
 

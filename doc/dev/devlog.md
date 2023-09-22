@@ -11,7 +11,7 @@ I think I've recursive subckts working. I needed to add node aliases for all
 subckt ports as I'm decending, so if I'm connecting to a port above, I can get
 the `NodeId`.
 
-Need to add support for all devices, and tidy up tests and clippy, and I think 
+Need to add support for all devices, and tidy up tests and clippy, and I think
 that's 0.8.0
 
 ## 2023-09-17 Subcircuits
@@ -25,7 +25,7 @@ diode bridge in another, and it simulates like flattened one!
 The R, C and Ds now have an identifier now. The other circuit elements do not. This
 caused lots of testmode reflow, and I'm not sure if they really need identifiers...
 
-I'm surprised the waveform dumping still works though - I thought the matrix would 
+I'm surprised the waveform dumping still works though - I thought the matrix would
 be a mix of Vs and Node voltages now, and not partitioned off nicely.
 
 The subckt code is _very_ copy-pasty. It also doesn't "cache" subcircuits it'll
@@ -45,7 +45,7 @@ The fact that my simulator can give the wrong answer for the diode bridge is a b
 of a disappointment. Whatever about time-step-too-small, I'd much prefer that to
 giving the wrong answer.
 
-How do I attack this? Well, first of all, I don't really have any good checks on 
+How do I attack this? Well, first of all, I don't really have any good checks on
 transient simulations. The fullwave runs 2 cycles of sinewaves. I'd like to have
 spot-checks on the output voltage on each peak of the input (maybe the zero
 crossings too?). To do this, either a implement a `measure` command, or inspect
@@ -60,7 +60,7 @@ Maybe this spot-checking has to be done on "constructed" simulation runs rather 
 SPICE-card runs? Is there a `continue to` command in NGSPICE? Can a transient
 simulation be run for longer?
 
-Should the main executable be changed to return different status values an 
+Should the main executable be changed to return different status values an
 assert fails? Otherwise, we'd need to go grepping the logfile?
 
 ### Interrogate Waveform Data
@@ -78,7 +78,7 @@ I updated `r8n` to do simple plots from the waveform data.
 The fullwave rectifier doesn't simulate well. I thought I'd done a big loop of sims
 to test such a thing. It works in `ngspice`, but interestingly not if the cap load
 is > ~500 nF! So I've a correctness issue and a convergence issue, possibly. It
-may need some tweaks to `RELTOL` and the like. And for that - do I need to support 
+may need some tweaks to `RELTOL` and the like. And for that - do I need to support
 allowing these to change in the `.control` blocks?
 
 Prepping for a release of 0.7.0.
@@ -97,7 +97,7 @@ I downloaded KST2 again. I can't find anything better for waveforms atm.
 
 
 ## 2022-10-15
-What if the next step is to just make everything I have working now be doable from a 
+What if the next step is to just make everything I have working now be doable from a
 SPICE card? That might make a nice next release.
 
 Then, I have 2 problems:
@@ -105,11 +105,11 @@ Then, I have 2 problems:
 2. Check that they trigger the correct analysis
 
 My imagination for this is, uncommonly, too much for this. I need to reign in things and
-just do something that I can cut a release for. I need to write some requirements. Some 
+just do something that I can cut a release for. I need to write some requirements. Some
 simple ones. Do I want to write an EBNF?
 
 ## After I get through this
-In general though, I want to understand noise better. So after this, I want to see 
+In general though, I want to understand noise better. So after this, I want to see
 how to implement noise analysis and do that thing where you can get the noise contributors.
 
 I think after this I want to tackle subcircuits too. Noise or subcircuits?
@@ -120,7 +120,7 @@ I have 5 SPICE tests running at the moment.
 * 3 are analysis tests that read in SPICE files
 
 I have a problem with testing the results of the analysis tests. Do I need golden waveforms
-to check against in the case of the transient tests? For the DC tests, I have comments in 
+to check against in the case of the transient tests? For the DC tests, I have comments in
 the file with the node voltages that `ngspice` produces. Do I need to parse and check these
 against `tiny-spice` outputs?
 
@@ -131,16 +131,16 @@ don't raise a "timestep too small".
 How do I, say, set an initial value for a sinewave node? Can I do this? How would I get
 a `dc` value for a voltage source to be the starting point for a `VSIN`, for example?A
 
-Maybe there's some kind of check that the `dc` value is a valid solution to A sin(wt) and 
-set the phase accordingly? Is this even how SPICE does things or are `dc` and `trans` 
+Maybe there's some kind of check that the `dc` value is a valid solution to A sin(wt) and
+set the phase accordingly? Is this even how SPICE does things or are `dc` and `trans`
 totally separate - they can't be, right?
 
 There is an offset in the VSIN definition, do I do the right thing here for `op` analysis?
-This is where it would be nice to do a sweep of a source parameter. Is that offset a DC 
+This is where it would be nice to do a sweep of a source parameter. Is that offset a DC
 offset or is it the initial value?
 
 ### Plots
-I also want an command that I can just run and have waveforms pop up afterwards. Then I'd 
+I also want an command that I can just run and have waveforms pop up afterwards. Then I'd
 have to deal with batch mode and immediate mode runs of the simulator.
 
 Maybe `plot` for this means writing out a waveform data file? What if there are multiple plots?
@@ -178,7 +178,7 @@ github stick, I needed to consolidate my github repos.
 
 
 ## 2018-02-02
-Can't remember where I was and what's left to do. 
+Can't remember where I was and what's left to do.
 
 Ok, now I remember - I'm trying to write a spice deck reader. I'm not sure how far
 I got, and what I'd consider a minimum viable product.
@@ -193,9 +193,9 @@ Getting weird results from the command line testing:
 
     test spice_irrc ... ok
     test spice_irrrr ...   [ELEMENT] Current source: 0.015709353792572548A into node 0 and out of node 1
-    test spice_reader ... 
+    test spice_reader ...
 
-It looks like `.success()` is not reliable. 
+It looks like `.success()` is not reliable.
 
 How do you test a SPICE engine?
 
@@ -220,7 +220,7 @@ Decisions:
 
 ## 2017-11-07
 Started `tiny-spice.rs` which is the toplevel binary to tie everything
-together. I'm trying to write this and the SPICE file reader at the 
+together. I'm trying to write this and the SPICE file reader at the
 same time so I can figure out what the interface should be.
 
 ## 2017-11-06
@@ -276,7 +276,7 @@ Still failing transient sims.
 
 ## 2017-10-31
 More messing with the Colon/Nagel thing. Use `Cell` to remember the previous
-values of things without making the entire `Diode` structure mutable and 
+values of things without making the entire `Diode` structure mutable and
 infecting the simulation engine.
 
 
@@ -309,7 +309,7 @@ diode companion model. I've made some progress, but the diode model doesn't
 seem robust yet in transient analysis.
 
 In the course of this investigation, the engine has been updated to print more
-information about which RETOL etc it's using, and it spits out messages when it 
+information about which RETOL etc it's using, and it spits out messages when it
 changes the timestep. I also make all the analyses return a result datastructure
 so that the unit-tests can determine if the circuit time-stepped-to-small or not,
 which is useful for robustness testing.
@@ -382,7 +382,7 @@ increasing in time because there's nothing happening.
 
 ## 2017-09-12
 Found an algorithm for time-stepping that uses only iteration counts and
-no fancy error calculations (used in SPICE2). See openoffice doc for more 
+no fancy error calculations (used in SPICE2). See openoffice doc for more
 details.
 
 ## 2017-09-10
@@ -446,7 +446,7 @@ devices.
 
 ## 2017-09-06
 Turns out that ODEs are not stored in the matrix:
-1. The nonlinear circuit elements are linearised around an operating point 
+1. The nonlinear circuit elements are linearised around an operating point
    using Newton-Raphson.
 2. Values are used to "stamp" the matrix with a linear companion model of the
    nonlinear element
@@ -463,7 +463,7 @@ plan is:
 1. Update circuit builder to MNA
 2. Update Guassian Elimination algorithm
 
-This actually was done. 
+This actually was done.
 
 The next step is to read source code of open-source circuit simulators to see
 how ODEs are handled.
@@ -471,7 +471,7 @@ how ODEs are handled.
 
 ## 2017-09-02
 I've been using PDF on the internet that got the F'(V) for a diode wrong. After
-fixing this, the DC operating point algorithm I have converges if the initial 
+fixing this, the DC operating point algorithm I have converges if the initial
 guess for the diode voltage is larger than what it should be. For lower initial
 guesses, things fail.
 
@@ -510,7 +510,7 @@ Well, I need:
  d. Newton-Raphson for nonlinear equations
 
 2. Transient Simulation
- a. 
+ a.
 
 
 

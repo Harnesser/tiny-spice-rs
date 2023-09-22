@@ -99,7 +99,7 @@ impl fmt::Display for Element {
 }
 
 /// Expression
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Expression {
     Literal(f64),
     Identifier(String),
@@ -122,7 +122,7 @@ impl fmt::Display for Expression {
 
 
 /// Parameter
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Parameter {
     pub name: String,
     pub defval: f64,
@@ -169,15 +169,19 @@ impl Instance {
         self.conns.push(nid);
     }
 
+    pub fn add_parameter(&mut self, param: &Parameter) {
+        self.params.push(param.clone());
+    }
+
 }
 
 impl fmt::Display for Instance {
     fn fmt (&self, f:&mut fmt::Formatter) -> fmt::Result {
         // I can't do a node-name lookup here yet as the LUT is only
         // build at the end of a read...
-        write!(f, "Inst '{}' of subcircuit '{}' has connections {:?}",
+        write!(f, "Inst '{}' of subcircuit '{}' has:\n connections {:?}\n parameters {:?}",
             self.name, self.subckt,
-            self.conns)
+            self.conns, self.params)
     }
 }
 

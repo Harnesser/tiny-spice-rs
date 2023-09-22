@@ -121,8 +121,10 @@ fn expand_subckt(
                         res.ident = hier.join(".");
                         hier.pop();
 
-                        res.a = connect(ckts, ckt, inst, host_ckt_id, subckt_id, &hier, subckt_res.a);
-                        res.b = connect(ckts, ckt, inst, host_ckt_id, subckt_id, &hier, subckt_res.b);
+                        res.a = connect(ckts, ckt, inst, host_ckt_id,
+                            subckt_id, &hier, subckt_res.a);
+                        res.b = connect(ckts, ckt, inst, host_ckt_id,
+                            subckt_id, &hier, subckt_res.b);
                         ckt.elements.push(Element::R(res));
                     },
 
@@ -135,8 +137,10 @@ fn expand_subckt(
                         cap.ident = hier.join(".");
                         hier.pop();
 
-                        cap.a = connect(ckts, ckt, inst, host_ckt_id, subckt_id, &hier, subckt_cap.a);
-                        cap.b = connect(ckts, ckt, inst, host_ckt_id, subckt_id, &hier, subckt_cap.b);
+                        cap.a = connect(ckts, ckt, inst, host_ckt_id,
+                            subckt_id, &hier, subckt_cap.a);
+                        cap.b = connect(ckts, ckt, inst, host_ckt_id,
+                            subckt_id, &hier, subckt_cap.b);
                         ckt.elements.push(Element::C(cap));
                     },
 
@@ -149,8 +153,10 @@ fn expand_subckt(
                         diode.ident = hier.join(".");
                         hier.pop();
 
-                        diode.p = connect(ckts, ckt, inst, host_ckt_id, subckt_id, &hier, subckt_diode.p);
-                        diode.n = connect(ckts, ckt, inst, host_ckt_id, subckt_id, &hier, subckt_diode.n);
+                        diode.p = connect(ckts, ckt, inst, host_ckt_id,
+                            subckt_id, &hier, subckt_diode.p);
+                        diode.n = connect(ckts, ckt, inst, host_ckt_id,
+                            subckt_id, &hier, subckt_diode.n);
                         ckt.elements.push(Element::D(diode));
                     },
 
