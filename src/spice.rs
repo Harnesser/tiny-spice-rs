@@ -39,7 +39,7 @@ use crate::bracket_expression::{extract_expression, extract_value};
 use crate::analysis::{Configuration, Kind};
 use crate::expander;
 
-/// Program execution trace macro
+/// Program execution trace macro - prefix `<spice>`
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints

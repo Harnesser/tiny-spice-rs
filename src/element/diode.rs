@@ -3,6 +3,7 @@
 use std::cell::Cell;
 use crate::circuit::{NodeId, BOLTZMANN, CHARGE, GMIN};
 
+/// Program exectution trace macro - prefix `<diode>`
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints

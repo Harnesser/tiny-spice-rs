@@ -52,3 +52,13 @@ realising subcircuits. Which means `Elements` are going to have to know what
 their parameters are. They are implicit in `R` and `C` - for example, there's
 no `Rload n1 n2 value={100k}` - it's just `Rload n1 n2 100k`.
 
+## Elements are Just Instantiations
+A problem I'm having now is that all my circuit element instantiations have
+to take Bracket Expressions now instead of values.
+
+Maybe in the first pass, just treat `Rx`, `Dx` etc. as the instantiations that
+they are. When the circuit is expanded, only then realise them as the device
+models that are needed for circuit analysis by the engine? The expressions can
+then be expanded as the hierarchy is traversed, just like the `NodeId`s?
+
+

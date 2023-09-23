@@ -37,9 +37,11 @@
 //! hierarchy name stack and expand that subcircuit into the toplevel
 //! clone.
 
-use crate::circuit::{Circuit, Instance, Element};
+use crate::element::{Element};
+use crate::circuit::{Circuit, Instance};
 use crate::circuit::{NodeId};
 
+/// Program execution trace macro - prefix `<expand>`
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints

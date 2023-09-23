@@ -4,11 +4,17 @@ use std::collections::HashMap;
 
 pub use crate::parameter::Parameter;
 
-pub use crate::diode::Diode;
-pub use crate::isine::CurrentSourceSine;
-pub use crate::vsine::VoltageSourceSine;
-pub use crate::capacitor::Capacitor;
+pub use crate::element::Element;
+pub use crate::element::diode::Diode;
+pub use crate::element::isine::CurrentSourceSine;
+pub use crate::element::vsine::VoltageSourceSine;
+pub use crate::element::capacitor::Capacitor;
+pub use crate::element::resistor::Resistor;
+pub use crate::element::independent::CurrentSource;
+pub use crate::element::independent::VoltageSource;
 
+
+/// Program execution trace macro - prefix `<circuit>`
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints
@@ -23,82 +29,7 @@ pub const BOLTZMANN : f64 = 1.380_648_8e-23;
 pub const CHARGE : f64 = 1.603e-19;
 pub const GMIN : f64 = 1.0e-12;
 
-/// Resistor Implementation
-#[allow(dead_code)]
-#[derive(Clone)]
-pub struct Resistor {
-    pub ident: String,
-    pub a: NodeId,
-    pub b: NodeId,
-    pub value: f64, // Ohms
-}
 
-
-/// Current Source Implementation
-#[allow(dead_code)]
-#[derive(Clone)]
-pub struct CurrentSource {
-    pub p: NodeId,
-    pub n: NodeId,
-    pub value: f64, // Amperes
-}
-
-/// Voltage Source Implementation
-#[allow(dead_code)]
-#[derive(Clone)]
-pub struct VoltageSource {
-    pub p: NodeId,
-    pub n: NodeId,
-    pub value: f64, // Volts
-    pub idx: usize, // index of voltage source in "known" column
-}
-
-/// Circuit Elements that this simulator supports
-#[allow(dead_code)]
-#[derive(Clone)]
-pub enum Element {
-    R(Resistor),
-    I(CurrentSource),
-    V(VoltageSource),
-    D(Diode),
-    Isin(CurrentSourceSine),
-    Vsin(VoltageSourceSine),
-    C(Capacitor),
-}
-
-
-impl fmt::Display for Element {
-    fn fmt (&self, f:&mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Element::I(ref el) => {
-                write!(f, "I p:{} n:{} {} A", el.p, el.n, el.value)
-            },
-            Element::R(ref el) => {
-                write!(f, "R a:{} b:{} {} Ohms ({})",
-                    el.a, el.b, el.value, el.ident)
-            },
-            Element::V(ref el) => {
-                write!(f, "V a:{} b:{} {} Volts", el.p, el.n, el.value)
-            },
-            Element::D(ref el) => {
-                write!(f, "D p:{} n:{} I_sat={} A ({})",
-                    el.p, el.n, el.i_sat, el.ident)
-            },
-            Element::Isin(ref el) => {
-                write!(f, "Isin p:{} n:{} = {} + {} * sin(2pi {})",
-                    el.p, el.n, el.vo, el.va, el.freq)
-            },
-            Element::Vsin(ref el) => {
-                write!(f, "Vsin p:{} n:{} = {} + {} * sin(2pi {})",
-                    el.p, el.n, el.vo, el.va, el.freq)
-            },
-            Element::C(ref el) => {
-                write!(f, "C a:{} b:{} {} Farads ({})",
-                    el.a, el.b, el.value, el.ident)
-            },
-        }
-    }
-}
 
 /// Subcircuit Instantiation
 #[derive(Clone)]

@@ -10,10 +10,7 @@ pub mod analysis;
 pub mod engine;
 
 // Device Models
-pub mod diode;
-pub mod isine;
-pub mod vsine;
-pub mod capacitor;
+pub mod element;
 
 // Waveform dumper
 pub mod wavewriter;

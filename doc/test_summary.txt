@@ -1,4 +1,4 @@
-test diode::tests::curve_trace ... ok
+test element::diode::tests::curve_trace ... ok
 test spice_irrc ... ok
 test spice_irrrr ... ok
 test spice_reader ... ok

@@ -6,6 +6,7 @@ use crate::analysis;
 use crate::circuit;
 use crate::wavewriter::WaveWriter;
 
+/// Program execution trace macro - prefix `<engine>`
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints
