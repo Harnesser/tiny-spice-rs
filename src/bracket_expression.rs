@@ -4,6 +4,14 @@
 
 use std::fmt;
 
+/// Program execution trace macro - prefix `<bktexpr>`
+macro_rules! trace {
+    ($fmt:expr $(, $($arg:tt)*)?) => {
+        // uncomment the line below for tracing prints
+        println!(concat!("<bktexpr> ", $fmt), $($($arg)*)?);
+    };
+}
+
 /// Expression
 #[derive(Clone, Debug)]
 pub enum Expression {
@@ -27,18 +35,67 @@ impl fmt::Display for Expression {
 
 /// Extract a bracket expression
 pub fn extract_expression(text: &str) -> Option<Expression> {
-    if text.starts_with("{") {
-        println!("*ERROR* bracket expressions not supported yet");
+
+    if !text.starts_with("{") {
+        let val = extract_value(text);
+        if let Some(n) = val {
+            return Some(Expression::Literal(n));
+        } else {
+            println!("*ERROR* expected numerical literal in expression");
+            return None;
+        }
+    }
+
+    println!("*WARN* only expressions that are a single identifier are supported");
+
+    let expr_str: Vec<_> = text.chars().collect();
+
+    let mut i:usize = 0;
+
+    trace!("looking for '{{'");
+    if expr_str[i] == '{' {
+        i += 1
+    } else {
+        println!("*ERROR* - expected '{{'");
         return None
     }
 
-    let val = extract_value(text);
-    if let Some(n) = val {
-        Some(Expression::Literal(n))
+    while expr_str[i].is_whitespace() {
+        i += 1;
+        if i >expr_str.len() {
+            return None;
+        }
+    }
+
+    trace!("looking for identifier");
+    let mut ident_chars: Vec<char> = vec![];
+    while expr_str[i].is_ascii_alphanumeric() {
+        ident_chars.push(expr_str[i]);
+        i += 1;
+        if i > expr_str.len() {
+            return None;
+        }
+    }
+
+    let ident: String = ident_chars.into_iter().collect();
+
+    trace!("looking for '}}'");
+    while expr_str[i].is_whitespace() {
+        i += 1;
+        if i > expr_str.len() {
+            return None;
+        }
+    }
+
+    if expr_str[i] == '}' {
     } else {
-        println!("*ERROR* can't decode numerical literal in parameter");
+        println!("*ERROR* - expected '}}'");
         return None
     }
+
+    trace!("Identifier: '{}'", ident);
+
+    return Some(Expression::Identifier(ident))
 }
 
 

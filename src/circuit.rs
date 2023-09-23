@@ -22,13 +22,18 @@ macro_rules! trace {
     };
 }
 
-/// Index of a node in the matrix
-pub type NodeId = usize;
 
+/// Physical Constant: Boltzman
 pub const BOLTZMANN : f64 = 1.380_648_8e-23;
+
+/// Physical Constant: Charge of an Electron
 pub const CHARGE : f64 = 1.603e-19;
+
+/// Simulator Constant: Minimum Impedance between Nodes
 pub const GMIN : f64 = 1.0e-12;
 
+/// Index of a node in the matrix
+pub type NodeId = usize;
 
 
 /// Subcircuit Instantiation

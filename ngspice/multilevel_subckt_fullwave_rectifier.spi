@@ -8,6 +8,8 @@ V1 vstack1 gnd     SIN(0 5 1e3) ; input voltage
 V2 vstack2 vstack1 SIN(0 2 2e3)
 V3 IN_p vstack2    SIN(0 1 3e3)
 
+*V1 IN_p gnd         SIN(0 5 1e3) ; input voltage
+
 * full-wave rectifier
 .subckt bridge bp bn ba bb 
 

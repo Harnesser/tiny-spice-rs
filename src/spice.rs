@@ -194,20 +194,23 @@ impl Reader {
                         self.ckts[self.c].add_v_sin(src);
                     }
                 } else if bits[0].starts_with('R') {
-                    let ident = extract_identifier(bits[0]);
-                    let node1 = self.extract_node(bits[1]);
-                    let node2 = self.extract_node(bits[2]);
-                    let value = extract_value(bits[3]);
-                    self.ckts[self.c].add_r(ident, node1, node2, value.unwrap());
+                    if let Some(r) = self.extract_primitive(&bits, 2, 1) {
+                        self.ckts[self.c].add_instance(r);
+                    } else {
+                        println!("*ERROR* can't extract resistance");
+                    }
                 } else if bits[0].starts_with('C') {
-                    let ident = extract_identifier(bits[0]);
-                    let node1 = self.extract_node(bits[1]);
-                    let node2 = self.extract_node(bits[2]);
-                    let value = extract_value(bits[3]);
-                    self.ckts[self.c].add_c(ident, node1, node2, value.unwrap());
+                    if let Some(c) = self.extract_primitive(&bits, 2, 1) {
+                        self.ckts[self.c].add_instance(c);
+                    } else {
+                        println!("*ERROR* can't extract capacitor");
+                    }
                 } else if bits[0].starts_with('D') {
-                    let d = self.extract_diode(&bits);
-                    self.ckts[self.c].add_d(d);
+                    if let Some(d) = self.extract_primitive(&bits, 2, 0) {
+                        self.ckts[self.c].add_instance(d);
+                    } else {
+                        println!("*ERROR* can't extract diode");
+                    }
                 } else if bits[0].starts_with('X') {
                     trace!("Found instantiation");
                     let inst = self.extract_instance(&bits);
@@ -242,7 +245,7 @@ impl Reader {
                                     println!("*ERROR* can't extract parameter");
                                     self.there_are_errors = true;
                                 }
-                                continue; // FIXME: should be a break
+                                continue;
                             }
                             self.ckts[self.c].add_node(nn);
                             num_ports += 1;
@@ -500,6 +503,50 @@ impl Reader {
             self.there_are_errors = true;
             None
         }
+    }
+
+    /// Extract an instantiation of a device primitive
+    pub fn extract_primitive(
+        &mut self,
+        bits: &[&str],
+        num_ports: usize,
+        num_params: usize
+    )
+        -> Option<Instance>
+    {
+        trace!("extracting primitive device");
+
+        if bits.len() < (1 + num_ports + num_params) {
+            println!("*ERROR* not enough bits");
+            return None
+        }
+
+        let ident = extract_identifier(bits[0]);
+        let mut inst = Instance::new(&ident, r"/device");
+        let mut i = 1;
+
+        for _j in 0..num_ports {
+            let node = self.extract_node(bits[i]);
+            inst.conns.push(node);
+            i += 1;
+        }
+
+        // parameters - treat num_params as a minimum
+        let mut p = 0;
+        for j in i..bits.len() {
+            let name = format!("param{}", p);
+            if let Some(expr) = extract_expression(bits[j]) {
+                let param = Parameter::from_expression(&name, &expr);
+                inst.params.push(param);
+            } else {
+                println!("*WARN* or maybe an err, i dunno");
+            }
+            p += 1;
+        }
+
+        trace!("Primitive: {}", inst);
+
+        Some(inst)
     }
 
 

@@ -3,7 +3,7 @@ test spice_irrc ... ok
 test spice_irrrr ... ok
 test spice_reader ... ok
 test spice::tests::multilevel_subckt_counts ... FAILED
-test spice::tests::simple_read_count_nodes ... ok
+test spice::tests::simple_read_count_nodes ... FAILED
 test spice::tests::simple_read_count_voltage_sources ... ok
 test spice::tests::simple_subckt_counts ... FAILED
 test test_dc_bridge_loaded_2v0 ... ok
