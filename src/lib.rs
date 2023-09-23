@@ -1,6 +1,8 @@
 //! Tiny-Spice-RS - A teeny weeny SPICE circuit simulator
 
 // Circuit and Analysis Datastructures
+pub mod parameter;
+pub mod bracket_expression;
 pub mod circuit;
 pub mod analysis;
 

@@ -1,4 +1,4 @@
-// Sinusoidal Current Source
+//! Sinusoidal Voltage Source Implementation
 
 use crate::circuit::{NodeId};
 use std::f64::consts::PI;

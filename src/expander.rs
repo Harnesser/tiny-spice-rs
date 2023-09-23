@@ -1,8 +1,44 @@
-//! Expand all the subcircuits
+//! Expand all the Subcircuits
+//!
+//! This crate has a bunch of routines to expand all the subcircuits from
+//! the toplevel down. The toplevel circuit is what is described in the
+//! SPICE deck, with the subcircuits being all the `Xsubckt1 ...`
+//! instantiations.
+//!
+//! Work recursively from a clone of the toplevel schematic datastructure -
+//! the "toplevel clone". At each level of hierarchy, add the circuit elements
+//! from the subciruit to the toplevel clone.
+//!
+//! Instance names and netnames created in subciruits are renamed so the
+//! identifiers include the hierarchy. For example, if a node called `out`
+//! is needed for a circuit at hierarchy `X1.X1.X3` then a new node will
+//! be created called `X1.X2.X3.out` and assigned a new `NodeId`.
+//!
+//! For ports, node aliases are added to the node list of the toplevel
+//! clone. The new node name has the hierarchical prefix. The `NodeId`
+//! is looked up from the connections in the instantiation.
+//!
+//! For example, consider the instantiation and subcircuit definition below:
+//!
+//! ```spice
+//! X1 node1 node2 my_subckt
+//!
+//! .subckt my_subckt port1 port2
+//!    ...blah...
+//! .ends
+//! ```
+//!
+//! The subcircuit's `port1` is connected to node `node1` in the above
+//! subcircuit. We look up the `NodeId` for `node1` and find that it is
+//! 69. We add this node alias to the node list of the toplevel clone:
+//! `X1.port1 = 69`.
+//!
+//! If we find the subcircuit has subcircuits of its own, we push to the
+//! hierarchy name stack and expand that subcircuit into the toplevel
+//! clone.
 
 use crate::circuit::{Circuit, Instance, Element};
 use crate::circuit::{NodeId};
-
 
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
@@ -11,10 +47,15 @@ macro_rules! trace {
     };
 }
 
-
 /// Expand subcircuits.
 ///
-/// Circuit [0] is the toplevel.
+/// This takes a list of subcircuits and returns a single `Circuit`
+/// datastructure. The first circuit in the list is taken as the toplevel,
+/// and all its subcircuits and all their subciruits are expanded into a
+/// single circuit.
+///
+/// Since we don't know the hierarchy of the circuit up-front, this
+/// function kicks off a cascade of recursive calls to `expand_subckt()`.
 pub fn expand(ckts: &[Circuit]) -> Circuit {
 
     let mut ckt = ckts[0].clone();
@@ -26,7 +67,7 @@ pub fn expand(ckts: &[Circuit]) -> Circuit {
 
     ckt.build_node_id_lut();
     ckt
-    
+
 }
 
 
@@ -160,7 +201,6 @@ fn expand_subckt(
                         ckt.elements.push(Element::D(diode));
                     },
 
-
                     _ => {},
                 }
 
@@ -173,6 +213,9 @@ fn expand_subckt(
 
 
 /// Find the index of the subcircuit called `name`.
+///
+/// `N` is small, so just search the circuit list one by one until
+/// a name match is found.
 fn find_subckt_index(ckts: &[Circuit], name: &str) -> Option<usize> {
     for (i, ckt) in ckts.iter().enumerate() {
         if ckt.name == name {
@@ -184,6 +227,7 @@ fn find_subckt_index(ckts: &[Circuit], name: &str) -> Option<usize> {
 
 
 /// Connect a subcircuit element port
+///
 /// Find out if there's an existing node that should be connected to,
 /// (port) or create a new node to connect to (internal node).
 fn connect(

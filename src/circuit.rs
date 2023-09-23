@@ -2,6 +2,8 @@
 use std::fmt;
 use std::collections::HashMap;
 
+pub use crate::parameter::Parameter;
+
 pub use crate::diode::Diode;
 pub use crate::isine::CurrentSourceSine;
 pub use crate::vsine::VoltageSourceSine;
@@ -98,53 +100,6 @@ impl fmt::Display for Element {
     }
 }
 
-/// Expression
-#[derive(Clone, Debug)]
-pub enum Expression {
-    Literal(f64),
-    Identifier(String),
-}
-
-impl fmt::Display for Expression {
-    fn fmt (&self, f:&mut fmt::Formatter) -> fmt::Result {
-        match *self {
-            Expression::Literal(ref p) => {
-                write!(f, "{}", p)
-            },
-            Expression::Identifier(ref p) => {
-                write!(f, "Identifier({})", p)
-            },
-        }
-    }
-}
-
-
-
-
-/// Parameter
-#[derive(Clone, Debug)]
-pub struct Parameter {
-    pub name: String,
-    pub defval: f64,
-    pub expr: Expression,
-    pub value: f64,
-}
-
-impl Parameter {
-
-    pub fn from_declaration(name: &str, expr:&Expression) -> Self {
-        Parameter {
-            name: name.to_string(),
-            defval: 234.0,
-            expr: expr.clone(),
-            value: 0.0
-        }
-
-    }
-
-}
-
-
 /// Subcircuit Instantiation
 #[derive(Clone)]
 pub struct Instance {
@@ -222,7 +177,7 @@ impl Circuit {
     /// List the parameters of the circuit
     pub fn list_parameters(&self) {
         for param in &self.params {
-            println!(" param: {} = {} ", param.name, param.expr);
+            println!(" param: {} = {:?} ", param.name, param.expr);
         }
     }
 

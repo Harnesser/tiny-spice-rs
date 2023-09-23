@@ -1,3 +1,5 @@
+//! Capacitor Implementation
+
 use crate::circuit::{NodeId};
 
 #[derive(Clone)]
@@ -26,6 +28,10 @@ impl Capacitor {
         let g_eq = self.value / t_delta;
         let i_eq = g_eq * v_prev;
         (g_eq, i_eq)
+    }
+
+    pub fn get_value(&self) -> f64 {
+        0.0
     }
 
 }

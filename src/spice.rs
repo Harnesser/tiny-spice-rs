@@ -1,27 +1,31 @@
 //! Read a SPICE Deck
 //!
-//! Supported:
-//! 1. Initial comment line
-//! 2. Components:
+//! Tiny-Spice-rs supports reading the the following circuit things from a
+//! SPICE deck description of a circuit.
+//!
+//! * Initial comment line
+//! * Components:
 //!   * Voltage source : `V<ident> <n+> <n-> <value>`
 //!   * Current source : `I<ident> <n+> <n-> <value>`
 //!   * Resistor : `R<ident> <n1> <n2> <value>`
-//! 3. Node names:
-//!   * Integers for now
-//! 4. Values:
-//!   * floating point with optional engineering scaler and unit
-//! 5. Control Blocks:
+//! * Node names:
+//!   * Integers (e.g. `23`) or text (e.g. `node_3452`)
+//!   * As usual, `0` , `gnd` and `GND` are aliases
+//! * Values:
+//!   * Numbers (e.g `400` or `420.69`
+//!   * Numbers with optional engineering scaler (e.g. `10k` or `10.5u`)
+//! * Control Blocks:
 //!   Only one operation for now - no sequences
 //!   * DC Operating Point `op`
 //!   * Transient : `trans <t_step> <t_stop> [t_start]`
 //!     * for now, `t_start` is ignored
-//! 6. Options (in Control Blocks)
+//! * Options (in Control Blocks)
 //!   * Options: `option <OPTION_NAME> = <value>`
 //!     * `ABSTOL`
 //!     * `RELTOL`
-//! 7. Subcircuits
+//! * Subcircuits
 //!   * Subcircuit definitions with `.subckt` and `.ends`
-//!   * Instantiations with `X....`
+//!   * Instantiations with `X...`
 
 use std::path::Path;
 use std::fs::File;
@@ -29,10 +33,13 @@ use std::io::{BufReader, BufRead};
 
 use crate::circuit::{Circuit, Diode, CurrentSourceSine, VoltageSourceSine};
 use crate::circuit::{Instance};
-use crate::circuit::{Parameter, Expression};
+use crate::parameter::{Parameter};
+use crate::bracket_expression::{extract_expression, extract_value};
+
 use crate::analysis::{Configuration, Kind};
 use crate::expander;
 
+/// Program execution trace macro
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints
@@ -41,14 +48,14 @@ macro_rules! trace {
 }
 
 
-/// Datastructure to info parsed from the SPICE deck
+/// Datastructure for info parsed from the SPICE deck
 pub struct Reader {
     /// Circuit information
     /// `ckts[0]` is the toplevel
     ckts: Vec<Circuit>,
     /// Options and analysis commands
     cfg: Configuration,
-    /// Irack which (sub)circuit we're adding things too.
+    /// Track which circuit in the `ckts` list that we're adding things too
     c: usize,
     /// Flag if problems were encountered during parsing
     there_are_errors: bool
@@ -58,6 +65,7 @@ pub struct Reader {
 impl Reader {
 
     #[allow(clippy::new_without_default)]
+    /// Initialise with an empty toplevel circuit
     pub fn new() -> Reader {
         let topckt = Circuit::new();
         Reader {
@@ -68,7 +76,7 @@ impl Reader {
         }
     }
 
-    /// Open and read a SPICE deck
+    /// Read and parse a SPICE deck
     pub fn read(&mut self, filename :&Path) -> bool {
 
         let input = File::open(filename).unwrap();
@@ -228,8 +236,12 @@ impl Reader {
                         for nn in bits.iter().skip(2) {
                             if nn.contains("=") {
                                 trace!("Found parameter: {}", nn);
-                                let param = self.extract_parameter(nn);
-                                self.ckts[self.c].params.push(param);
+                                if let Some(param) = self.extract_parameter(nn) {
+                                    self.ckts[self.c].params.push(param);
+                                } else {
+                                    println!("*ERROR* can't extract parameter");
+                                    self.there_are_errors = true;
+                                }
                                 continue; // FIXME: should be a break
                             }
                             self.ckts[self.c].add_node(nn);
@@ -398,7 +410,7 @@ impl Reader {
 
     /// Parse an instantiation line
     ///
-    /// 2nd last non-<ident>=<value> bit is the subcircuit name
+    /// 2nd last non-`<ident>=<value>` bit is the subcircuit name
     pub fn extract_instance(&mut self,  bits: &[&str]) -> Instance {
         // If we're here, we know bits[0] starts with 'X'
         // fuckit, we'll just leave the x in the inst name...
@@ -407,15 +419,19 @@ impl Reader {
         let mut inst = Instance::new(ident, "(not-found)");
 
         // Paramters, if there are any
-        // Search back from the end of the `bits` list until we find the first 
+        // Search back from the end of the `bits` list until we find the first
         // text section without an "=" sign. This is the subcircuit name.
-        // This all assumes that there are no spaces around the equals sign in 
+        // This all assumes that there are no spaces around the equals sign in
         // "<ident>=<expr>".
         let mut subckt_id = 0;
         for i in (0..bits.len()).rev() {
             if bits[i].contains("=") {
-                let param = self.extract_parameter(bits[i]);
-                inst.add_parameter(&param);
+                if let Some(param) = self.extract_parameter(bits[i]) {
+                    inst.add_parameter(&param);
+                } else {
+                    println!("*ERROR* paraeter in instance bad");
+                    self.there_are_errors = true;
+                }
             } else {
                 subckt_id = i;
                 break;
@@ -434,7 +450,10 @@ impl Reader {
     }
 
 
-    /// Nodes are integers (for now)
+    /// Extract a SPICE node identifier from a lump text
+    ///
+    /// Node identifiers can be integers or strings, e.g. both `69` and
+    /// `bridge_output_234234` are valid node names
     ///
     /// This:
     /// * Parses the node name from the SPICE file
@@ -464,33 +483,22 @@ impl Reader {
     }
 
     /// Extract a parameter definition from a `.subckt` line
-    pub fn extract_parameter(&mut self, text: &str) -> Parameter {
+    pub fn extract_parameter(&mut self, text: &str) -> Option<Parameter> {
         // mut is for `there are errors`
         let bits: Vec<_> = text.split("=").collect();
         if bits.len() != 2 {
             println!("*ERROR* expected <ident>=<expr>");
             self.there_are_errors = true;
+            return None
         }
+
         let name = extract_identifier(bits[0]);
-        let expr = self.extract_expression(bits[1]);
-        Parameter::from_declaration(&name, &expr)
-    }
-
-
-    /// Extract a bracket expression
-    pub fn extract_expression(&mut self, text: &str) -> Expression {
-        if text.starts_with("{") {
-            println!("*ERROR* bracket expressions not supported yet");
-            self.there_are_errors = true;
-            return Expression::Literal(1.111111111)
-        }
-
-        let val = extract_value(text);
-        if let Some(n) = val {
-            Expression::Literal(n)
+        if let Some(expr) = extract_expression(bits[1]) {
+            Some(Parameter::from_expression(&name, &expr))
         } else {
-            println!("*ERROR* can't decode numerical literal in parameter");
-            Expression::Literal(2.2222222222)
+            println!("*ERROR* expected <ident>=<expr>");
+            self.there_are_errors = true;
+            None
         }
     }
 
@@ -517,166 +525,6 @@ impl Reader {
 fn extract_identifier(text: &str) -> String {
     text.to_string()
 }
-
-
-#[derive(Debug)]
-enum ValueState {
-    Start,
-    Int,
-    Frac,
-    ExpStart, // '+' | '-' | digit
-    Exp, // digit
-    Unit,
-}
-
-// possibilities:
-// * 10
-// * 10.0
-// * 10.0m
-// * 10.0meg [not implemented]
-// * 10mA
-// * 10.0megV [not implemented]
-// * 10.0e-6 [not implemented]
-// * 10.0e-6V [not implemented]
-//
-// Supported engineering: k m u n p (future: meg f)
-// Supported units: NONE (future:  A V F s)
-fn extract_value(text: &str) -> Option<f64> {
-    let mut value: Option<f64> = None;
-    let mut float_str = "".to_string();
-    let mut c: char;
-    let mut state = ValueState::Start;
-    let mut nxt;
-    let mut eng_mult :f64 = 1.0;
-
-    //println!("VALUE: '{}'", text);
-    let mut text_iter = text.chars();
-
-    fn eval( txt :&str, mult: f64) -> Option<f64> {
-        Some( txt.parse::<f64>().unwrap() * mult )
-    }
-
-    'things: loop {
-
-        if let Some(c_) = text_iter.next() {
-            c = c_;
-        } else {
-            break 'things;
-        }
-        //println!(" {:?} '{}'", state, c);
-        match state {
-
-            ValueState::Start => {
-                match c {
-                    '+' | '-' => { float_str.push(c); nxt = ValueState::Int },
-                    '0' ..= '9' => { float_str.push(c); nxt = ValueState::Int },
-                    _ => break 'things
-                }
-            },
-
-            ValueState::Int => {
-                match c {
-                    '0' ..= '9' => { float_str.push(c); nxt = ValueState::Int },
-                    '.' => { float_str.push(c); nxt = ValueState::Frac },
-                    'e' => { float_str.push(c); nxt = ValueState::ExpStart },
-                    'k' => {
-                        eng_mult = 1e3;
-                        value = eval(&float_str, eng_mult);
-                        nxt = ValueState::Unit
-                    },
-                    'm' => {
-                        eng_mult = 1e-3;
-                        value = eval(&float_str, eng_mult);
-                        nxt = ValueState::Unit
-                    },
-                    'u' => {
-                        eng_mult = 1e-6;
-                        value = eval(&float_str, eng_mult);
-                        nxt = ValueState::Unit
-                    },
-                    'n' => {
-                        eng_mult = 1e-9;
-                        value = eval(&float_str, eng_mult);
-                        nxt = ValueState::Unit
-                    },
-                    'p' => {
-                        eng_mult = 1e-12;
-                        value = eval(&float_str, eng_mult);
-                        nxt = ValueState::Unit
-                    },
-                    _ => break 'things
-                }
-            },
-
-            ValueState::Frac => {
-                match c {
-                    '0' ..= '9' => { float_str.push(c); nxt = ValueState::Frac },
-                    'e' => { float_str.push(c); nxt = ValueState::ExpStart },
-                    'k' => {
-                        eng_mult = 1e3;
-                        value = eval(&float_str, eng_mult);
-                        nxt = ValueState::Unit
-                    },
-                    'm' => {
-                        eng_mult = 1e-3;
-                        value = eval(&float_str, eng_mult);
-                        nxt = ValueState::Unit
-                    },
-                    'u' => {
-                        eng_mult = 1e-6;
-                        value = eval(&float_str, eng_mult);
-                        nxt = ValueState::Unit
-                    },
-                    'n' => {
-                        eng_mult = 1e-9;
-                        value = eval(&float_str, eng_mult);
-                        nxt = ValueState::Unit
-                    },
-                    'p' => {
-                        eng_mult = 1e-12;
-                        value = eval(&float_str, eng_mult);
-                        nxt = ValueState::Unit
-                    },
-                    _ => break 'things
-                }
-            },
-
-            ValueState::ExpStart => {
-                match c {
-                    '+' | '-' => { float_str.push(c); nxt = ValueState::Exp },
-                    '0' ..= '9' => { float_str.push(c); nxt = ValueState::Exp },
-                    _ => break 'things
-                }
-            },
-
-            ValueState::Exp => {
-                match c {
-                    '0' ..= '9' => { float_str.push(c); nxt = ValueState::Exp },
-                    _ => break 'things
-                }
-            },
-
-            ValueState::Unit => {
-                break 'things
-            },
-        }
-
-        //println!(" -> {:?} '{}'", nxt, float_str);
-        state = nxt;
-    }
-
-    // if we've broken out of the loop at a point where the gathered
-    // string might be a valid number, calculate it.
-    match state {
-        ValueState::Int | ValueState::Frac | ValueState::Exp => {
-            value = eval(&float_str, eng_mult)
-        },
-        _ => {}
-    }
-
-    value
-}
-
 
 #[cfg(test)]
 mod tests {

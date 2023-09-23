@@ -1,6 +1,6 @@
-/// SPICE Engine
-///
-/// Contains the stamper, solver and convergence checkers
+//! SPICE Ionsamhlóir Ciorcaid
+//!
+//! Contains the stamper, solver and convergence checkers
 
 use crate::analysis;
 use crate::circuit;

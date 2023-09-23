@@ -1,3 +1,5 @@
+//! Diode Implementation
+
 use std::cell::Cell;
 use crate::circuit::{NodeId, BOLTZMANN, CHARGE, GMIN};
 

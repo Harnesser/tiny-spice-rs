@@ -27,9 +27,9 @@ V3 IN_p vstack2    SIN(0 1 3e3)
 
 * Load
 .subckt load in1 in2 out cval=1uF rtval=100 rbval=1k
-  Cl in1 in2 1uF ; {cval}
-  Rtop in1 out 100 ;{rtval}
-  Rbot out in2 1k  ;{rbval}
+  Cl in1 in2 {cval}
+  Rtop in1 out {rtval}
+  Rbot out in2 {rbval}
 .ends
 
 Xbrigde1 IN_p gnd vp1 vn1 bridge

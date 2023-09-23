@@ -1,3 +1,8 @@
+//! Circuit Analysis Commands
+//!
+//! Datastructures to hold circuit analysis job types and associated
+//! parameters.
+
 use std::fmt;
 
 #[derive(Clone)]
