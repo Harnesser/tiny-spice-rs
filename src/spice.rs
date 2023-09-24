@@ -31,7 +31,7 @@ use std::path::Path;
 use std::fs::File;
 use std::io::{BufReader, BufRead};
 
-use crate::circuit::{Circuit, Diode, CurrentSourceSine, VoltageSourceSine};
+use crate::circuit::{Circuit, CurrentSourceSine, VoltageSourceSine};
 use crate::circuit::{Instance};
 use crate::parameter::{Parameter};
 use crate::bracket_expression::{extract_expression, extract_value};
@@ -237,7 +237,7 @@ impl Reader {
                         // the port names are nodes in the subckt
                         let mut num_ports = 0;
                         for nn in bits.iter().skip(2) {
-                            if nn.contains("=") {
+                            if nn.contains('=') {
                                 trace!("Found parameter: {}", nn);
                                 if let Some(param) = self.extract_parameter(nn) {
                                     self.ckts[self.c].params.push(param);
@@ -287,23 +287,6 @@ impl Reader {
 
         self.there_are_errors
     }
-
-    /// Parse a diode SPICE instantiation
-    fn extract_diode(&mut self, bits: &[&str]) -> Diode {
-        let i_sat = 1e-9;
-        let tdegc = 27.0;
-        let _ = extract_identifier(bits[0]);
-        let node1 = self.extract_node(bits[1]);
-        let node2 = self.extract_node(bits[2]);
-        //let value = extract_value(&bits[3]);
-
-        #[allow(clippy::manual_range_contains)]
-        if (i_sat < 0.0) || (i_sat > 1e-6) {
-            println!("*WARN* check diode saturation current. It seems weird");
-        }
-        Diode::new(bits[0], node1, node2, i_sat, tdegc)
-    }
-
 
     // only support one parameter per option line
     /// Parse a control block option command
@@ -428,7 +411,7 @@ impl Reader {
         // "<ident>=<expr>".
         let mut subckt_id = 0;
         for i in (0..bits.len()).rev() {
-            if bits[i].contains("=") {
+            if bits[i].contains('=') {
                 if let Some(param) = self.extract_parameter(bits[i]) {
                     inst.add_parameter(&param);
                 } else {
@@ -488,7 +471,7 @@ impl Reader {
     /// Extract a parameter definition from a `.subckt` line
     pub fn extract_parameter(&mut self, text: &str) -> Option<Parameter> {
         // mut is for `there are errors`
-        let bits: Vec<_> = text.split("=").collect();
+        let bits: Vec<_> = text.split('=').collect();
         if bits.len() != 2 {
             println!("*ERROR* expected <ident>=<expr>");
             self.there_are_errors = true;
@@ -510,13 +493,13 @@ impl Reader {
         &mut self,
         bits: &[&str],
         num_ports: usize,
-        num_params: usize
+        min_num_params: usize
     )
         -> Option<Instance>
     {
         trace!("extracting primitive device");
 
-        if bits.len() < (1 + num_ports + num_params) {
+        if bits.len() < (1 + num_ports + min_num_params) {
             println!("*ERROR* not enough bits");
             return None
         }
@@ -531,17 +514,17 @@ impl Reader {
             i += 1;
         }
 
-        // parameters - treat num_params as a minimum
-        let mut p = 0;
-        for j in i..bits.len() {
+        // parameters
+        // going by the calculations above, there should be a minimum number
+        // of parameters we expect to parse
+        for (p, param_text) in bits.iter().skip(i).enumerate() {
             let name = format!("param{}", p);
-            if let Some(expr) = extract_expression(bits[j]) {
+            if let Some(expr) = extract_expression(param_text) {
                 let param = Parameter::from_expression(&name, &expr);
                 inst.params.push(param);
             } else {
                 println!("*WARN* or maybe an err, i dunno");
             }
-            p += 1;
         }
 
         trace!("Primitive: {}", inst);
@@ -550,11 +533,10 @@ impl Reader {
     }
 
 
-    /// Return reference to the completed circuit datastructures
-    /// Should I create the toplevel here?
-    /// I think I should create the toplevel here...
-    // I can't figure out how to implement `Copy`, so can I update
-    // the toplevel circuit directly? I needed to make things `Clone`.
+    /// Return a circuit that is the expansion of the toplevel circuit
+    ///
+    /// The toplevel circuit instantiations are resolved with all subcircuit
+    /// elements hoisted up into a clone of the toplevel circuit.
     pub fn get_expanded_circuit(&self) -> Circuit {
         expander::expand(&self.ckts)
     }

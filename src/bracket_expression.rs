@@ -36,7 +36,7 @@ impl fmt::Display for Expression {
 /// Extract a bracket expression
 pub fn extract_expression(text: &str) -> Option<Expression> {
 
-    if !text.starts_with("{") {
+    if !text.starts_with('{') {
         let val = extract_value(text);
         if let Some(n) = val {
             return Some(Expression::Literal(n));
@@ -95,7 +95,7 @@ pub fn extract_expression(text: &str) -> Option<Expression> {
 
     trace!("Identifier: '{}'", ident);
 
-    return Some(Expression::Identifier(ident))
+    Some(Expression::Identifier(ident))
 }
 
 

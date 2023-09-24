@@ -192,7 +192,6 @@ fn expand_primitive(
     let mut hier = inhier.to_owned();
 
     println!("{}", inst);
-    let mut subckt_id = 0;
 
     hier.push(inst.name.to_string());
     let ident = hier.join(".");
@@ -218,54 +217,8 @@ fn expand_primitive(
     } else {
         println!("*ERROR* Unrecognised primitive");
     }
-
-    /*
-    for subckt_el in &ckts[subckt_id].elements {
-            trace!(" Element: {}", subckt_el);
-
-            match subckt_el {
-
-                Element::R(subckt_res) => {
-                },
-
-                Element::C(subckt_cap) => {
-                    trace!("Found a capacitor subcircuit element");
-
-                    // Copy element, cos we have to tweak the nodeids for its ports
-                    let mut cap = subckt_cap.clone();
-                    hier.push(cap.ident);
-                    cap.ident = hier.join(".");
-                    hier.pop();
-
-                    cap.a = connect(ckts, ckt, inst, host_ckt_id,
-                        subckt_id, &hier, subckt_cap.a);
-                    cap.b = connect(ckts, ckt, inst, host_ckt_id,
-                        subckt_id, &hier, subckt_cap.b);
-                    ckt.elements.push(Element::C(cap));
-                },
-
-                Element::D(subckt_diode) => {
-                    trace!("Found a diode subcircuit element");
-
-                    // Copy element, cos we have to tweak the nodeids for its ports
-                    let mut diode = subckt_diode.clone();
-                    hier.push(diode.ident);
-                    diode.ident = hier.join(".");
-                    hier.pop();
-
-                    diode.p = connect(ckts, ckt, inst, host_ckt_id,
-                        subckt_id, &hier, subckt_diode.p);
-                    diode.n = connect(ckts, ckt, inst, host_ckt_id,
-                        subckt_id, &hier, subckt_diode.n);
-                    ckt.elements.push(Element::D(diode));
-                },
-
-                _ => {},
-            }
-    }
-*/
-
 }
+
 
 
 /// Find the index of the subcircuit called `name`.
@@ -280,51 +233,6 @@ fn find_subckt_index(ckts: &[Circuit], name: &str) -> Option<usize> {
     }
     None
 }
-
-
-/// Connect a subcircuit element port
-///
-/// Find out if there's an existing node that should be connected to,
-/// (port) or create a new node to connect to (internal node).
-fn connect(
-    ckts: &[Circuit],
-    ckt: &mut Circuit,
-    inst: &Instance,
-    host_ckt_id: usize,
-    subckt_id: usize,
-    inhier: &[String],
-    subckt_nid: NodeId,
-) -> NodeId {
-
-    let mut hier = inhier.to_owned();
-
-    if subckt_nid > ckts[subckt_id].num_ports {
-        let local_node_name = &ckts[subckt_id].node_id_lut[&subckt_nid];
-        hier.push(local_node_name.to_string());
-        let node_name = hier.join(".");
-        _ = hier.pop();
-
-        let nid = ckt.add_node(&node_name);
-        trace!("Connected an internal subckt node: '{}' -> {}", node_name, nid);
-        nid
-    } else {
-        // we have a port
-        // create a node alias to the port
-        // 1. find the netname in the host circuit
-        let hnid = inst.conns[subckt_nid-1];
-        hier.pop();
-        let local_node_name = &ckts[host_ckt_id].node_id_lut[&hnid];
-        hier.push(local_node_name.to_string());
-        let node_name = hier.join(".");
-        _ = hier.pop();
-        hier.push(inst.name.to_string());
-
-        let nid = ckt.add_node(&node_name); // should exist
-        trace!("Connected a subckt port: '{}' -> {}", node_name, nid);
-        nid
-    }
-}
-
 
 /// Connect a primitive
 fn local_connect(
