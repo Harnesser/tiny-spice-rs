@@ -45,6 +45,9 @@ use crate::element::resistor::Resistor;
 use crate::element::capacitor::Capacitor;
 use crate::element::diode::Diode;
 
+use crate::parameter::Parameter;
+use crate::bracket_expression::{Expression};
+
 /// Program execution trace macro - prefix `<expand>`
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
@@ -86,14 +89,51 @@ fn expand_instances(
     println!("-- Deal with instances of maybe subcircuits ---------");
     let insts: &Vec<Instance> = &ckts[ckt_id].instances.clone();
 
+    let mut hier = inhier.to_owned();
+
     for inst in insts {
+
+        // resolve the parameters at this level
+        // add the parameter to the main circuits parameter list in the same style
+        // as for nodes: prefixed with the hierarchy...
+        hier.push(inst.name.to_string());
+        for p in &inst.params {
+            hier.push(p.name.to_string());
+
+            let value = match p.expr {
+
+                Some(Expression::Literal(val)) => {
+                    val
+                },
+
+                _ => {
+                    panic!("I'm getting to old for this shit");
+                }
+            };
+
+            let param_full_name = hier.join(".");
+            trace!("Considering: {} = {}", param_full_name, value);
+            ckt.params.push( Parameter {
+                name: param_full_name,
+                defval: None,
+                expr: None,
+                value: Some(value),
+            });
+
+            hier.pop();
+        }
+
+        // now we can expand primitives...
         if inst.subckt == "/device" {
             expand_primitive(ckts, ckt, ckt_id, inst, inhier);
         } else {
+            // ... and subcircuits
             let mut hier = inhier.to_owned();
             hier.push(inst.name.to_string());
             expand_subckt(ckts, ckt, ckt_id, inst, &hier);
         }
+
+        hier.pop();
     }
 }
 
@@ -109,7 +149,7 @@ fn expand_subckt(
 
     let mut hier = inhier.to_owned();
 
-    println!("{}", inst);
+    trace!("Expanding: {}", inst);
     let mut subckt_id = 0;
 
     // find the subckt definition index
@@ -129,7 +169,8 @@ fn expand_subckt(
         println!("have different port sizes");
     }
 
-    trace!("Subcircuit: index={}; name={}", subckt_id, ckts[subckt_id].name);
+    trace!("Subcircuit: index={}; subckt={}; idenr={}",
+           subckt_id, ckts[subckt_id].name, inst.name);
 
     // Add node aliases for all the ports
     for (n, hnid) in inst.conns.iter().enumerate() {
@@ -155,6 +196,11 @@ fn expand_subckt(
         //println!(" '{}' -> {} -> '{}'", full_port_name, top_nid, full_host_net_name);
         ckt.add_node_alias(&full_port_name, top_nid);
     }
+
+    // Resolve Parameters, somehow
+    trace!("Resolving parameters...");
+    println!(" Host  : {:?}", ckts[host_ckt_id].params);
+    println!(" Subckt: {:?}", ckts[subckt_id].params);
 
     expand_instances(ckts, ckt, subckt_id, &hier);
     _ = hier.pop();
@@ -193,20 +239,49 @@ fn expand_primitive(
 
     println!("{}", inst);
 
-    hier.push(inst.name.to_string());
+    hier.push(inst.name.to_string()); // push the primitive local idenitifer
     let ident = hier.join(".");
-    hier.pop();
 
+    hier.pop();
     let n1 = local_connect(ckts, ckt, host_ckt_id, &hier, inst.conns[0]);
     let n2 = local_connect(ckts, ckt, host_ckt_id, &hier, inst.conns[1]);
+    hier.push(inst.name.to_string());
 
     if inst.name.starts_with('R') {
         trace!("Found a resistor primitive");
-        let res = Resistor {ident, a: n1, b: n2, value: 100.0 };
+        assert!(!inst.params.is_empty());
+
+        hier.push("/param0".to_string());
+        let param_full_name = hier.join(".");
+        hier.pop();
+
+        let param_lut = get_param_value(ckt, &param_full_name);
+        let value = if let Some(rval) = param_lut {
+            rval
+        } else {
+            println!("Can't find {}", param_full_name);
+            panic!("*FATAL* Value for R was not resolved");
+        };
+
+        let res = Resistor {ident, a: n1, b: n2, value};
         ckt.elements.push(Element::R(res));
     } else if inst.name.starts_with('C') {
         trace!("Found a capacitor primitive");
-        let cap = Capacitor {ident, a: n1, b: n2, value: 10e-6 };
+        assert!(!inst.params.is_empty());
+
+        hier.push("/param0".to_string());
+        let param_full_name = hier.join(".");
+        hier.pop();
+
+        let param_lut = get_param_value(ckt, &param_full_name);
+        let value = if let Some(cval) = param_lut {
+            cval
+        } else {
+            println!("Can't find {}", param_full_name);
+            panic!("*FATAL* Value for C was not resolved");
+        };
+
+        let cap = Capacitor {ident, a: n1, b: n2, value };
         ckt.elements.push(Element::C(cap));
     } else if inst.name.starts_with('D') {
         trace!("Found a diode primitive");
@@ -215,8 +290,12 @@ fn expand_primitive(
         let diode = Diode::new(&ident, n1, n2, i_sat, tdegc);
         ckt.elements.push(Element::D(diode));
     } else {
-        println!("*ERROR* Unrecognised primitive");
+        println!("*ERROR* Unrecognised primitive '{}'", inst.name);
+        panic!("*FATAL*");
     }
+
+    // should pop the primitive local instance name
+    hier.pop();
 }
 
 
@@ -229,6 +308,18 @@ fn find_subckt_index(ckts: &[Circuit], name: &str) -> Option<usize> {
     for (i, ckt) in ckts.iter().enumerate() {
         if ckt.name == name {
             return Some(i);
+        }
+    }
+    None
+}
+
+/// Find a parameter value
+///
+/// `N` is small..
+fn get_param_value(ckt: &Circuit, name: &str) -> Option<f64> {
+    for p in &ckt.params {
+        if p.name == name {
+            return p.value
         }
     }
     None

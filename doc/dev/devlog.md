@@ -2,6 +2,31 @@
 
     This is a personal project. It does not have to be rigourously tested.
 
+## 2023-09-23 Parameters - Numerical Literals
+Refactored the `multi_` subcircuit example to have 3 instantiations of the
+`system`. A system is:
+* A diode bridge subckt.
+* A series resistor, just to get a new node in the system
+* A resistor load `r_load` where the resistance is split up, again to
+  get more nodes in the system.
+
+Each system has a different cap load. I'm running the sim to 5 ms which isn't
+that fast, tbh. A profiling job later?
+
+Can I get numeric literals for the primitives working again?
+
+## 2023-09-23 Parameters for Primitives
+Decided to keep primitive instantiations as actual instantiations until the
+circuit expansion phase. This means I can keep expressions in the instantiations,
+but the primitives themselves just have a value. I won't have to touch the
+engine code to do resolve bracket expressions or anything - this is all done
+when decending the hierarchy.
+
+Faoi laithar, the device paramters get default values. Next steps:
+1. Parse and apply parameters that are numeric literals
+2. Propagate and lookup single parameter bracket expressions in the form,
+   e.g. `{rval}`.
+
 ## 2023-09-19 Parameters
 Parameters would be a nice addition to subcircuits. Maybe just allow 1 term
 in the expressions?

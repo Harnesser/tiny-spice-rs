@@ -18,7 +18,7 @@ pub use crate::element::independent::VoltageSource;
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints
-        println!(concat!("<circuit> ", $fmt), $($($arg)*)?);
+        //println!(concat!("<circuit> ", $fmt), $($($arg)*)?);
     };
 }
 

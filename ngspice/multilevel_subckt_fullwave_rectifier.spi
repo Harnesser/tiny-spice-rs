@@ -1,4 +1,6 @@
 Full-Wave Rectifier with subcircuits
+* 3 instances of a diode bridge + multi-resistor load
+* 3 different capacitors on the output
 
 * The bridge is defined before it is instantiated
 * The load is instantiated before it is defined
@@ -11,13 +13,13 @@ V3 IN_p vstack2    SIN(0 1 3e3)
 *V1 IN_p gnd         SIN(0 5 1e3) ; input voltage
 
 * full-wave rectifier
-.subckt bridge bp bn ba bb 
+.subckt bridge bp bn ba bb
 
   D1 bp ba
   D2 bb bp
   D3 bn ba
   D4 bb bn
-  
+
   * Small caps across the diodes to prevent time-step-too-small
   CD1 bp ba 12pF
   CD2 bb bp 12pF
@@ -29,33 +31,33 @@ V3 IN_p vstack2    SIN(0 1 3e3)
 .subckt system sinp sinn soutp soutn
   Xbridge sinp sinn midnode soutn bridge
   Rd midnode soutp 1
-  Xload soutp soutn rc_load
+  Xload soutp soutn r_load
 .ends
 
 * Load
-.subckt rc_load in1 in2
+.subckt r_load in1 in2
 * Split R so we have internal nodes
   Rl1 in1 la 200
   Rl2 la lb 300
   Rl3 lb lc 400
   Rl4 lc in2 100
-  Cl in1 in2 1uF
 .ends
 
-Xsystem IN_p gnd vp vn system
+Xsystem1 IN_p gnd vp1 vn1 system
+Cload1 vp1 vn1 1uF
 
-Xbridge2 IN_p gnd vp2 vn2 bridge
-Rload2 vp2 vn2 1k
+Xsystem2 IN_p gnd vp2 vn2 system
+Cload2 vp2 vn2 10uF
 
-Xbridge3 IN_p gnd vp3 vn3 bridge
-Rload3 vp3 vn3 2k
+Xsystem3 IN_p gnd vp3 vn3 system
+Cload3 vp3 vn3 100uF
 
 .control
 *  option reltol = 0.001
 *  option abstol = 1e-12
 
-  tran 100ns 2ms 
+  tran 100ns 5ms
   option ; ngspice only shows new values after analysis
 
-  plot v(IN_p) v(vp,vn) v(vp2,vn2) v(vp3,vn3); (ngspice)
+  plot v(IN_p) v(vp1,vn1) v(vp2,vn2) v(vp3,vn3); (ngspice)
 .endc

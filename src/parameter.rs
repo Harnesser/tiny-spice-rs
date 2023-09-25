@@ -22,21 +22,5 @@ impl Parameter {
         }
     }
 
-    /*
-    pub fn resolve(&self) -> f64 {
-        if let Some(val) = self.value {
-            val
-        } else if let Some(self.expr) {
-            // evaluate
-            -100.00
-        } else if let Some(val) = self.defval {
-            val
-        } else {
-            println!("*ERROR* Can't resolve parameter to a value");
-        }
-    }
-*/
-
 }
-
 

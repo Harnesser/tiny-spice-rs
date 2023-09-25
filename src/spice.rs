@@ -43,7 +43,7 @@ use crate::expander;
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints
-        println!(concat!("<spice> ", $fmt), $($($arg)*)?);
+        //println!(concat!("<spice> ", $fmt), $($($arg)*)?);
     };
 }
 
@@ -518,7 +518,7 @@ impl Reader {
         // going by the calculations above, there should be a minimum number
         // of parameters we expect to parse
         for (p, param_text) in bits.iter().skip(i).enumerate() {
-            let name = format!("param{}", p);
+            let name = format!("/param{}", p);
             if let Some(expr) = extract_expression(param_text) {
                 let param = Parameter::from_expression(&name, &expr);
                 inst.params.push(param);
@@ -577,47 +577,50 @@ mod tests {
     fn simple_subckt_counts() {
         let mut rdr = Reader::new();
         rdr.read(Path::new("./ngspice/subckt_fullwave_rectifier.spi"));
-        assert!(rdr.ckts.len() == 3);
+        assert_eq!(rdr.ckts.len(), 3);
 
-        assert!(rdr.ckts[0].nodes.len() == 5);
-        assert!(rdr.ckts[0].instances.len() == 2);
+        assert_eq!(rdr.ckts[0].nodes.len(), 5);
+        assert_eq!(rdr.ckts[0].instances.len(), 2);
 
         // bridge
-        assert!(rdr.ckts[1].nodes.len() == 5);
-        assert!(rdr.ckts[1].instances.len() == 0);
+        assert_eq!(rdr.ckts[1].nodes.len(), 5);
+        assert_eq!(rdr.ckts[1].instances.len(), 8); // 4 diodes, 4 caps
 
         // load
-        assert!(rdr.ckts[2].nodes.len() == 6);
-        assert!(rdr.ckts[2].instances.len() == 0);
+        assert_eq!(rdr.ckts[2].nodes.len(), 6); // 2 ports, 3 internal + gnd
+        assert_eq!(rdr.ckts[2].instances.len(), 5); // 4 res + 1 cap
 
         // elaborated circuit
         let ckt = rdr.get_expanded_circuit();
-        assert!(ckt.nodes.len() == 8);
+        //assert_eq!(ckt.nodes.len(), 8); // this include aliases...
+        assert_eq!(ckt.node_id_lut.len(), 8); // this include aliases...
     }
 
     #[test]
     fn multilevel_subckt_counts() {
         let mut rdr = Reader::new();
         rdr.read(Path::new("./ngspice/multilevel_subckt_fullwave_rectifier.spi"));
-        assert!(rdr.ckts.len() == 3);
+        assert_eq!(rdr.ckts.len(), 4);
 
-        assert!(rdr.ckts[0].nodes.len() == 5);
-        assert!(rdr.ckts[0].instances.len() == 2);
+        assert_eq!(rdr.ckts[0].nodes.len(), 10); // gnd + 3 op pairs + 3 v stack
+        assert_eq!(rdr.ckts[0].instances.len(), 6); // 3x (system + cap)
 
         // bridge
-        assert!(rdr.ckts[1].nodes.len() == 5);
-        assert!(rdr.ckts[1].instances.len() == 0);
-
-        // load
-        assert!(rdr.ckts[2].nodes.len() == 6);
-        assert!(rdr.ckts[2].instances.len() == 0);
+        assert_eq!(rdr.ckts[1].nodes.len(), 5);
+        assert_eq!(rdr.ckts[1].instances.len(), 8); // 4x diode, 4x cap
 
         // system
-        assert!(rdr.ckts[3].nodes.len() == 6);
-        assert!(rdr.ckts[3].instances.len() == 0);
+        assert_eq!(rdr.ckts[2].nodes.len(), 6); // 4x port, 1x internal, gnd
+        assert_eq!(rdr.ckts[2].instances.len(), 3); // bridge, R, rload
+
+        // load
+        assert_eq!(rdr.ckts[3].nodes.len(), 6); // 2x port, 3x internal, gnd
+        assert_eq!(rdr.ckts[3].instances.len(), 4); // 4x R
 
         // elaborated circuit
         let ckt = rdr.get_expanded_circuit();
-        assert!(ckt.nodes.len() == 8);
+//      assert_eq!(ckt.nodes.len(), 8); // this has aliase
+        assert_eq!(ckt.node_id_lut.len(), 22); // HARDCODED! 6x 3 + 4
+
     }
 }
