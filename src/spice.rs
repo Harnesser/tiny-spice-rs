@@ -239,7 +239,7 @@ impl Reader {
                         for nn in bits.iter().skip(2) {
                             if nn.contains('=') {
                                 trace!("Found parameter: {}", nn);
-                                if let Some(param) = self.extract_parameter(nn) {
+                                if let Some(param) = self.extract_override(nn) {
                                     self.ckts[self.c].params.push(param);
                                 } else {
                                     println!("*ERROR* can't extract parameter");
@@ -469,6 +469,8 @@ impl Reader {
     }
 
     /// Extract a parameter definition from a `.subckt` line
+    /// 
+    /// The value goes in the `defval` field.
     pub fn extract_parameter(&mut self, text: &str) -> Option<Parameter> {
         // mut is for `there are errors`
         let bits: Vec<_> = text.split('=').collect();
@@ -480,7 +482,29 @@ impl Reader {
 
         let name = extract_identifier(bits[0]);
         if let Some(expr) = extract_expression(bits[1]) {
-            Some(Parameter::from_expression(&name, &expr))
+            Some(Parameter::default_from_expression(&name, &expr))
+        } else {
+            println!("*ERROR* expected <ident>=<expr>");
+            self.there_are_errors = true;
+            None
+        }
+    }
+
+    /// Extract a parameter definition from an instantiation line
+    /// 
+    /// The value goes in the `expr` field.
+    pub fn extract_override(&mut self, text: &str) -> Option<Parameter> {
+        // mut is for `there are errors`
+        let bits: Vec<_> = text.split('=').collect();
+        if bits.len() != 2 {
+            println!("*ERROR* expected <ident>=<expr>");
+            self.there_are_errors = true;
+            return None
+        }
+
+        let name = extract_identifier(bits[0]);
+        if let Some(expr) = extract_expression(bits[1]) {
+            Some(Parameter::override_from_expression(&name, &expr))
         } else {
             println!("*ERROR* expected <ident>=<expr>");
             self.there_are_errors = true;
@@ -520,7 +544,7 @@ impl Reader {
         for (p, param_text) in bits.iter().skip(i).enumerate() {
             let name = format!("/param{}", p);
             if let Some(expr) = extract_expression(param_text) {
-                let param = Parameter::from_expression(&name, &expr);
+                let param = Parameter::override_from_expression(&name, &expr);
                 inst.params.push(param);
             } else {
                 println!("*WARN* or maybe an err, i dunno");
@@ -616,6 +640,38 @@ mod tests {
         // load
         assert_eq!(rdr.ckts[3].nodes.len(), 6); // 2x port, 3x internal, gnd
         assert_eq!(rdr.ckts[3].instances.len(), 4); // 4x R
+
+        // elaborated circuit
+        let ckt = rdr.get_expanded_circuit();
+//      assert_eq!(ckt.nodes.len(), 8); // this has aliase
+        assert_eq!(ckt.node_id_lut.len(), 22); // HARDCODED! 6x 3 + 4
+
+    }
+
+    #[test]
+    fn param_subckt_counts() {
+        let mut rdr = Reader::new();
+        rdr.read(Path::new("./ngspice/param_subckt_fullwave_rectifier.spi"));
+        assert_eq!(rdr.ckts.len(), 4);
+
+        assert_eq!(rdr.ckts[0].nodes.len(), 10); // gnd + 3 op pairs + 3 v stack
+        assert_eq!(rdr.ckts[0].instances.len(), 6); // 3x (system + cap)
+        assert_eq!(rdr.ckts[0].params.len(), 0);
+
+        // bridge
+        assert_eq!(rdr.ckts[1].nodes.len(), 5);
+        assert_eq!(rdr.ckts[1].instances.len(), 8); // 4x diode, 4x cap
+        assert_eq!(rdr.ckts[1].params.len(), 0);
+
+        // system
+        assert_eq!(rdr.ckts[2].nodes.len(), 6); // 4x port, 1x internal, gnd
+        assert_eq!(rdr.ckts[2].instances.len(), 3); // bridge, R, rload
+        assert_eq!(rdr.ckts[2].params.len(), 0);
+
+        // load
+        assert_eq!(rdr.ckts[3].nodes.len(), 6); // 2x port, 3x internal, gnd
+        assert_eq!(rdr.ckts[3].instances.len(), 4); // 4x R
+        assert_eq!(rdr.ckts[3].params.len(), 0);
 
         // elaborated circuit
         let ckt = rdr.get_expanded_circuit();

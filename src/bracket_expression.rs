@@ -34,6 +34,8 @@ impl fmt::Display for Expression {
 
 
 /// Extract a bracket expression
+///
+/// FIXME - allow `_` too...
 pub fn extract_expression(text: &str) -> Option<Expression> {
 
     if !text.starts_with('{') {

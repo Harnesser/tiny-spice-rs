@@ -64,16 +64,16 @@ subckt:
 multi: TC=multilevel_subckt_fullwave_rectifier
 multi:
 	\rm -rf waves/${TC} && \
-	cargo run ngspice/${TC}.spi && \
+	cargo run ${ARGS} ngspice/${TC}.spi && \
 	head -10 waves/${TC}/tran.dat && \
 	python3 bin/r8n -expr "4, 5-6, 7-8, 9-10" waves/${TC}
 
 param: TC=param_fullwave_rectifier
 param:
 	\rm -rf waves/${TC} && \
-	cargo run ngspice/${TC}.spi && \
+	cargo run ${ARGS} ngspice/${TC}.spi && \
 	head -10 waves/${TC}/tran.dat && \
-	python3 bin/r8n -expr "4, 7-6, 10-9" waves/${TC}
+	python3 bin/r8n -expr "4, 5-6, 7-8, 9-10" waves/${TC}
 
 
 

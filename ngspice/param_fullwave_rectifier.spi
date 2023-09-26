@@ -1,21 +1,21 @@
-Full-Wave Rectifier with parametised subcircuits
+Full-Wave Rectifier with parameterised subcircuits
 
-* The bridge is defined before it is instantiated
-* The load is instantiated before it is defined
-* ngspice is happy with both orderings
+* 3 instances of a diode bridge + RC load
+* cap load in each instances parameterised and overriden from
+*   the toplevel
 
 V1 vstack1 gnd     SIN(0 5 1e3) ; input voltage
-V2 vstack1 vstack2 SIN(0 2 2e3)
+V2 vstack2 vstack1 SIN(0 2 2e3)
 V3 IN_p vstack2    SIN(0 1 3e3)
 
 * full-wave rectifier
-.subckt bridge bp bn ba bb 
+.subckt bridge bp bn ba bb
 
   D1 bp ba
   D2 bb bp
   D3 bn ba
   D4 bb bn
-  
+
   * Small caps across the diodes to prevent time-step-too-small
   CD1 bp ba 12pF
   CD2 bb bp 12pF
@@ -24,26 +24,32 @@ V3 IN_p vstack2    SIN(0 1 3e3)
 
 .ends
 
-
-* Load
-.subckt load in1 in2 out cval=1uF rtval=100 rbval=1k
-  Cl in1 in2 {cval}
-  Rtop in1 out {rtval}
-  Rbot out in2 {rbval}
+.subckt system sinp sinn soutp soutn cval=10uF
+  Xbridge sinp sinn midnode soutn bridge
+  Rd midnode soutp 1
+  Xload soutp soutn r_load cval={cval}
 .ends
 
-Xbrigde1 IN_p gnd vp1 vn1 bridge
-Xload1 vp1 vn1 o1 load cval=10uF rtval=10 rbval=10000000
+* Load
+.subckt r_load in1 in2 cval=1nF
+* Split R so we have internal nodes
+  Rl1 in1 la 200
+  Rl2 la lb 300
+  Rl3 lb lc 400
+  Rl4 lc in2 100
+  Cload in1 in2 {cval}
+.ends
 
-Xbridge2 IN_p gnd vp2 vn2 bridge
-Xload2 vp2 vn2 o2 load
+Xsystem1 IN_p gnd vp1 vn1 system cval=1uF
+Xsystem2 IN_p gnd vp2 vn2 system cval=10uF
+Xsystem3 IN_p gnd vp3 vn3 system cval=100uF
 
 .control
 *  option reltol = 0.001
 *  option abstol = 1e-12
 
-  tran 100ns 2ms 
+  tran 100ns 5ms
   option ; ngspice only shows new values after analysis
 
-  plot v(IN_p) v(o1,vn1) v(o2,vn2); (ngspice)
+  plot v(IN_p) v(vp1,vn1) v(vp2,vn2) v(vp3,vn3); (ngspice)
 .endc

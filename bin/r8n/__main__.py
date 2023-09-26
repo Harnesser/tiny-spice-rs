@@ -93,11 +93,11 @@ colours = [
 
 # plot all the data
 for i in range( len(filenames) ):
-    for expr in exprs:
+    for (j,expr) in enumerate(exprs):
 #for i in range( 10 ):
         filename = filenames[i]
         wv = waveforms.load( os.path.join(dirname, filename), expr=expr )
-        colour = colours[i%len(colours)]
+        colour = colours[j%len(colours)]
         plt.plot(wv.x, wv.y, color=colour)
         plt.plot(wv.x[-1], wv.y[-1], 'o', color=colour)
 

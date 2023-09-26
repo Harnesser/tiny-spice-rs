@@ -96,18 +96,73 @@ fn expand_instances(
         // resolve the parameters at this level
         // add the parameter to the main circuits parameter list in the same style
         // as for nodes: prefixed with the hierarchy...
-        hier.push(inst.name.to_string());
-        for p in &inst.params {
-            hier.push(p.name.to_string());
 
-            let value = match p.expr {
+        hier.push(inst.name.to_string()); // inst-name
+
+        for p in &inst.params {
+            hier.push(p.name.to_string()); // param-name
+
+            let value = match &p.expr {
 
                 Some(Expression::Literal(val)) => {
-                    val
+                    *val
+                },
+
+                Some(Expression::Identifier(ident)) => {
+                    // there is an identifier that must be looked up
+                    // in the enclosing scope
+                    hier.pop(); // param-name
+                    hier.pop(); // inst-name
+                    hier.push(ident.to_string()); // lut-name
+                    let lookup_param_name = hier.join(".");
+                    hier.pop(); // lut-name
+                    hier.push(inst.name.to_string()); // inst-name
+                    hier.push(p.name.to_string()); // param
+
+                    let lut = get_param_value(ckt, &lookup_param_name);
+
+                    if let Some(val) = lut {
+                        val
+                    } else {
+                        panic!("So close, can't find '{}'", lookup_param_name);
+                    }
+
                 },
 
                 _ => {
-                    panic!("I'm getting to old for this shit");
+                    // maybe we pick up a default...
+                    match &p.defval {
+
+                        Some(Expression::Literal(def)) => {
+                            *def
+                        },
+
+                        Some(Expression::Identifier(ident)) => {
+                            // there is an identifier that must be looked up
+                            // in the enclosing scope
+                            hier.pop(); // param-name
+                            hier.pop(); // inst-name
+                            hier.push(ident.to_string()); // lut-name
+                            let lookup_param_name = hier.join(".");
+                            hier.pop(); // lut-name
+                            hier.push(inst.name.to_string()); // inst-name
+                            hier.push(p.name.to_string()); // param
+
+                            let lut = get_param_value(ckt, &lookup_param_name);
+
+                            if let Some(val) = lut {
+                                val
+                            } else {
+                                panic!("Can't find default override '{}'",
+                                    lookup_param_name);
+                            }
+
+                        },
+
+                        _ => {
+                            panic!("I'm getting to old for this shit");
+                        }
+                    } // defval match
                 }
             };
 
@@ -120,7 +175,7 @@ fn expand_instances(
                 value: Some(value),
             });
 
-            hier.pop();
+            hier.pop(); // inst name
         }
 
         // now we can expand primitives...
@@ -154,7 +209,8 @@ fn expand_subckt(
 
     // find the subckt definition index
     if let Some(ckt_id) = find_subckt_index(ckts, &inst.subckt) {
-        trace!("Found definition for {}", inst.subckt);
+        trace!("Found subcircuit definition: index={}; subckt={}; ident={}",
+           ckt_id, ckts[ckt_id].name, inst.name);
         subckt_id = ckt_id;
     } else {
         println!("*ERROR* Can't find a definition for subcircuit {}",
@@ -169,8 +225,6 @@ fn expand_subckt(
         println!("have different port sizes");
     }
 
-    trace!("Subcircuit: index={}; subckt={}; idenr={}",
-           subckt_id, ckts[subckt_id].name, inst.name);
 
     // Add node aliases for all the ports
     for (n, hnid) in inst.conns.iter().enumerate() {
@@ -201,6 +255,9 @@ fn expand_subckt(
     trace!("Resolving parameters...");
     println!(" Host  : {:?}", ckts[host_ckt_id].params);
     println!(" Subckt: {:?}", ckts[subckt_id].params);
+    for i in &ckts[host_ckt_id].instances {
+        println!(" Insta : {:?}", i.params);
+    }
 
     expand_instances(ckts, ckt, subckt_id, &hier);
     _ = hier.pop();
@@ -259,7 +316,6 @@ fn expand_primitive(
         let value = if let Some(rval) = param_lut {
             rval
         } else {
-            println!("Can't find {}", param_full_name);
             panic!("*FATAL* Value for R was not resolved");
         };
 

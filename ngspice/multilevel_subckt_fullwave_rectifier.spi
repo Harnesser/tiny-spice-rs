@@ -1,4 +1,5 @@
 Full-Wave Rectifier with subcircuits
+
 * 3 instances of a diode bridge + multi-resistor load
 * 3 different capacitors on the output
 

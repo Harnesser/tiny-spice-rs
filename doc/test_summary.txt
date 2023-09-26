@@ -3,6 +3,7 @@ test spice_irrc ... ok
 test spice_irrrr ... ok
 test spice_reader ... ok
 test spice::tests::multilevel_subckt_counts ... ok
+test spice::tests::param_subckt_counts ... FAILED
 test spice::tests::simple_read_count_nodes ... FAILED
 test spice::tests::simple_read_count_voltage_sources ... ok
 test spice::tests::simple_subckt_counts ... ok
