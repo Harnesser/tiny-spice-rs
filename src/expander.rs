@@ -56,6 +56,7 @@ macro_rules! trace {
     };
 }
 
+
 /// Expand subcircuits.
 ///
 /// This takes a list of subcircuits and returns a single `Circuit`
@@ -80,116 +81,201 @@ pub fn expand(ckts: &[Circuit]) -> Circuit {
 }
 
 
+/// Expand the instances in the current scope.
+///
+/// Foreach instance in at this level
+/// 1. Resolve parameter values
+/// 2. either:
+///   2a. `expand_primitive()` or
+///   2b. `expand_subckt()`
+///
+/// Instances include both primitive circuit element and subcircuits
 fn expand_instances(
     ckts: &[Circuit],
     ckt: &mut Circuit,
     ckt_id: usize,
-    inhier: &[String]
+    inhier: &[String], // the hierarchy we are working in
 ) {
-    println!("-- Deal with instances of maybe subcircuits ---------");
-    let insts: &Vec<Instance> = &ckts[ckt_id].instances.clone();
 
     let mut hier = inhier.to_owned();
 
-    for inst in insts {
+    println!("-- Deal with instances of maybe subcircuits -- {} --",
+             inhier.len());
+    trace!("expand_instances() -> {}", hier.join("."));
+
+    // Set up aliases for parameters
+    // When at scope X1.X2 which has instances Xa and Xbb, set param
+    // aliases in `ckt` for:
+    //
+    //   X1.X2.xa.param0
+    //             ...
+    //   X1.X2.xa.paramN
+    //
+    //   X1.X2.xbb.param0
+    //              ...
+    //   X1.X2.xbb.paramM
+
+    for inst in &ckts[ckt_id].instances {
+
+        trace!("> inst: '{}' . '{}'", hier.join("."), inst.name);
 
         // resolve the parameters at this level
         // add the parameter to the main circuits parameter list in the same style
         // as for nodes: prefixed with the hierarchy...
+        // this way, when we come to actually realize the subcircuit/primitive,
+        // we can look up an f64 value for the parameter directly.
 
-        hier.push(inst.name.to_string()); // inst-name
+        // TODO: any parameters we can't set at this level, the lower level
+        // will pick up a default?
 
         for p in &inst.params {
+
+            hier.push(inst.name.to_string()); // inst-name
             hier.push(p.name.to_string()); // param-name
+            let param_full_name = hier.join(".");
+            hier.pop(); // param-name
+            hier.pop(); // inst-name
 
-            let value = match &p.expr {
+            trace!("Resolving param {}", param_full_name);
 
+            let param_override = match &p.expr {
+
+                // look for a parameter override that has an expression:
+                // `cval0={cval}`
                 Some(Expression::Literal(val)) => {
-                    *val
+                    Some(*val)
                 },
 
                 Some(Expression::Identifier(ident)) => {
                     // there is an identifier that must be looked up
-                    // in the enclosing scope
-                    hier.pop(); // param-name
-                    hier.pop(); // inst-name
+                    // in the current scope
+
                     hier.push(ident.to_string()); // lut-name
                     let lookup_param_name = hier.join(".");
                     hier.pop(); // lut-name
-                    hier.push(inst.name.to_string()); // inst-name
-                    hier.push(p.name.to_string()); // param
 
                     let lut = get_param_value(ckt, &lookup_param_name);
 
                     if let Some(val) = lut {
-                        val
+                        trace!("Found value for identifier in param");
+                        Some(val)
                     } else {
-                        panic!("So close, can't find '{}'", lookup_param_name);
+                        trace!("Can't find identifier '{}' for param '{}'",
+                               lookup_param_name, param_full_name);
+                        None
                     }
-
                 },
 
                 _ => {
-                    // maybe we pick up a default...
-                    match &p.defval {
-
-                        Some(Expression::Literal(def)) => {
-                            *def
-                        },
-
-                        Some(Expression::Identifier(ident)) => {
-                            // there is an identifier that must be looked up
-                            // in the enclosing scope
-                            hier.pop(); // param-name
-                            hier.pop(); // inst-name
-                            hier.push(ident.to_string()); // lut-name
-                            let lookup_param_name = hier.join(".");
-                            hier.pop(); // lut-name
-                            hier.push(inst.name.to_string()); // inst-name
-                            hier.push(p.name.to_string()); // param
-
-                            let lut = get_param_value(ckt, &lookup_param_name);
-
-                            if let Some(val) = lut {
-                                val
-                            } else {
-                                panic!("Can't find default override '{}'",
-                                    lookup_param_name);
-                            }
-
-                        },
-
-                        _ => {
-                            panic!("I'm getting to old for this shit");
-                        }
-                    } // defval match
+                    None
                 }
             };
 
-            let param_full_name = hier.join(".");
-            trace!("Considering: {} = {}", param_full_name, value);
-            ckt.params.push( Parameter {
-                name: param_full_name,
-                defval: None,
-                expr: None,
-                value: Some(value),
-            });
+            if let Some(value) = param_override {
+                trace!("Subckt Parameter Override : {} = {}",
+                       param_full_name, value);
+                ckt.params.push( Parameter {
+                    name: param_full_name,
+                    defval: None,
+                    expr: None,
+                    value: Some(value),
+                });
+            };
 
-            hier.pop(); // inst name
-        }
+        } // for p in parameters
 
         // now we can expand primitives...
         if inst.subckt == "/device" {
             expand_primitive(ckts, ckt, ckt_id, inst, inhier);
-        } else {
+        } else { // expand subckts
             // ... and subcircuits
-            let mut hier = inhier.to_owned();
-            hier.push(inst.name.to_string());
-            expand_subckt(ckts, ckt, ckt_id, inst, &hier);
-        }
 
-        hier.pop();
-    }
+            trace!("WHUT: {}", hier.join(" "));
+
+            // expand params for this instance that might be
+            // picking up defaults
+            let mut subckt_id = 0;
+
+            // find the subckt definition index
+            if let Some(ckt_id) = find_subckt_index(ckts, &inst.subckt) {
+                trace!("Found subcircuit definition: index={}; subckt={}; ident={}",
+                   ckt_id, ckts[ckt_id].name, inst.name);
+                subckt_id = ckt_id;
+            } else {
+                println!("*ERROR* Can't find a definition for subcircuit {}",
+                    inst.subckt);
+            }
+
+            for param_def in &ckts[subckt_id].params {
+
+                hier.push(inst.name.to_string());
+                hier.push(param_def.name.to_string()); // param-name
+                let lookup_param_name = hier.join(".");
+                hier.pop(); // param-name
+                hier.pop(); // inst-name
+
+                println!("Looking for subckt inst param : {}", lookup_param_name);
+
+                let lut = get_param_value(ckt, &lookup_param_name);
+
+                if let Some(_) = lut {
+                    trace!("param '{}' already defined, skipping", lookup_param_name);
+                    continue;
+                }
+                println!("{:?}", param_def);
+
+                let param_default_value = match &param_def.defval {
+
+                    // look for a parameter override that has an expression:
+                    // `cval0={cval}`
+                    Some(Expression::Literal(val)) => {
+                        Some(*val)
+                    },
+
+                    Some(Expression::Identifier(ident)) => {
+                        // there is an identifier that must be looked up
+                        // in the enclosing scope
+                        hier.push(ident.to_string()); // lut-name
+                        let lookup_param_name = hier.join(".");
+                        hier.pop(); // lut-name
+
+                        let lut = get_param_value(ckt, &lookup_param_name);
+                        trace!("IIIIIIIIIIII {}", lookup_param_name);
+                        if let Some(val) = lut {
+                            trace!("HHHHHH asdfasdf-asdf HJASDFASDF");
+                            Some(val)
+                        } else {
+                            panic!("*FATAL* Can't find prim override '{}'",
+                                lookup_param_name);
+                        }
+                    },
+
+                    _ => {
+                        panic!("*FATAL* just can't get enough");
+                        None
+                    }
+                };
+
+                if let Some(value) = param_default_value {
+                    let param_full_name = hier.join(".");
+                    trace!("Subckt Parameter Default : {} = {}",
+                           param_full_name, value);
+                    ckt.params.push( Parameter {
+                        name: param_full_name,
+                        defval: None,
+                        expr: None,
+                        value: Some(value),
+                    });
+                };
+            } // for
+
+            expand_subckt(ckts, ckt, ckt_id, inst, &hier);
+
+        } // expand subckts
+
+        // not popping here - leaving the hier at the enclosing scope
+
+    } // insts
 }
 
 /// Expand a subcircuit instantiation
@@ -204,7 +290,8 @@ fn expand_subckt(
 
     let mut hier = inhier.to_owned();
 
-    trace!("Expanding: {}", inst);
+    trace!("expand_subckt() -> '{}' . '{}'", hier.join("."), inst.name);
+
     let mut subckt_id = 0;
 
     // find the subckt definition index
@@ -232,17 +319,17 @@ fn expand_subckt(
         let nid = n + 1;
         let port = &ckts[subckt_id].node_id_lut[&nid];
 
-        hier.push(port.to_string());
+        hier.push(inst.name.to_string()); // inst-name
+        hier.push(port.to_string()); // port-name
         let full_port_name = hier.join(".").to_string();
-        hier.pop();
+        hier.pop(); // port-name
+        hier.pop(); // inst-name
 
         let host_net_name = &ckts[host_ckt_id].node_id_lut[hnid];
-        hier.pop();
-        hier.push(host_net_name.to_string());
 
+        hier.push(host_net_name.to_string()); // connecting-net
         let full_host_net_name = hier.join(".").to_string();
-        hier.pop();
-        hier.push(inst.name.to_string());
+        hier.pop(); // connecting-net
 
         //println!("  '{}' -> '{}' ", full_port_name, full_host_net_name);
         let top_nid = ckt.add_node(&full_host_net_name);
@@ -251,16 +338,9 @@ fn expand_subckt(
         ckt.add_node_alias(&full_port_name, top_nid);
     }
 
-    // Resolve Parameters, somehow
-    trace!("Resolving parameters...");
-    println!(" Host  : {:?}", ckts[host_ckt_id].params);
-    println!(" Subckt: {:?}", ckts[subckt_id].params);
-    for i in &ckts[host_ckt_id].instances {
-        println!(" Insta : {:?}", i.params);
-    }
-
+    hier.push(inst.name.to_string()); // inst-name
     expand_instances(ckts, ckt, subckt_id, &hier);
-    _ = hier.pop();
+    hier.pop(); // inst-name
 }
 
 
@@ -289,20 +369,19 @@ fn expand_primitive(
     ckt: &mut Circuit,
     host_ckt_id: usize,
     inst: &Instance,
-    inhier: &[String]
+    inhier: &[String] // the scope the primitive is instantiated in
 ) {
 
     let mut hier = inhier.to_owned();
 
-    println!("{}", inst);
+    trace!("expand_primitive() -> {} . {}", hier.join("."), inst.name);
 
-    hier.push(inst.name.to_string()); // push the primitive local idenitifer
-    let ident = hier.join(".");
-
-    hier.pop();
+    // lookup connections in the scope in which the R, C whatever is instantiated
     let n1 = local_connect(ckts, ckt, host_ckt_id, &hier, inst.conns[0]);
     let n2 = local_connect(ckts, ckt, host_ckt_id, &hier, inst.conns[1]);
-    hier.push(inst.name.to_string());
+
+    hier.push(inst.name.to_string()); // push the primitive local idenitifer
+    let ident = hier.join("."); // full path to device
 
     if inst.name.starts_with('R') {
         trace!("Found a resistor primitive");
@@ -351,7 +430,8 @@ fn expand_primitive(
     }
 
     // should pop the primitive local instance name
-    hier.pop();
+    // this kinda doesn't matter cos we're not in a loop
+    hier.pop(); // inst-name
 }
 
 

@@ -6,7 +6,7 @@ Full-Wave Rectifier with parameterised subcircuits
 
 V1 vstack1 gnd     SIN(0 5 1e3) ; input voltage
 V2 vstack2 vstack1 SIN(0 2 2e3)
-V3 IN_p vstack2    SIN(0 1 3e3)
+V3 vstack2 IN_p    SIN(0 1 3e3) ; flip to differentiate between "multi_"
 
 * full-wave rectifier
 .subckt bridge bp bn ba bb
@@ -27,17 +27,17 @@ V3 IN_p vstack2    SIN(0 1 3e3)
 .subckt system sinp sinn soutp soutn cval=10uF
   Xbridge sinp sinn midnode soutn bridge
   Rd midnode soutp 1
-  Xload soutp soutn r_load cval={cval}
+  Xload soutp soutn r_load cvalo={cval}
 .ends
 
 * Load
-.subckt r_load in1 in2 cval=1nF
+.subckt r_load in1 in2 cvalo=1nF
 * Split R so we have internal nodes
   Rl1 in1 la 200
   Rl2 la lb 300
   Rl3 lb lc 400
   Rl4 lc in2 100
-  Cload in1 in2 {cval}
+  Cload in1 in2 {cvalo}
 .ends
 
 Xsystem1 IN_p gnd vp1 vn1 system cval=1uF

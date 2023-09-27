@@ -45,3 +45,13 @@ Xload vp vn  rc_load
 
   plot v(IN_p,IN_n) v(vp,vn) ; (ngspice)
 .endc
+
+* Nodes
+*  0 = gnd
+*  IN_n = Xbridge.bn
+*  IN_p = Xbridge.bp
+*  vp = Xbridge.ba = Xload.in1
+*  vn = Xbridge.bb = Xload.in2
+*  Xload.la
+*  Xload.lb
+*  Xload.lc

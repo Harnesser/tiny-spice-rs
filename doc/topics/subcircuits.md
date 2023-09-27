@@ -61,4 +61,10 @@ they are. When the circuit is expanded, only then realise them as the device
 models that are needed for circuit analysis by the engine? The expressions can
 then be expanded as the hierarchy is traversed, just like the `NodeId`s?
 
+## Hierarchy Stack
+As the circuit hierarchy is traversed, a stack keeps track of the current scope
+operations are happening in. This is very important to keep correct.
 
+If a function has an input hierarchy stack `inhier` - this is the scope that
+instances, primitives, etc are going to be instantiated in. I try to keep
+`push()` and `pop()`s when building identifiers local (i.e. within 5 lines or so)
