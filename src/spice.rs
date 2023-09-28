@@ -247,7 +247,6 @@ impl Reader {
                                 }
                                 continue;
                             }
-                            println!("$$$$$$ {}", self.c);
                             self.ckts[self.c].add_node(nn);
                             num_ports += 1;
                         }
@@ -583,6 +582,13 @@ fn extract_identifier(text: &str) -> String {
 #[cfg(test)]
 mod tests {
 
+    // how do I use the one from tests::common?
+    pub fn assert_nearly(x: f64, expected: f64) {
+        const EPSILON: f64 = 1e-9;
+        let delta = (x - expected).abs();
+        assert!( delta < EPSILON, "{} isn't approximately {}", x, expected);
+    }
+
     // If node count for the expanded circuit goes wrong and the SPICE file hasn't
     // changed, it's usually the hierarchy stack that's passed around not getting
     // pushed or popped symmetrically in the Expander.
@@ -687,5 +693,9 @@ mod tests {
 //      assert_eq!(ckt.nodes.len(), 8); // this has aliase
         assert_eq!(ckt.node_id_lut.len(), 22); // HARDCODED! 6x 3 + 4
 
+        // check if the parameters propagated...
+        assert_nearly(ckt.get_param_value("Xsystem1.Xload.cvalo").unwrap(),   1e-6);
+        assert_nearly(ckt.get_param_value("Xsystem2.Xload.cvalo").unwrap(),  10e-6);
+        assert_nearly(ckt.get_param_value("Xsystem3.Xload.cvalo").unwrap(), 100e-6);
     }
 }

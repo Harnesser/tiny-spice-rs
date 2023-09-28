@@ -2,6 +2,17 @@
 
     This is a personal project. It does not have to be rigourously tested.
 
+## 2023-09-28 Subcircuits with Parameters
+This seems to work now, and even bracket expressions with a single identifier
+are supported in the parameter overrides.
+
+The circuit `param_fullwave_rectifier.spi` instantiates 3 versions of a 
+bridge rectifier subsystem. The capacitor value in the `rc_load` subcircuit
+is parameterised, passed down from the instantiation of the subsystem at the
+toplevel.
+
+I'm quite pleased with this.
+
 ## 2023-09-23 Parameters - Numerical Literals
 Refactored the `multi_` subcircuit example to have 3 instantiations of the
 `system`. A system is:

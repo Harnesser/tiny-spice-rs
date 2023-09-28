@@ -1,14 +1,16 @@
 # Changelog
 
-## [0.8.0] Subcircuits <<Unreleased>>
-Allow nets to be named something other than integers. Subcircuits!
+## [0.8.0] Subcircuits
+Subcircuits! See the circuit `ngspice/param_fullwave_rectifier.spi`.
 
 ### Added
-- Nodes can have names now, but integers still work.
+- Subcircuits with are supported
+- Basic Bracket Expression with 1 identifier supported:
+ * e.g. `cval={top_cval}`
 
 ### Changed
+- Nodes can have names now, but integers still work
 
-### Fixed
 
 
 ## [0.7.0] SPICE Deck Reader

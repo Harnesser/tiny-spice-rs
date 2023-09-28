@@ -343,4 +343,16 @@ impl Circuit {
         }
     }
 
+    /// Find a parameter value
+    ///
+    /// `N` is small..
+    pub fn get_param_value(&self, name: &str) -> Option<f64> {
+        for p in &self.params {
+            if p.name == name {
+                return p.value
+            }
+        }
+        None
+    }
+
 }

@@ -8,7 +8,7 @@ use std::fmt;
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints
-        println!(concat!("<bktexpr> ", $fmt), $($($arg)*)?);
+        //println!(concat!("<bktexpr> ", $fmt), $($($arg)*)?);
     };
 }
 

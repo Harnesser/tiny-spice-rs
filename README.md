@@ -26,6 +26,7 @@ In SPICE decks:
 * Engineering notation is supported, e.g. `1k` is 1000
 * A control block with a small list of commands between `.control` and `.endc` is
   supported
+* Subcircuits with limited bracket expressions are supported
 
 
 Unsupported Stuff
@@ -33,7 +34,6 @@ Unsupported Stuff
 A _huge_ list of things are _not_ supported. Everything not listed above, which
 includes:
 * DC Sweeps are not supported
-* Sub-circuits are not supported
 * MOSFETs and other transistors are not supported
 * Noise Analysis is not supported
 * Circuit topology checks are not supported

@@ -52,7 +52,7 @@ use crate::bracket_expression::{Expression};
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints
-        println!(concat!("<expand> ", $fmt), $($($arg)*)?);
+        //println!(concat!("<expand> ", $fmt), $($($arg)*)?);
     };
 }
 
@@ -71,9 +71,9 @@ pub fn expand(ckts: &[Circuit]) -> Circuit {
     let mut ckt = ckts[0].clone();
     let hier: Vec<String> = vec![];
 
-    println!("------------------------------------------------");
+    trace!("------------------------------------------------");
     expand_instances(ckts, &mut ckt, 0, &hier);
-    println!("------------------------------------------------");
+    trace!("------------------------------------------------");
 
     ckt.build_node_id_lut();
     ckt
@@ -99,8 +99,8 @@ fn expand_instances(
 
     let mut hier = inhier.to_owned();
 
-    println!("-- Deal with instances of maybe subcircuits -- {} --",
-             inhier.len());
+//    println!("-- Deal with instances of maybe subcircuits -- {} --",
+//             inhier.len());
     trace!("expand_instances() -> {}", hier.join("."));
 
     // Set up aliases for parameters
@@ -154,8 +154,9 @@ fn expand_instances(
                     let lookup_param_name = hier.join(".");
                     hier.pop(); // lut-name
 
-                    let lut = get_param_value(ckt, &lookup_param_name);
+                    let lut = ckt.get_param_value(&lookup_param_name);
 
+                    #[allow(clippy::manual_map)] // cos of the trace!
                     if let Some(val) = lut {
                         trace!("Found value for identifier in param");
                         Some(val)
@@ -184,16 +185,11 @@ fn expand_instances(
 
         } // for p in parameters
 
-        // now we can expand primitives...
-        if inst.subckt == "/device" {
-            expand_primitive(ckts, ckt, ckt_id, inst, inhier);
-        } else { // expand subckts
-            // ... and subcircuits
-
-            trace!("WHUT: {}", hier.join(" "));
-
-            // expand params for this instance that might be
-            // picking up defaults
+        // Make sure we don't leave out any parameters that have defaults
+        // and are not overridden. The problem is that I don't know if I'm a
+        // subcircuit here...
+        if inst.subckt != "/device" {
+            trace!("Looking for nonoverridden parameters");
             let mut subckt_id = 0;
 
             // find the subckt definition index
@@ -210,19 +206,19 @@ fn expand_instances(
 
                 hier.push(inst.name.to_string());
                 hier.push(param_def.name.to_string()); // param-name
-                let lookup_param_name = hier.join(".");
+                let param_full_name = hier.join(".");
                 hier.pop(); // param-name
                 hier.pop(); // inst-name
 
-                println!("Looking for subckt inst param : {}", lookup_param_name);
+                trace!("Looking for subckt inst param : {}", param_full_name);
 
-                let lut = get_param_value(ckt, &lookup_param_name);
+                let lut = ckt.get_param_value(&param_full_name);
 
-                if let Some(_) = lut {
-                    trace!("param '{}' already defined, skipping", lookup_param_name);
+                if lut.is_some() {
+                    trace!("param '{}' already defined, skipping", param_full_name);
                     continue;
                 }
-                println!("{:?}", param_def);
+                trace!("Need a default from {:?}", param_def);
 
                 let param_default_value = match &param_def.defval {
 
@@ -239,7 +235,7 @@ fn expand_instances(
                         let lookup_param_name = hier.join(".");
                         hier.pop(); // lut-name
 
-                        let lut = get_param_value(ckt, &lookup_param_name);
+                        let lut = ckt.get_param_value(&lookup_param_name);
                         trace!("IIIIIIIIIIII {}", lookup_param_name);
                         if let Some(val) = lut {
                             trace!("HHHHHH asdfasdf-asdf HJASDFASDF");
@@ -252,12 +248,10 @@ fn expand_instances(
 
                     _ => {
                         panic!("*FATAL* just can't get enough");
-                        None
                     }
                 };
 
                 if let Some(value) = param_default_value {
-                    let param_full_name = hier.join(".");
                     trace!("Subckt Parameter Default : {} = {}",
                            param_full_name, value);
                     ckt.params.push( Parameter {
@@ -268,12 +262,15 @@ fn expand_instances(
                     });
                 };
             } // for
+        }
 
+
+        // now we can expand primitives...
+        if inst.subckt == "/device" {
+            expand_primitive(ckts, ckt, ckt_id, inst, inhier);
+        } else {
             expand_subckt(ckts, ckt, ckt_id, inst, &hier);
-
-        } // expand subckts
-
-        // not popping here - leaving the hier at the enclosing scope
+        }
 
     } // insts
 }
@@ -391,7 +388,7 @@ fn expand_primitive(
         let param_full_name = hier.join(".");
         hier.pop();
 
-        let param_lut = get_param_value(ckt, &param_full_name);
+        let param_lut = ckt.get_param_value(&param_full_name);
         let value = if let Some(rval) = param_lut {
             rval
         } else {
@@ -408,7 +405,7 @@ fn expand_primitive(
         let param_full_name = hier.join(".");
         hier.pop();
 
-        let param_lut = get_param_value(ckt, &param_full_name);
+        let param_lut = ckt.get_param_value(&param_full_name);
         let value = if let Some(cval) = param_lut {
             cval
         } else {
@@ -449,17 +446,6 @@ fn find_subckt_index(ckts: &[Circuit], name: &str) -> Option<usize> {
     None
 }
 
-/// Find a parameter value
-///
-/// `N` is small..
-fn get_param_value(ckt: &Circuit, name: &str) -> Option<f64> {
-    for p in &ckt.params {
-        if p.name == name {
-            return p.value
-        }
-    }
-    None
-}
 
 /// Connect a primitive
 fn local_connect(
@@ -477,6 +463,7 @@ fn local_connect(
     let node_name = hier.join(".");
     _ = hier.pop();
 
+    #[allow(clippy::manual_map)] // cos of the trace!
     let gnid = ckt.add_node(&node_name);
     trace!("Primitive connection: '{}' -> {}", node_name, gnid);
     gnid

@@ -27,11 +27,11 @@ V3 vstack2 IN_p    SIN(0 1 3e3) ; flip to differentiate between "multi_"
 .subckt system sinp sinn soutp soutn cval=10uF
   Xbridge sinp sinn midnode soutn bridge
   Rd midnode soutp 1
-  Xload soutp soutn r_load cvalo={cval}
+  Xload soutp soutn rc_load cvalo={cval}
 .ends
 
 * Load
-.subckt r_load in1 in2 cvalo=1nF
+.subckt rc_load in1 in2 cvalo=1nF
 * Split R so we have internal nodes
   Rl1 in1 la 200
   Rl2 la lb 300
@@ -41,7 +41,7 @@ V3 vstack2 IN_p    SIN(0 1 3e3) ; flip to differentiate between "multi_"
 .ends
 
 Xsystem1 IN_p gnd vp1 vn1 system cval=1uF
-Xsystem2 IN_p gnd vp2 vn2 system cval=10uF
+Xsystem2 IN_p gnd vp2 vn2 system ; DEFAULT cval=10uF
 Xsystem3 IN_p gnd vp3 vn3 system cval=100uF
 
 .control
