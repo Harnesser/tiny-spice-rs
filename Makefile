@@ -7,6 +7,7 @@ run:
 
 release: ARGS+=--release
 release: run
+
 debug:
 	env RUST_BACKTRACE=1 cargo run
 
@@ -75,7 +76,16 @@ param:
 	head -10 waves/${TC}/tran.dat && \
 	python3 bin/r8n -expr "4, 5-6, 7-8, 9-10" waves/${TC}
 
+## Drum Machine
 
+trig: TC=dm_trigger
+trig:
+	\rm -rf waves/${TC} && \
+	cargo run ${ARGS} ngspice/drum-machine/${TC}.spi && \
+	head -10 waves/${TC}/tran.dat && \
+	python3 bin/r8n -expr "2,3,4" waves/${TC}
+
+##
 
 
 # not implemented yet.

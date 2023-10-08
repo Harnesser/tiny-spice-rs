@@ -7,7 +7,7 @@ so I can simulate a twin-T oscillator.
 
 ### Added
 - PWL voltage sources
- * not all repeat options are supported
+ * r > 0 not supported
 
 ### Fixed
 - Panic now if subcircuit definitions are not found. Otherwise this can

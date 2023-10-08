@@ -17,12 +17,13 @@
 //! * Control Blocks:
 //!   Only one operation for now - no sequences
 //!   * DC Operating Point `op`
-//!   * Transient : `trans <t_step> <t_stop> [t_start]`
+//!   * Transient : `tran <t_step> <t_stop> [t_start]`
 //!     * for now, `t_start` is ignored
 //! * Options (in Control Blocks)
 //!   * Options: `option <OPTION_NAME> = <value>`
 //!     * `ABSTOL`
 //!     * `RELTOL`
+//!     * `RMAX`
 //! * Subcircuits
 //!   * Subcircuit definitions with `.subckt` and `.ends`
 //!   * Instantiations with `X...`
@@ -32,9 +33,11 @@ use std::fs::File;
 use std::io::{BufReader, BufRead};
 
 use crate::circuit::{Circuit, CurrentSourceSine, VoltageSourceSine};
+use crate::circuit::{VoltageSourcePwl};
 use crate::circuit::{Instance};
 use crate::parameter::{Parameter};
 use crate::bracket_expression::{extract_expression, extract_value};
+use crate::bracket_expression::Expression::{Literal};
 
 use crate::analysis::{Configuration, Kind};
 use crate::expander;
@@ -192,6 +195,13 @@ impl Reader {
                         trace!("*INFO* Vsin");
                         let src = self.extract_v_sine(&bits);
                         self.ckts[self.c].add_v_sin(src);
+                    } else if bits[3].starts_with("PWL(") {
+                        trace!("*INFO* Vpwl");
+                        let src = self.extract_v_pwl(&bits);
+                        self.ckts[self.c].add_v_pwl(src);
+                    } else {
+                        println!("Some weird V thing you've got going here");
+                        println!("bits: {:?}", bits);
                     }
                 } else if bits[0].starts_with('R') {
                     if let Some(r) = self.extract_primitive(&bits, 2, 1) {
@@ -311,6 +321,9 @@ impl Reader {
             "RELTOL" => {
                 self.cfg.RELTOL = extract_value(bits[3]).unwrap();
             },
+            "RMAX" => {
+                self.cfg.RMAX = extract_value(bits[3]).unwrap();
+            },
             _ => {
             }
         }
@@ -394,6 +407,93 @@ impl Reader {
     }
 
 
+    /// extract the stuff from PWL
+    fn extract_v_pwl(&mut self, bits: &[&str]) -> VoltageSourcePwl {
+        let _ = extract_identifier(bits[0]);
+        let node1 = self.extract_node(bits[1]);
+        let node2 = self.extract_node(bits[2]);
+
+        let mut src = VoltageSourcePwl {
+            p: node1,
+            n: node2,
+            pat: vec![],
+            repeat: -1.0,
+            t_delay: 0.0,
+            idx: 0
+        };
+
+        // work from the end and pick off any variables:
+        // in this case, delay and repeat time
+        let mut n_params = 0;
+        for i in (0..bits.len()).rev() {
+            if bits[i].contains('=') {
+                n_params += 1;
+                if let Some(param) = self.extract_override(bits[i]) {
+
+                    // eugh... assume the parameter value is a literal.
+                    let val = if let Some(Literal(v)) = param.expr {
+                        v
+                    } else {
+                        0.0
+                    };
+
+                    match param.name.as_str() {
+                        "r" => { src.repeat = val},
+                        "td" => { src.t_delay = val},
+                        _ => {
+                            println!("*WARNING* unrecogised PWL parameter '{}'",
+                                param.name);
+                        }
+                    }
+                } else {
+                    println!("*WARNING* something bad in VPWL");
+                }
+            } else {
+                break;
+            }
+        }
+
+        // ugly stuff...
+        // push all the remaining bits of the SPICE line into 1 string
+        let mut line = "".to_string();
+        for b in bits[3..].iter() {
+            line += *b;
+            line.push(' ');
+        }
+
+        // eugh... pop off the parameters
+        for _ in 0..n_params {
+            line.pop();
+        }
+
+        // then when we remove "PWL" "(" and ")" we should be left with
+        // some numbers that we can extract
+        line = line.replace("PWL", "");
+        line = line.replace('(', "");
+        line = line.replace(')', "");
+        //trace!("Line: {}", line);
+
+        let all_bits: Vec<&str> = line.split(',').collect();
+
+        let mut tvs: Vec<(f64, f64)> = vec![];
+
+        for tv_pair in all_bits.chunks(2) {
+            if tv_pair.len() == 1 {
+                println!("*WARNING* Unmatched time value: {}", tv_pair[0]);
+            }
+            let t = extract_value(tv_pair[0].trim()).unwrap();
+            let v = extract_value(tv_pair[1].trim()).unwrap();
+            tvs.push((t,v));
+            trace!("time: {:?}, value: {:?}", t, v);
+        }
+        src.pat = tvs;
+
+        //trace!("*INFO* VPWL {} {} {}", offset, amplitude, frequency);
+        trace!("{:?}", src);
+        src
+    }
+
+
     /// Parse an instantiation line
     ///
     /// 2nd last non-`<ident>=<value>` bit is the subcircuit name
@@ -469,7 +569,7 @@ impl Reader {
     }
 
     /// Extract a parameter definition from a `.subckt` line
-    /// 
+    ///
     /// The value goes in the `defval` field.
     pub fn extract_parameter(&mut self, text: &str) -> Option<Parameter> {
         // mut is for `there are errors`
@@ -491,7 +591,7 @@ impl Reader {
     }
 
     /// Extract a parameter definition from an instantiation line
-    /// 
+    ///
     /// The value goes in the `expr` field.
     pub fn extract_override(&mut self, text: &str) -> Option<Parameter> {
         // mut is for `there are errors`
@@ -698,4 +798,23 @@ mod tests {
         assert_nearly(ckt.get_param_value("Xsystem2.Xload.cvalo").unwrap(),  10e-6);
         assert_nearly(ckt.get_param_value("Xsystem3.Xload.cvalo").unwrap(), 100e-6);
     }
+
+    #[test]
+    fn v_pwl() {
+        let mut rdr = Reader::new();
+        rdr.read(Path::new("./ngspice/v_pwl.spi"));
+        assert_eq!(rdr.ckts.len(), 1);
+
+        assert_eq!(rdr.ckts[0].nodes.len(), 5); 
+        // voltage sources don't count yet
+        assert_eq!(rdr.ckts[0].instances.len(), 0);
+        assert_eq!(rdr.ckts[0].elements.len(), 4);
+        assert_eq!(rdr.ckts[0].params.len(), 0);
+
+        // elaborated circuit
+        let ckt = rdr.get_expanded_circuit();
+        assert_eq!(ckt.node_id_lut.len(), 5);
+    }
+
+
 }

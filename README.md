@@ -11,7 +11,7 @@ some waveform data to a file.
 Supported SPICE Deck Stuff
 --------------------------
 Currently supported components:
-* `V` - voltage source, `DC` and `SIN()`
+* `V` - voltage source, `DC`, `SIN() and PWL()`
 * `I` - current source, `DC` and `SIN()`
 * `R` - resistor
 * `C` - capacitor

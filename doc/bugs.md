@@ -1,6 +1,7 @@
 ## Bugs ##
 [ ] V with PWL doesn't barf
 [ ] test_ird comes up with a nonsense if Isat = 1e-12
+[ ] parameters won't work in I and V sources
 
 ## Fixed ##
 [X] `gnd` in subcircuits not treated as a global

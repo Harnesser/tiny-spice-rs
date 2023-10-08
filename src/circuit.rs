@@ -12,6 +12,7 @@ pub use crate::element::capacitor::Capacitor;
 pub use crate::element::resistor::Resistor;
 pub use crate::element::independent::CurrentSource;
 pub use crate::element::independent::VoltageSource;
+pub use crate::element::vpwl::VoltageSourcePwl;
 
 
 /// Program execution trace macro - prefix `<circuit>`
@@ -219,6 +220,16 @@ impl Circuit {
                             c_nodes += 1;
                         }
                     }
+                    Element::Vpwl(VoltageSourcePwl{ ref p, ref n, ..}) => {
+                        if !seen[*p] {
+                            seen[*p] = true;
+                            c_nodes += 1;
+                        }
+                        if !seen[*n] {
+                            seen[*n] = true;
+                            c_nodes += 1;
+                        }
+                    }
                 }
         }
         c_nodes
@@ -238,6 +249,9 @@ impl Circuit {
                         c_vsrc += 1;
                 },
                 Element::Vsin(VoltageSourceSine{..}) => {
+                        c_vsrc += 1;
+                },
+                Element::Vpwl(VoltageSourcePwl{..}) => {
                         c_vsrc += 1;
                 },
                 _ => {}
@@ -265,6 +279,15 @@ impl Circuit {
         self.elements.push(Element::Vsin(v_sin_upd));
         self.v_idx_next += 1;
     }
+
+    /// Add piecewise linear voltage source
+    pub fn add_v_pwl(&mut self, v_pwl: VoltageSourcePwl) {
+        let mut v_pwl_upd = v_pwl.clone();
+        v_pwl_upd.idx = self.v_idx_next;
+        self.elements.push(Element::Vpwl(v_pwl_upd));
+        self.v_idx_next += 1;
+    }
+
 
     /// Add DC voltage source
     pub fn add_v(&mut self, p: NodeId, n: NodeId, value: f64) {
@@ -332,7 +355,7 @@ impl Circuit {
     
         // Node name might be hierarchical. We look for an alias
         // of ground in the last bit.
-        let endbit = name.rsplit_once(".");
+        let endbit = name.rsplit_once('.');
         let localname = if let Some(bit) = endbit {
             bit.1
         } else {

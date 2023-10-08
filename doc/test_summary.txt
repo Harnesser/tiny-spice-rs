@@ -7,6 +7,7 @@ test spice::tests::param_subckt_counts ... ok
 test spice::tests::simple_read_count_nodes ... ok
 test spice::tests::simple_read_count_voltage_sources ... ok
 test spice::tests::simple_subckt_counts ... ok
+test spice::tests::v_pwl ... ok
 test test_dc_bridge_loaded_2v0 ... ok
 test test_dc_bridge_loaded_gnd ... ok
 test test_dc_ird_isat_1pA ... FAILED

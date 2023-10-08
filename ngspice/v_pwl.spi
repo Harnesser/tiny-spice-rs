@@ -1,0 +1,16 @@
+Bunch of PWL voltage sources
+
+V1 pwl1 gnd PWL(1us, 0.0V,  2us, 1.0V, 4us, -1.0V)
+V2 pwl2 gnd PWL(1us, 0.0V,  2us, 2.0V, 4us, -2.0V) td=5us
+*V3 pwl3 gnd PWL(1us, 0.0V,  2us, 2.0V, 4us, -2.0V) r=0 ; this does not work
+V3 pwl3 gnd PWL(0, 0.0V, 1us, 0.0V,  2us, 3.0V, 4us, -3.0V) r=0
+V4 pwl4 gnd PWL(0, 0.0V, 1us, 0.0V,  2us, 4.0V, 4us, -4.0V) r=0 td=10us
+
+.control
+  option RMAX = 1
+  tran 100ns 20us
+  option
+
+  plot v(pwl1) v(pwl2) v(pwl3) v(pwl4)
+*  print v(pwl1)
+.endc

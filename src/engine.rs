@@ -188,7 +188,7 @@ impl Engine {
 
         // transient loop
         let mut t_delta = cfg.TSTEP * cfg.FS;
-        let t_delta_min = cfg.TSTEP * cfg.RMIN;
+        let t_delta_min = cfg.TSTEP * cfg.RMIN; // not mimimum resistance...
         let mut t_now = 0.0;
 
         // announce
@@ -520,6 +520,13 @@ impl Engine {
                         circuit::Element::C(c.clone())
                     );
                 }
+
+                circuit::Element::Vpwl(ref vpwl) => {
+                    trace!("  [ELEMENT] PWL Voltage Source:");
+                    self.independent_sources.push(
+                        circuit::Element::Vpwl(vpwl.clone())
+                    );
+                }
                 
             }
         }
@@ -821,6 +828,21 @@ impl Engine {
                 },
 
                 circuit::Element::Vsin(ref vsrc) => {
+                    trace!("  [STAMP] {}", el);
+
+                    // evaluate at the present sim time
+                    let v_now = vsrc.evaluate(t_now);
+
+                    // stamp
+                    self.stamp_voltage_source(m, &circuit::VoltageSource{
+                        p: vsrc.p,
+                        n: vsrc.n,
+                        value: v_now,
+                        idx: vsrc.idx,
+                    });
+                },
+
+                circuit::Element::Vpwl(ref vsrc) => {
                     trace!("  [STAMP] {}", el);
 
                     // evaluate at the present sim time

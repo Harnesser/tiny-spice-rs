@@ -9,6 +9,8 @@ pub mod diode;
 pub mod isine;
 pub mod vsine;
 
+pub mod vpwl;
+
 pub mod independent;
 
 /// Circuit Elements that this simulator supports
@@ -21,6 +23,7 @@ pub enum Element {
     D(diode::Diode),
     Isin(isine::CurrentSourceSine),
     Vsin(vsine::VoltageSourceSine),
+    Vpwl(vpwl::VoltageSourcePwl),
     C(capacitor::Capacitor),
 }
 
@@ -49,6 +52,10 @@ impl fmt::Display for Element {
             Element::Vsin(ref el) => {
                 write!(f, "Vsin p:{} n:{} = {} + {} * sin(2pi {})",
                     el.p, el.n, el.vo, el.va, el.freq)
+            },
+            Element::Vpwl(ref el) => {
+                write!(f, "Vpwl p:{} n:{}",
+                    el.p, el.n)
             },
             Element::C(ref el) => {
                 write!(f, "C a:{} b:{} {} Farads ({})",
