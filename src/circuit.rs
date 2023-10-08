@@ -329,7 +329,16 @@ impl Circuit {
 
     /// Look up the `NodeId` for a node name
     pub fn get_node_id(&self, name: &str) -> Option<NodeId> {
-        match name {
+    
+        // Node name might be hierarchical. We look for an alias
+        // of ground in the last bit.
+        let endbit = name.rsplit_once(".");
+        let localname = if let Some(bit) = endbit {
+            bit.1
+        } else {
+            name
+        };
+        match localname {
             "gnd" | "GND" | "0" => Some(0),
             _ => self.nodes.get(name).copied()
         }

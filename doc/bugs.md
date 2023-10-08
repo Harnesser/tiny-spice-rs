@@ -1,9 +1,9 @@
 ## Bugs ##
-[ ] `gnd` in subcircuits not treated as a global
-[ ] test_ird comes up with a nonsense if Isat = 1e-12
 [ ] V with PWL doesn't barf
+[ ] test_ird comes up with a nonsense if Isat = 1e-12
 
 ## Fixed ##
+[X] `gnd` in subcircuits not treated as a global
 [X] bad subcircuit instantiations can cause stackoverflows
     - panic if we don't find a subcircuit definition
 [X] Running the robustness loop can cause an infinite loop

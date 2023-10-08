@@ -12,6 +12,8 @@ so I can simulate a twin-T oscillator.
 ### Fixed
 - Panic now if subcircuit definitions are not found. Otherwise this can
   cause a stack overflow.
+- Treats `0`, `GND` and `gnd` within subcircuits as the global nodes
+  they are.
 
 
 

@@ -1,10 +1,11 @@
 Drum Machine Trigger Circuit
 
-Vseq seq gnd PWL(0ns, 0.0, 9ns, 0.0, 10ns, 1.0, 20ns, 1.0, 21ns, 0.0)
+*Vseq seq gnd PWL(0ns, 0.0, 9ns, 0.0, 10ns, 1.0, 20ns, 1.0, 21ns, 0.0)
+V1 seq gnd SIN(0 5 1e3)
 
 .subckt trigger seqout trig cval=4nF
-  R1  trigger gnd    12k
-  Cin trigger a      {cval}
+  R1  trig    gnd    12k
+  Cin trig    a      {cval}
   R2  a       gnd    47k
   R3  a       b      27k
   D1  b       seqout
@@ -12,6 +13,10 @@ Vseq seq gnd PWL(0ns, 0.0, 9ns, 0.0, 10ns, 1.0, 20ns, 1.0, 21ns, 0.0)
 .ends
 
 
-Xtrigger1 seq trig1 
+Xtrigger1 seq trig1 trigger
 Xtrigger2 seq trig2 trigger cval=0.047uF
+
+.control
+  tran 100ns 5ms
+.endc
 
