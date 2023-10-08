@@ -1,3 +1,4 @@
-Fixed parameter default lookup. Clippy'd and added tests to make
-sure that the parameters propagated properly.
+I think I want to get this supporting drum machine circuits:
+* PWL
+* Inverter, somehow.
 

@@ -1,0 +1,17 @@
+Drum Machine Trigger Circuit
+
+Vseq seq gnd PWL(0ns, 0.0, 9ns, 0.0, 10ns, 1.0, 20ns, 1.0, 21ns, 0.0)
+
+.subckt trigger seqout trig cval=4nF
+  R1  trigger gnd    12k
+  Cin trigger a      {cval}
+  R2  a       gnd    47k
+  R3  a       b      27k
+  D1  b       seqout
+  R4  seqout  gnd    10k
+.ends
+
+
+Xtrigger1 seq trig1 
+Xtrigger2 seq trig2 trigger cval=0.047uF
+

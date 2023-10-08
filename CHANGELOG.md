@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.9.0] PWL and Inverters <<UNRELEASED>>
+I want tiny-spice-rs to help with my drum machine project. This checkun
+adds support for PWL voltage sources, and for a model of an inverter
+so I can simulate a twin-T oscillator.
+
+### Added
+- PWL voltage sources
+ * not all repeat options are supported
+
+### Fixed
+- Panic now if subcircuit definitions are not found. Otherwise this can
+  cause a stack overflow.
+
+
+
 ## [0.8.0] Subcircuits
 Subcircuits! See the circuit `ngspice/param_fullwave_rectifier.spi`.
 

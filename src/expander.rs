@@ -190,17 +190,17 @@ fn expand_instances(
         // subcircuit here...
         if inst.subckt != "/device" {
             trace!("Looking for nonoverridden parameters");
-            let mut subckt_id = 0;
 
             // find the subckt definition index
-            if let Some(ckt_id) = find_subckt_index(ckts, &inst.subckt) {
+            let subckt_id = if let Some(ckt_id) = find_subckt_index(ckts, &inst.subckt) {
                 trace!("Found subcircuit definition: index={}; subckt={}; ident={}",
                    ckt_id, ckts[ckt_id].name, inst.name);
-                subckt_id = ckt_id;
+                ckt_id
             } else {
-                println!("*ERROR* Can't find a definition for subcircuit {}",
+                println!("*FATAL* Can't find a definition for subcircuit {}",
                     inst.subckt);
-            }
+                panic!();
+            };
 
             for param_def in &ckts[subckt_id].params {
 
@@ -289,17 +289,16 @@ fn expand_subckt(
 
     trace!("expand_subckt() -> '{}' . '{}'", hier.join("."), inst.name);
 
-    let mut subckt_id = 0;
-
     // find the subckt definition index
-    if let Some(ckt_id) = find_subckt_index(ckts, &inst.subckt) {
+    let subckt_id = if let Some(ckt_id) = find_subckt_index(ckts, &inst.subckt) {
         trace!("Found subcircuit definition: index={}; subckt={}; ident={}",
            ckt_id, ckts[ckt_id].name, inst.name);
-        subckt_id = ckt_id;
+        ckt_id
     } else {
-        println!("*ERROR* Can't find a definition for subcircuit {}",
+        println!("*FATAL* Can't find a definition for subcircuit {}",
             inst.subckt);
-    }
+        panic!();
+    };
 
     // check that the instantiation and the subckt agree on the
     // number of ports
