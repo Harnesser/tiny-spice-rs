@@ -456,14 +456,10 @@ impl Reader {
         // ugly stuff...
         // push all the remaining bits of the SPICE line into 1 string
         let mut line = "".to_string();
-        for b in bits[3..].iter() {
+        let end = bits.len() - n_params;
+        for b in bits[3..end].iter() {
             line += *b;
             line.push(' ');
-        }
-
-        // eugh... pop off the parameters
-        for _ in 0..n_params {
-            line.pop();
         }
 
         // then when we remove "PWL" "(" and ")" we should be left with
@@ -472,6 +468,7 @@ impl Reader {
         line = line.replace('(', "");
         line = line.replace(')', "");
         //trace!("Line: {}", line);
+        //println!("Line: {}", line);
 
         let all_bits: Vec<&str> = line.split(',').collect();
 
