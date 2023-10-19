@@ -3,19 +3,20 @@ A Tiny SPICE Simulator
 
 Ionsamhlóir ciorcaid an-bheag.
 
-A teeny-weeny SPICE simulator implemented in Rust. It can read a (simple) SPICE
-deck, perform the (limited) analyses listed in the `.control` section and write
-some waveform data to a file.
+A teeny-weeny SPICE circuit simulator implemented in Rust. It can read a (simple)
+SPICE deck, perform the (limited) analyses listed in the `.control` section and
+write some waveform data to a file.
 
 
 Supported SPICE Deck Stuff
 --------------------------
-Currently supported components:
-* `V` - voltage source, `DC`, `SIN() and PWL()`
-* `I` - current source, `DC` and `SIN()`
-* `R` - resistor
+Currently supported components (alphabetically):
 * `C` - capacitor
 * `D` - diode (basic)
+* `I` - current source, `DC` and `SIN()`
+* `R` - resistor
+* `V` - voltage source, `DC`, `SIN() and PWL()`
+* `X` - subcircuits
 
 Analyses supported:
 * `op`    - DC operating point
@@ -26,7 +27,7 @@ In SPICE decks:
 * Engineering notation is supported, e.g. `1k` is 1000
 * A control block with a small list of commands between `.control` and `.endc` is
   supported
-* Subcircuits with limited bracket expressions are supported
+* Limited bracket expressions are supported for subcircuits, `R` & `C`.
 
 
 Unsupported Stuff
