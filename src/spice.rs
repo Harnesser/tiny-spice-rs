@@ -826,5 +826,21 @@ mod tests {
         assert_eq!(ckt.node_id_lut.len(), 5);
     }
 
+    #[test]
+    fn vcvs_vccs() {
+        let mut rdr = Reader::new();
+        rdr.read(Path::new("./ngspice/vc_vs_cs.spi"));
+        assert_eq!(rdr.ckts.len(), 1);
+
+        assert_eq!(rdr.ckts[0].nodes.len(), 4); 
+        assert_eq!(rdr.ckts[0].instances.len(), 3); // E, G & R
+        assert_eq!(rdr.ckts[0].elements.len(), 1); // Vsim
+        assert_eq!(rdr.ckts[0].params.len(), 0);
+
+        // elaborated circuit
+        let ckt = rdr.get_expanded_circuit();
+        assert_eq!(ckt.node_id_lut.len(), 4);
+    }
+
 
 }

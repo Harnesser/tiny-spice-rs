@@ -291,6 +291,9 @@ impl Circuit {
                 Element::Vpwl(VoltageSourcePwl{..}) => {
                         c_vsrc += 1;
                 },
+                Element::Vcvs(Vcvs{..}) => {
+                        c_vsrc += 1;
+                },
                 _ => {}
             }
         }
@@ -355,7 +358,7 @@ impl Circuit {
 
     /// Add an instantiation
     pub fn add_instance(&mut self, inst:Instance) {
-        self.instances.push(inst);
+        self.instances.push(inst)
     }
 
     /// Add a node

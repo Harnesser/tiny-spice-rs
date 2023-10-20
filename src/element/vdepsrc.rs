@@ -14,13 +14,14 @@ pub struct Vcvs {
     pub cp: NodeId,
     pub cn: NodeId,
     pub k: f64,
+    pub idx: usize, // index of voltage source in "known" column
 }
 
 impl Vcvs {
 
     /// I need to be stamping a voltage source, somehow...
-    pub fn evaluate(&self, t: f64) -> f64 {
-        1.0
+    pub fn evaluate(&self, v: f64) -> f64 {
+        v * self.k
     }
 
 }
@@ -39,8 +40,8 @@ pub struct Vccs {
 impl Vccs {
 
     /// I need to be stamping a voltage source, somehow...
-    pub fn evaluate(&self, t: f64) -> f64 {
-        1.0
+    pub fn evaluate(&self, v: f64) -> f64 {
+        v * self.k
     }
 
 }

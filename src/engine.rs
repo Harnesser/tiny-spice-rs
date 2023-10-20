@@ -52,6 +52,9 @@ pub struct Engine {
     // list of independent sources
     independent_sources: Vec<circuit::Element>,
 
+    // list of voltage-dependent sources
+    v_dependent_sources: Vec<circuit::Element>,
+
     // list of elements with energy storage (caps & inductors)
     storage_elements: Vec<circuit::Element>,
 
@@ -70,6 +73,7 @@ impl Engine {
             base_matrix: vec![vec![]],
             nonlinear_elements: vec![],
             independent_sources: vec![],
+            v_dependent_sources: vec![],
             storage_elements: vec![],
             dc_op: vec![],
         }
@@ -252,6 +256,9 @@ impl Engine {
                 // stamp independent sources
                 self.independent_source_stamp(&mut v, t_now + t_delta);
 
+                // Stamp voltage-dependent sources
+                self.v_dependent_source_stamp(&mut v, &unknowns_prev);
+
                 // stamp elements that store energy
                 self.storage_stamp(&mut v, &unknowns_prev, t_delta);
 
@@ -376,6 +383,9 @@ impl Engine {
             // Stamp independent sources at time=0.0
             // !!!FIXME!!! - hoist out of loop?
             self.independent_source_stamp(&mut v, 0.0);
+
+            // Stamp voltage-dependent sources
+            self.v_dependent_source_stamp(&mut v, &unknowns_prev);
 
             // stamp companion models of nonlinear devices
             self.nonlinear_stamp(&mut v, &unknowns_prev, &unknowns_prev_prev);
@@ -530,12 +540,16 @@ impl Engine {
 
                 circuit::Element::Vcvs(ref vcvs) => {
                     trace!("  [ELEMENT] VCVS:");
-                    todo!();
+                    self.v_dependent_sources.push(
+                        circuit::Element::Vcvs(vcvs.clone())
+                    );
                 }
 
                 circuit::Element::Vccs(ref vccs) => {
                     trace!("  [ELEMENT] VCCS:");
-                    todo!();
+                    self.v_dependent_sources.push(
+                        circuit::Element::Vccs(vccs.clone())
+                    );
                 }
                 
             }
@@ -810,6 +824,49 @@ impl Engine {
                 }
 
                 _ => { println!("*ERROR* - unrecognised nonlinear element"); }
+            }
+        }
+        //println!("*INFO* Non-linear stamped matrix");
+        //self.pp_matrix(&m);
+    }
+
+    fn v_dependent_source_stamp(&self, m: &mut [Vec<f64>], n: &[f64]) {
+        trace!("  [STAMP] voltage-dependent sources");
+        for el in &self.v_dependent_sources {
+            match *el {
+
+                circuit::Element::Vcvs(ref src) => {
+
+                    let v_in = n[src.cp] - n[src.cn];
+                    let v_out = src.evaluate(v_in);
+
+                    trace!(" [STAMP] {} {} {}", el, v_in, v_out);
+
+                    // stamp
+                    self.stamp_voltage_source(m, &circuit::VoltageSource{
+                        p: src.p,
+                        n: src.n,
+                        value: v_out,
+                        idx: src.idx
+                    });
+                }
+
+                circuit::Element::Vccs(ref src) => {
+
+                    let v_in = n[src.cp] - n[src.cn];
+                    let i_out = src.evaluate(v_in);
+
+                    trace!(" [STAMP] {} {} {}", el, v_in, i_out);
+
+                    // stamp
+                    self.stamp_current_source(m, &circuit::CurrentSource{
+                        p: src.p,
+                        n: src.n,
+                        value: i_out
+                    });
+                }
+
+                _ => { println!("*ERROR* - unrecognised voltage-dependent source"); }
             }
         }
         //println!("*INFO* Non-linear stamped matrix");

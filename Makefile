@@ -82,6 +82,7 @@ vc:
 	cargo run ${ARGS} ngspice/${TC}.spi && \
 	head -10 waves/${TC}/tran.dat && \
 	python3 bin/r8n -expr "2,3,4" waves/${TC}
+	ngspice ngspice/${TC}.spi
 
 ## Drum Machine
 

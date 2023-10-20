@@ -441,7 +441,11 @@ fn expand_primitive(
             panic!("*FATAL* k value for VCVS was not resolved");
         };
 
-        let vcvs = Vcvs {ident, p: n[0], n: n[1], cp: n[2], cn: n[3], k };
+        // Need to update the voltage source ids for VCVS
+        let v_idx = ckt.v_idx_next;
+        ckt.v_idx_next += 1;
+
+        let vcvs = Vcvs {ident, p: n[0], n: n[1], cp: n[2], cn: n[3], k, idx:v_idx };
         ckt.elements.push(Element::Vcvs(vcvs));
     } else if inst.name.starts_with('G') {
         trace!("Found a vccs primitive");
