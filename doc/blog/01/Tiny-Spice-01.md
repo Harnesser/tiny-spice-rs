@@ -26,6 +26,7 @@ expressions!
 My working example is 3 copies of a fullwave rectifier system with parameterised loads.
 The SPICE for this circuit is shown below, as is a cartoon of the circuit.
 
+![Circuit](./tinyspice_param_fullwave_rectifier.png?raw=True)
 
 ALT-TEXT: Circuit diagram showing 3 instances of a subcircuit. The supply to all three
 is a stack of sinewave sources at different frequencies and amplitudes. The subcircuits
@@ -35,6 +36,8 @@ in the RC load subcircuit all the way from the toplevel instantiations.
 
 
 These waveforms are the proof that it works.
+
+![Waveforms](tinyspice_subckt_params.png?raw=True)
 
 ALT-TEXT:
 Waveforms from a transient simulation of the above 3-bridge circuit. The input 3-tone

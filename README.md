@@ -13,6 +13,8 @@ Supported SPICE Deck Stuff
 Currently supported components (alphabetically):
 * `C` - capacitor
 * `D` - diode (basic)
+* `E` - voltage-controlled voltage source (VCVS)
+* `G` - voltage-controlled current source (VCCS)
 * `I` - current source, `DC` and `SIN()`
 * `R` - resistor
 * `V` - voltage source, `DC`, `SIN() and PWL()`

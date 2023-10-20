@@ -2,6 +2,21 @@
 
     This is a personal project. It does not have to be rigourously tested.
 
+## 2023-10-19 PWL, E & G
+Recently, i'm going to implement stuff that supports studying electronic drum
+machine circuits. To that end, I've
+* V PWL for the gate pulses
+* VCVS (`E`) and VCCS (`G`) because I want to model an opamp
+
+After I had implemented the instancing thing for `R`s, `C`s and `D`s,
+implementing `E` and `G` was fairly straightforward. The only tricky bit was
+registering the "output" voltage source for the VCVS.
+
+It might be nice to implement `.param` for the toplevel. Also, I feel
+`.include` needs to happen soon?
+
+Version v0.8.0 is on github, but i had to do a few bugfixes afterwards.
+
 ## 2023-09-28 Subcircuits with Parameters
 This seems to work now, and even bracket expressions with a single identifier
 are supported in the parameter overrides.
