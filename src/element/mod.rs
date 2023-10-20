@@ -13,6 +13,8 @@ pub mod vpwl;
 
 pub mod independent;
 
+pub mod vdepsrc;
+
 /// Circuit Elements that this simulator supports
 #[allow(dead_code)]
 #[derive(Clone)]
@@ -25,6 +27,8 @@ pub enum Element {
     Vsin(vsine::VoltageSourceSine),
     Vpwl(vpwl::VoltageSourcePwl),
     C(capacitor::Capacitor),
+    Vcvs(vdepsrc::Vcvs),
+    Vccs(vdepsrc::Vccs),
 }
 
 
@@ -60,6 +64,14 @@ impl fmt::Display for Element {
             Element::C(ref el) => {
                 write!(f, "C a:{} b:{} {} Farads ({})",
                     el.a, el.b, el.value, el.ident)
+            },
+            Element::Vcvs(ref el) => {
+                write!(f, "VCVS p:{} n:{} cp:{} cn:{} k={} ({})",
+                    el.p, el.n, el.cp, el.cn, el.k, el.ident)
+            },
+            Element::Vccs(ref el) => {
+                write!(f, "VCCS p:{} n:{} cp:{} cn:{} k={} ({})",
+                    el.p, el.n, el.cp, el.cn, el.k, el.ident)
             },
         }
     }

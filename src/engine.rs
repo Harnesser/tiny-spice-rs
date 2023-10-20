@@ -527,6 +527,16 @@ impl Engine {
                         circuit::Element::Vpwl(vpwl.clone())
                     );
                 }
+
+                circuit::Element::Vcvs(ref vcvs) => {
+                    trace!("  [ELEMENT] VCVS:");
+                    todo!();
+                }
+
+                circuit::Element::Vccs(ref vccs) => {
+                    trace!("  [ELEMENT] VCCS:");
+                    todo!();
+                }
                 
             }
         }

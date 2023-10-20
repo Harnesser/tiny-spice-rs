@@ -45,6 +45,8 @@ use crate::element::resistor::Resistor;
 use crate::element::capacitor::Capacitor;
 use crate::element::diode::Diode;
 
+use crate::element::vdepsrc::{Vcvs, Vccs};
+
 use crate::parameter::Parameter;
 use crate::bracket_expression::{Expression};
 
@@ -373,8 +375,11 @@ fn expand_primitive(
     trace!("expand_primitive() -> {} . {}", hier.join("."), inst.name);
 
     // lookup connections in the scope in which the R, C whatever is instantiated
-    let n1 = local_connect(ckts, ckt, host_ckt_id, &hier, inst.conns[0]);
-    let n2 = local_connect(ckts, ckt, host_ckt_id, &hier, inst.conns[1]);
+    let mut n: Vec<NodeId> = vec![];
+    for net in &inst.conns {
+        let tmp = local_connect(ckts, ckt, host_ckt_id, &hier, *net);
+        n.push(tmp);
+    }
 
     hier.push(inst.name.to_string()); // push the primitive local idenitifer
     let ident = hier.join("."); // full path to device
@@ -394,7 +399,7 @@ fn expand_primitive(
             panic!("*FATAL* Value for R was not resolved");
         };
 
-        let res = Resistor {ident, a: n1, b: n2, value};
+        let res = Resistor {ident, a: n[0], b: n[1], value};
         ckt.elements.push(Element::R(res));
     } else if inst.name.starts_with('C') {
         trace!("Found a capacitor primitive");
@@ -412,14 +417,50 @@ fn expand_primitive(
             panic!("*FATAL* Value for C was not resolved");
         };
 
-        let cap = Capacitor {ident, a: n1, b: n2, value };
+        let cap = Capacitor {ident, a: n[0], b: n[1], value };
         ckt.elements.push(Element::C(cap));
     } else if inst.name.starts_with('D') {
         trace!("Found a diode primitive");
         let i_sat = 1e-9;
         let tdegc = 27.0;
-        let diode = Diode::new(&ident, n1, n2, i_sat, tdegc);
+        let diode = Diode::new(&ident, n[0], n[1], i_sat, tdegc);
         ckt.elements.push(Element::D(diode));
+    } else if inst.name.starts_with('E') {
+        trace!("Found a vcvs primitive");
+        assert!(!inst.params.is_empty());
+
+        hier.push("/param0".to_string());
+        let param_full_name = hier.join(".");
+        hier.pop();
+
+        let param_lut = ckt.get_param_value(&param_full_name);
+        let k = if let Some(cval) = param_lut {
+            cval
+        } else {
+            println!("Can't find {}", param_full_name);
+            panic!("*FATAL* k value for VCVS was not resolved");
+        };
+
+        let vcvs = Vcvs {ident, p: n[0], n: n[1], cp: n[2], cn: n[3], k };
+        ckt.elements.push(Element::Vcvs(vcvs));
+    } else if inst.name.starts_with('G') {
+        trace!("Found a vccs primitive");
+        assert!(!inst.params.is_empty());
+
+        hier.push("/param0".to_string());
+        let param_full_name = hier.join(".");
+        hier.pop();
+
+        let param_lut = ckt.get_param_value(&param_full_name);
+        let k = if let Some(cval) = param_lut {
+            cval
+        } else {
+            println!("Can't find {}", param_full_name);
+            panic!("*FATAL* k value for VCCS was not resolved");
+        };
+
+        let vccs = Vccs {ident, p: n[0], n: n[1], cp: n[2], cn: n[3], k };
+        ckt.elements.push(Element::Vccs(vccs));
     } else {
         println!("*ERROR* Unrecognised primitive '{}'", inst.name);
         panic!("*FATAL*");

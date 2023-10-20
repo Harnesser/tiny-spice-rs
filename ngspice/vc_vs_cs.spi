@@ -1,0 +1,15 @@
+Voltage Controlled Sources
+
+Vsrc in gnd SIN(0 5.0 1kHz)
+
+* VCCS - voltage controlled current source with load
+Gvccs ctrl gnd in gnd 20
+Rvccs ctrl gnd 1
+
+* VCVS - voltage controlled voltage source
+Evcvs out gnd ctrl gnd -0.05
+
+.control
+  tran 1us 5ms  
+  plot v(in) v(ctrl) v(out)
+.endc

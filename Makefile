@@ -53,8 +53,6 @@ readme:
 	python3 bin/r8n -expr "2-3, 4-5" waves/${TC}
 	ngspice ngspice/${TC}.spi
 
-
-
 subckt: TC=subckt_fullwave_rectifier
 subckt:
 	\rm -rf waves/${TC} && \
@@ -75,6 +73,15 @@ param:
 	cargo run ${ARGS} ngspice/${TC}.spi && \
 	head -10 waves/${TC}/tran.dat && \
 	python3 bin/r8n -expr "4, 5-6, 7-8, 9-10" waves/${TC}
+
+
+## Sources
+vc: TC=vc_vs_cs
+vc:
+	\rm -rf waves/${TC} && \
+	cargo run ${ARGS} ngspice/${TC}.spi && \
+	head -10 waves/${TC}/tran.dat && \
+	python3 bin/r8n -expr "2,3,4" waves/${TC}
 
 ## Drum Machine
 

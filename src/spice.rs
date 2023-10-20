@@ -221,6 +221,18 @@ impl Reader {
                     } else {
                         println!("*ERROR* can't extract diode");
                     }
+                } else if bits[0].starts_with('E') {
+                    if let Some(e) = self.extract_primitive(&bits, 4, 1) {
+                        self.ckts[self.c].add_instance(e);
+                    } else {
+                        println!("*ERROR* can't extract VCVS");
+                    }
+                } else if bits[0].starts_with('G') {
+                    if let Some(g) = self.extract_primitive(&bits, 4, 1) {
+                        self.ckts[self.c].add_instance(g);
+                    } else {
+                        println!("*ERROR* can't extract VCCS");
+                    }
                 } else if bits[0].starts_with('X') {
                     trace!("Found instantiation");
                     let inst = self.extract_instance(&bits);
@@ -268,6 +280,8 @@ impl Reader {
                         println!("*ERROR* unsupported dot-command: {}", bits[0]);
                         self.there_are_errors = true;
                     }
+                } else {
+                    panic!("Unrecognised circuit element: '{}'", bits[0]);
                 }
             }
 
@@ -652,7 +666,6 @@ impl Reader {
 
         Some(inst)
     }
-
 
     /// Return a circuit that is the expansion of the toplevel circuit
     ///

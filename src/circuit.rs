@@ -13,6 +13,7 @@ pub use crate::element::resistor::Resistor;
 pub use crate::element::independent::CurrentSource;
 pub use crate::element::independent::VoltageSource;
 pub use crate::element::vpwl::VoltageSourcePwl;
+pub use crate::element::vdepsrc::{Vcvs, Vccs};
 
 
 /// Program execution trace macro - prefix `<circuit>`
@@ -227,6 +228,42 @@ impl Circuit {
                         }
                         if !seen[*n] {
                             seen[*n] = true;
+                            c_nodes += 1;
+                        }
+                    }
+                    Element::Vcvs(Vcvs{ ref p, ref n, ref cp, ref cn, ..}) => {
+                        if !seen[*p] {
+                            seen[*p] = true;
+                            c_nodes += 1;
+                        }
+                        if !seen[*n] {
+                            seen[*n] = true;
+                            c_nodes += 1;
+                        }
+                        if !seen[*cp] {
+                            seen[*cp] = true;
+                            c_nodes += 1;
+                        }
+                        if !seen[*cn] {
+                            seen[*cn] = true;
+                            c_nodes += 1;
+                        }
+                    }
+                    Element::Vccs(Vccs{ ref p, ref n, ref cp, ref cn, ..}) => {
+                        if !seen[*p] {
+                            seen[*p] = true;
+                            c_nodes += 1;
+                        }
+                        if !seen[*n] {
+                            seen[*n] = true;
+                            c_nodes += 1;
+                        }
+                        if !seen[*cp] {
+                            seen[*cp] = true;
+                            c_nodes += 1;
+                        }
+                        if !seen[*cn] {
+                            seen[*cn] = true;
                             c_nodes += 1;
                         }
                     }
