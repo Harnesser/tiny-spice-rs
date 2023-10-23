@@ -2,6 +2,19 @@
 
     This is a personal project. It does not have to be rigourously tested.
 
+## 2023-10-21 Opamps Don't Work
+The opamp cct i made with a `G` and an `R` doesn't work. The same cct works in
+ngspice.
+
+I did notice the other day when looking at the data for the nodes that the 
+VCVS took a 'cycle' to kick in. Maybe this is the problem? I should be using 
+the current voltage values in the solver rather than the last time point? Nah,
+that's stupid. At the very first solve, that matrix would be 0 anyway.
+
+Changing the commmand to an `op` and switching out the sinewave voltage 
+source to a 1V dc source - still results in a failure. So there's something
+fundamentally wrong in the engine that can't solve this.
+
 ## 2023-10-19 PWL, E & G
 Recently, i'm going to implement stuff that supports studying electronic drum
 machine circuits. To that end, I've

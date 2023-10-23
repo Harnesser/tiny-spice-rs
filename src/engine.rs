@@ -10,7 +10,7 @@ use crate::wavewriter::WaveWriter;
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints
-        //println!(concat!("<engine> ", $fmt), $($($arg)*)?);
+        println!(concat!("<engine> ", $fmt), $($($arg)*)?);
     };
 }
 
@@ -409,7 +409,7 @@ impl Engine {
                         }
                     },
                     Err(_) => {
-                        println!("*ERROR* math gone bad");
+                        println!("*ERROR* math gone bad during DC solve");
                         break;
                     },
                 }
@@ -944,9 +944,9 @@ impl Engine {
         let mut res = Ok(true);
         for (i,x) in xv.iter().enumerate() {
             if !x.is_finite() {
-                println!("*ERROR* math gone bad");
+                println!("*ERROR* math gone bad - infinites in convergence check {}", i);
                 res = Err(ConvergenceError::Divergent);
-                break;
+                continue;
             }
             let limit: f64 = if i < self.c_nodes {
                 x.abs() * cfg.RELTOL + cfg.VNTOL

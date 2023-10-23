@@ -93,6 +93,14 @@ trig:
 	head -10 waves/${TC}/tran.dat && \
 	python3 bin/r8n -expr "2,3,4" waves/${TC}
 
+
+kick: TC=kick_drum
+kick:
+	\rm -rf waves/${TC} && \
+	cargo run ${ARGS} ngspice/drum-machine/${TC}.spi && \
+	head -10 waves/${TC}/tran.dat && \
+	python3 bin/r8n -expr "2,3" waves/${TC}
+
 ##
 
 
