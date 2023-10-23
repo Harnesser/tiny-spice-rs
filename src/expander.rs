@@ -463,7 +463,7 @@ fn expand_primitive(
             panic!("*FATAL* k value for VCCS was not resolved");
         };
 
-        let vccs = Vccs {ident, p: n[0], n: n[1], cp: n[2], cn: n[3], k };
+        let vccs = Vccs::new(&ident, n[0], n[1], n[2], n[3], k);
         ckt.elements.push(Element::Vccs(vccs));
     } else {
         println!("*ERROR* Unrecognised primitive '{}'", inst.name);

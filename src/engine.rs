@@ -763,7 +763,11 @@ impl Engine {
 
 
     fn storage_stamp(&self, m: &mut [Vec<f64>], n: &[f64], t: f64) {
-        trace!("  [STAMP] storage elements");
+
+        if !&self.storage_elements.is_empty() {
+            trace!("  [STAMP] storage elements");
+        }
+
         for el in &self.storage_elements {
             match *el {
                 circuit::Element::C(ref c) => {
@@ -797,7 +801,11 @@ impl Engine {
     // stamp a matrix with linearized companion models of all the nonlinear
     // devices listed in the SPICE netlist
     fn nonlinear_stamp(&self, m: &mut [Vec<f64>], n: &[f64], n_prev: &[f64] ) {
-        trace!("  [STAMP] nonlinear elements");
+
+        if !&self.nonlinear_elements.is_empty() {
+            trace!("  [STAMP] nonlinear elements");
+        }
+
         for el in &self.nonlinear_elements {
             match *el {
                 circuit::Element::D(ref d) => {
@@ -831,7 +839,11 @@ impl Engine {
     }
 
     fn v_dependent_source_stamp(&self, m: &mut [Vec<f64>], n: &[f64]) {
-        trace!("  [STAMP] voltage-dependent sources");
+
+        if !&self.v_dependent_sources.is_empty() {
+            trace!("  [STAMP] voltage-dependent sources");
+        }
+
         for el in &self.v_dependent_sources {
             match *el {
 
@@ -876,8 +888,11 @@ impl Engine {
 
     // stamp independent sources
     fn independent_source_stamp(&self, m: &mut [Vec<f64>], t_now: f64) {
-        trace!("  [STAMP] Stamping independent source elements");
-        trace!("  [STAMP] {} of them", &self.independent_sources.len());
+
+        if !&self.independent_sources.is_empty() {
+            trace!("  [STAMP] Stamping independent source elements");
+        }
+
         for el in &self.independent_sources {
             match *el {
                 circuit::Element::Isin(ref isrc) => {

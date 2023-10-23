@@ -3,18 +3,23 @@ Can I even model an opamp?
 * opamp
 * CMOS book says VCCS converge better
 .subckt opamp ip in out
-  Gitgud out gnd ip in 100k
-  Rl out gnd 1000000
+  Gitgud out gnd in ip 100k
+  Rl out gnd 1
 .ends opamp
 
 * Inverting opamp with a gain of 10
 Vin in gnd SIN(0 5.0 1k)
+
+*Vin in gnd 1V
 Rin in fb 1k
 Rfb fb out 10k
-Xkd gnd fb out opamp
+
+Xopamp gnd fb out opamp
 
 .control
   tran 1us 10ms
   plot v(in) v(out)
+*  op
+*  print v(in) v(fb) v(out)
 .endc
 

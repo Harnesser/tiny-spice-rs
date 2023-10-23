@@ -12,15 +12,15 @@ Kick Drum implemented as T bridge
 * opamp
 * CMOS book says VCCS converge better
 .subckt opamp ip in out
-  Gitgud out gnd ip in 100k
-  Rl out gnd 100k
+  Gitgud out gnd ip in 1000k
+  Rl out gnd 1
 .ends opamp
 
 Vgate gate gnd PWL(0,0, 99us, 0v, 100us,5V, 5ms,5V, 5.01ms, 0V)
 Xkd gate out kickdrum
 
 .control
-  tran 100u 10ms
+  tran 1u 10ms
   plot v(gate) v(out)
 .endc
 
