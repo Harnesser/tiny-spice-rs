@@ -1,0 +1,19 @@
+Voltage Controlled Sources
+
+* Set up a control voltage
+Isrc gnd ctl 3A
+R1 ctl gnd 1
+
+* VCCS - voltage controlled current source with load
+Gvccs gnd n1 ctl gnd 2
+Rc n1 gnd 1
+
+* VCVS - voltage controlled voltage source with load
+*Evcvs n2 gnd ctl gnd 3
+*Rv n2 gnd
+
+.control
+  op
+  print ctl n1
+* print ctl n1 n2
+.endc

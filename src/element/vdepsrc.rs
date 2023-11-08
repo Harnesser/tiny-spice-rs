@@ -53,19 +53,17 @@ impl Vccs {
 
     /// I need to be stamping a voltage source, somehow...
     pub fn evaluate(&self, v: f64) -> f64 {
-        let limit = 0.01;
-        let v_delta = (v - self.v_prev.get()).abs();
+        //let limit = 0.01;
+        //let v_delta = (v - self.v_prev.get()).abs();
 
         let mut v_ctrl = v;
-        if v_delta > limit {
-            v_ctrl = self.v_prev.get() + limit;
-        } else if v_delta < -limit {
-            v_ctrl = self.v_prev.get() - limit;
-        }
+//        if v_ctrl < 1e-9 && v_ctrl > -1e-9 {
+//            v_ctrl = 1e-9;
+//        }
         self.v_prev.set(v_ctrl);
 
         if (v_ctrl > 10e3) || (v_ctrl < -10e3) {
-            panic!("nah. v_ctrl = {} V", v_ctrl);
+            panic!("nah, not wasting energy on this: v_ctrl = {} V", v_ctrl);
         }
 
         v_ctrl * self.k

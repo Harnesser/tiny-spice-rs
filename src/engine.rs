@@ -373,7 +373,8 @@ impl Engine {
         // Newton-Raphson loop
         let mut c_iteration: usize = 0;
 
-        while c_iteration < cfg.ITL1 {
+        while c_iteration < (cfg.ITL1+1) {
+            c_iteration += 1;
 
             // copy the base matrix, cos we're going to change it a lot:
             // * stamp nonlinear element companion models
@@ -393,7 +394,6 @@ impl Engine {
             // Guassian elimination & back solve of the now linearized
             // circuit matrix
             unknowns = self.solve(v);
-
 
             // Convergence check
             trace!(" [CONVERGE] Convergence check {}", c_iteration);
@@ -418,12 +418,11 @@ impl Engine {
             // leave
             unknowns_prev_prev = unknowns_prev.clone();
             unknowns_prev = unknowns.clone();
-            c_iteration += 1;
         }
 
 
         if converged {
-            trace!(" [CONVERGE] Converged after {} iterations", c_iteration + 1);
+            trace!(" [CONVERGE] Converged after {} iterations", c_iteration);
         } else {
             println!("*ERROR* Divergent");
         }

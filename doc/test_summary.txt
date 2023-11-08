@@ -28,6 +28,7 @@ test test_irrc_trans_hpf_2kHz ... ok
 test test_irrc_trans_hpf_5kHz ... ok
 test test_irrc_trans_lpf_loop ... ignored
 test test_irrrr ... ok
+test test_opamp_basic ... FAILED
 test test_trans_ir_bridge_1kHz_10us ... ok
 test test_trans_ir_bridge_1kHz_1us ... ok
 test test_trans_ir_bridge_loaded_loop ... ignored
@@ -42,6 +43,7 @@ test test_trans_ir_sine_1kHz_10us ... ok
 test test_trans_ir_sine_1kHz_1us ... ok
 test test_trans_ir_sine_1kHz ... ok
 test test_trans_ir_sine_loop ... ignored
+test test_vc_vs_cs_basic ... FAILED
 test test_v_d_vs_d ... ok
 test test_vvrrr ... ok
 test trans_ir ... ok
