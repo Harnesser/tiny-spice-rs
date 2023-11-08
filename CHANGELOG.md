@@ -1,19 +1,25 @@
 # Changelog
 
-## [0.9.0] PWL and Inverters <<UNRELEASED>>
-I want tiny-spice-rs to help with my drum machine project. This checkun
-adds support for PWL voltage sources, and for a model of an inverter
-so I can simulate a twin-T oscillator.
+
+## [0.9.0] PWL, VCVS and VCCS
+I want tiny-spice-rs to help with my drum machine project. This checkin
+adds support for PWL voltage sources, and for VCVS (`E`) and VCCS(`G`)
+elements so macromodels of simple opamps is possible.
 
 ### Added
 - PWL voltage sources
- * r > 0 not supported
+    * r > 0 not supported
+- Voltage-Controlled Voltage Source
+    * `k` is the V/V factor
+- Voltage-Controlled Current Source
+    * `k` is the A/V factor
 
 ### Fixed
 - Panic now if subcircuit definitions are not found. Otherwise this can
   cause a stack overflow.
 - Treats `0`, `GND` and `gnd` within subcircuits as the global nodes
   they are.
+- Some actual value checks for circuits read from SPICE decks
 
 
 
@@ -23,7 +29,7 @@ Subcircuits! See the circuit `ngspice/param_fullwave_rectifier.spi`.
 ### Added
 - Subcircuits with are supported
 - Basic Bracket Expression with 1 identifier supported:
- * e.g. `cval={top_cval}`
+    * e.g. `cval={top_cval}`
 
 ### Changed
 - Nodes can have names now, but integers still work
@@ -36,7 +42,7 @@ Subcircuits! See the circuit `ngspice/param_fullwave_rectifier.spi`.
 - Toplevel program `tiny-spice` 
 - Sinewave Voltage Source
 - SPICE deck reader
- * Components: I, V, R, D, C
+    * Components: I, V, R, D, C
 
 ### Changed
 - Configuration object to hold parameters for analyses

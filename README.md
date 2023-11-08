@@ -17,7 +17,7 @@ Currently supported components (alphabetically):
 * `G` - voltage-controlled current source (VCCS)
 * `I` - current source, `DC` and `SIN()`
 * `R` - resistor
-* `V` - voltage source, `DC`, `SIN() and PWL()`
+* `V` - voltage source, `DC`, `SIN()` and `PWL()`
 * `X` - subcircuits
 
 Analyses supported:
