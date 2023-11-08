@@ -34,10 +34,11 @@ fn test_opamp_basic() {
 
     // find the sinewave source and hack the offset to 5.0V to get
     // a non-zero dc value
+    let vin = 6.0;
     for el in &mut ckt.elements {
         match el {
             Element::Vsin(ref mut src) => {
-                src.vo = 5.0;
+                src.vo = vin;
             },
             _ => {},
         }
@@ -46,7 +47,9 @@ fn test_opamp_basic() {
     let _ = eng.dc_operating_point(&ckt, &cfg);
     let v = eng.dc().unwrap();
 
-    assert_nearly(-50.0, v[3]);
+    assert_nearly(vin, v[1]); // v(in)
+    assert_nearly(-10.0*vin, v[3]); // v(out1) [vccs]
+    assert_nearly(2.0*vin, v[4]); // v(out2) [vcvs]
 
 }
 

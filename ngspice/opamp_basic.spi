@@ -1,23 +1,32 @@
 Can I even model an opamp? I can!
 
-* opamp
-* CMOS book says VCCS converge better
-* pump the gain up so the unittest passes with epsiolon in assert_nearly()
-.subckt opamp ip in out
-  Gitgud out gnd ip in 100000k
-  Rl out gnd 1
-.ends opamp
-
-* Inverting opamp with a gain of 10
 Vin in gnd SIN(0 5.0 1k)
 
-Rin in fb 1k
-Rfb fb out 10k
+* opamp
+* CMOS book says VCCS converge better
+.subckt opamp_vccs ip in out
+  Gitgud out gnd ip in 100000k
+  Rl out gnd 1
+.ends opamp_vccs
 
-Xopamp gnd fb out opamp
+* opamp - VCVS
+.subckt opamp_vcvs ip in out
+  Eejit out gnd ip in 100000k
+.ends opamp_vcvs
+
+* Inverting amplifier with a gain of 10
+Rin in fb 1k
+Rfb fb out1 10k
+Xopamp1 gnd fb out1 opamp_vccs
+
+* Non-Inverting amplifier with a gain of 2
+R1 out2 y   2k
+R2 y   gnd  2k
+Xopamp2 in y out2 opamp_vcvs
+
 
 .control
   tran 1us 10ms
-  plot v(in) v(out)
+  plot v(in) v(out1) v(out2)
 .endc
 
