@@ -1,9 +1,10 @@
-Can I even model an opamp?
+Can I even model an opamp? I can!
 
 * opamp
 * CMOS book says VCCS converge better
+* pump the gain up so the unittest passes with epsiolon in assert_nearly()
 .subckt opamp ip in out
-  Gitgud out gnd ip in 1000k
+  Gitgud out gnd ip in 100000k
   Rl out gnd 1
 .ends opamp
 

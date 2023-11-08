@@ -34,7 +34,7 @@ fn test_opamp_basic() {
     let _ = eng.dc_operating_point(&ckt, &cfg);
     let v = eng.dc().unwrap();
 
-    assert_nearly(-50.0, v[2]);
+    assert_nearly(-50.0, v[3]);
 
 }
 

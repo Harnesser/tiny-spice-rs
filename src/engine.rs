@@ -251,22 +251,22 @@ impl Engine {
                 // copy the base matrix, cos we're going to change it a lot:
                 // * stamp nonlinear element companion models
                 // * re-order during guassian elimination
-                let mut v = self.base_matrix.clone();
+                let mut m = self.base_matrix.clone();
 
                 // stamp independent sources
-                self.independent_source_stamp(&mut v, t_now + t_delta);
+                self.independent_source_stamp(&mut m, t_now + t_delta);
 
                 // Stamp voltage-dependent sources
-                self.v_dependent_source_stamp(&mut v, &unknowns_prev);
+                self.v_dependent_source_stamp(&mut m);
 
                 // stamp elements that store energy
-                self.storage_stamp(&mut v, &unknowns_prev, t_delta);
+                self.storage_stamp(&mut m, &unknowns_prev, t_delta);
 
                 // stamp companion models of nonlinear devices
-                self.nonlinear_stamp(&mut v, &unknowns, &unknowns_solve_prev);
+                self.nonlinear_stamp(&mut m, &unknowns, &unknowns_solve_prev);
 
                 // Solve
-                unknowns = self.solve(v);
+                unknowns = self.solve(m);
                 _mse = self.mean_squared_error(&unknowns_solve, &unknowns);
 
                 // enable this to plot delta-time
@@ -379,21 +379,21 @@ impl Engine {
             // copy the base matrix, cos we're going to change it a lot:
             // * stamp nonlinear element companion models
             // * re-order during guassian elimination
-            let mut v = mna.to_owned();
+            let mut m = mna.to_owned();
 
             // Stamp independent sources at time=0.0
             // !!!FIXME!!! - hoist out of loop?
-            self.independent_source_stamp(&mut v, 0.0);
+            self.independent_source_stamp(&mut m, 0.0);
 
             // Stamp voltage-dependent sources
-            self.v_dependent_source_stamp(&mut v, &unknowns_prev);
+            self.v_dependent_source_stamp(&mut m);
 
             // stamp companion models of nonlinear devices
-            self.nonlinear_stamp(&mut v, &unknowns_prev, &unknowns_prev_prev);
+            self.nonlinear_stamp(&mut m, &unknowns_prev, &unknowns_prev_prev);
 
             // Guassian elimination & back solve of the now linearized
             // circuit matrix
-            unknowns = self.solve(v);
+            unknowns = self.solve(m);
 
             // Convergence check
             trace!(" [CONVERGE] Convergence check {}", c_iteration);
@@ -837,7 +837,7 @@ impl Engine {
         //self.pp_matrix(&m);
     }
 
-    fn v_dependent_source_stamp(&self, m: &mut [Vec<f64>], n: &[f64]) {
+    fn v_dependent_source_stamp(&self, m: &mut [Vec<f64>]) {
 
         if !&self.v_dependent_sources.is_empty() {
             trace!("  [STAMP] voltage-dependent sources");
@@ -848,33 +848,37 @@ impl Engine {
 
                 circuit::Element::Vcvs(ref src) => {
 
-                    let v_in = n[src.cp] - n[src.cn];
-                    let v_out = src.evaluate(v_in);
+                    todo!();
+//                    trace!(" [STAMP] {} {} {}", el, v_out);
 
-                    trace!(" [STAMP] {} {} {}", el, v_in, v_out);
-
-                    // stamp
-                    self.stamp_voltage_source(m, &circuit::VoltageSource{
-                        p: src.p,
-                        n: src.n,
-                        value: v_out,
-                        idx: src.idx
-                    });
+//                    // stamp
+//                    self.stamp_voltage_source(m, &circuit::VoltageSource{
+//                        p: src.p,
+//                        n: src.n,
+//                        value: v_out,
+//                        idx: src.idx
+//                    });
                 }
 
                 circuit::Element::Vccs(ref src) => {
+                    // Reminder to self:
+                    // +ve currents flow into a node
+                    // -ve currents flow out of a node
+                    // A VCCS with a +ve value:
+                    //   -> (p) ----> (n) ->
+                    // (in thru p, out thru n)
+                    trace!(" [STAMP] VCCS");
 
-                    let v_in = n[src.cp] - n[src.cn];
-                    let i_out = src.evaluate(v_in);
+                    let ia = self.c_nodes + self.c_vsrcs; // index for ampere vector
+                    if src.p != 0 {
+                        if src.cp != 0 { m[src.p][src.cp] += src.k }
+                        if src.cn != 0 { m[src.p][src.cn] -= src.k }
+                    }
+                    if src.n != 0 {
+                        if src.cp != 0 { m[src.n][src.cp] -= src.k }
+                        if src.cn != 0 { m[src.n][src.cn] += src.k }
+                    }
 
-                    trace!(" [STAMP] {} {} {}", el, v_in, i_out);
-
-                    // stamp
-                    self.stamp_current_source(m, &circuit::CurrentSource{
-                        p: src.p,
-                        n: src.n,
-                        value: i_out
-                    });
                 }
 
                 _ => { println!("*ERROR* - unrecognised voltage-dependent source"); }

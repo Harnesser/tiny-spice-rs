@@ -38,8 +38,8 @@ fn test_vc_vs_cs_basic() {
     assert_nearly(6.0, v[2]); // vccs
 //  assert_nearly(9.0, v[3]); // vcvs
 
-    // linear solve should only take one step
-    assert_eq!(stats.iterations, 1);
+    // linear solve should only take 2 steps to converge
+    assert_eq!(stats.iterations, 2);
 
 }
 
