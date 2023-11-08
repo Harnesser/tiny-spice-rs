@@ -6,6 +6,7 @@ extern crate tiny_spice;
 
 use tiny_spice::spice;
 use tiny_spice::engine;
+use tiny_spice::element::Element;
 
 mod common;
 use crate::common::assert_nearly;
@@ -28,8 +29,19 @@ fn test_opamp_basic() {
         return;
     }
 
-    let ckt = reader.get_expanded_circuit();
+    let mut ckt = reader.get_expanded_circuit();
     let cfg = reader.configuration();
+
+    // find the sinewave source and hack the offset to 5.0V to get
+    // a non-zero dc value
+    for el in &mut ckt.elements {
+        match el {
+            Element::Vsin(ref mut src) => {
+                src.vo = 5.0;
+            },
+            _ => {},
+        }
+    }
 
     let _ = eng.dc_operating_point(&ckt, &cfg);
     let v = eng.dc().unwrap();

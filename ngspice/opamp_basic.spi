@@ -9,8 +9,7 @@ Can I even model an opamp? I can!
 .ends opamp
 
 * Inverting opamp with a gain of 10
-*Vin in gnd SIN(0 5.0 1k)
-Vin in gnd 5V
+Vin in gnd SIN(0 5.0 1k)
 
 Rin in fb 1k
 Rfb fb out 10k
@@ -20,7 +19,5 @@ Xopamp gnd fb out opamp
 .control
   tran 1us 10ms
   plot v(in) v(out)
-*  op
-*  print v(in) v(fb) v(out)
 .endc
 
