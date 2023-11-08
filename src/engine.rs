@@ -10,7 +10,7 @@ use crate::wavewriter::WaveWriter;
 macro_rules! trace {
     ($fmt:expr $(, $($arg:tt)*)?) => {
         // uncomment the line below for tracing prints
-        println!(concat!("<engine> ", $fmt), $($($arg)*)?);
+        //println!(concat!("<engine> ", $fmt), $($($arg)*)?);
     };
 }
 
@@ -847,17 +847,19 @@ impl Engine {
             match *el {
 
                 circuit::Element::Vcvs(ref src) => {
+                    let idx = self.c_nodes + src.idx; // index in ampere vector
+                    trace!(" [STAMP] VCVS (idx:{} ({}))", src.idx, idx);
 
-                    todo!();
-//                    trace!(" [STAMP] {} {} {}", el, v_out);
+                    // branch current of output source
+                    if src.p != 0 { m[src.p][idx] += 1.0 }
+                    if src.n != 0 { m[src.n][idx] -= 1.0 }
 
-//                    // stamp
-//                    self.stamp_voltage_source(m, &circuit::VoltageSource{
-//                        p: src.p,
-//                        n: src.n,
-//                        value: v_out,
-//                        idx: src.idx
-//                    });
+                    // make sure controls and outputs are related
+                    if src.cp != 0 { m[idx][src.cp] += src.k }
+                    if src.cn != 0 { m[idx][src.cn] -= src.k }
+
+                    if src.p != 0 { m[idx][src.p] -= 1.0 }
+                    if src.n != 0 { m[idx][src.n] += 1.0 }
                 }
 
                 circuit::Element::Vccs(ref src) => {
@@ -868,8 +870,6 @@ impl Engine {
                     //   -> (p) ----> (n) ->
                     // (in thru p, out thru n)
                     trace!(" [STAMP] VCCS");
-
-                    let ia = self.c_nodes + self.c_vsrcs; // index for ampere vector
                     if src.p != 0 {
                         if src.cp != 0 { m[src.p][src.cp] += src.k }
                         if src.cn != 0 { m[src.p][src.cn] -= src.k }
@@ -878,7 +878,6 @@ impl Engine {
                         if src.cp != 0 { m[src.n][src.cp] -= src.k }
                         if src.cn != 0 { m[src.n][src.cn] += src.k }
                     }
-
                 }
 
                 _ => { println!("*ERROR* - unrecognised voltage-dependent source"); }

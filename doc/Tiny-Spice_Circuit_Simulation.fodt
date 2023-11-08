@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <office:document xmlns:officeooo="http://openoffice.org/2009/office" xmlns:css3t="http://www.w3.org/TR/css3-text/" xmlns:grddl="http://www.w3.org/2003/g/data-view#" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:chart="urn:oasis:names:tc:opendocument:xmlns:chart:1.0" xmlns:svg="urn:oasis:names:tc:opendocument:xmlns:svg-compatible:1.0" xmlns:draw="urn:oasis:names:tc:opendocument:xmlns:drawing:1.0" xmlns:rpt="http://openoffice.org/2005/report" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:config="urn:oasis:names:tc:opendocument:xmlns:config:1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:of="urn:oasis:names:tc:opendocument:xmlns:of:1.2" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ooo="http://openoffice.org/2004/office" xmlns:dr3d="urn:oasis:names:tc:opendocument:xmlns:dr3d:1.0" xmlns:formx="urn:openoffice:names:experimental:ooxml-odf-interop:xmlns:form:1.0" xmlns:calcext="urn:org:documentfoundation:names:experimental:calc:xmlns:calcext:1.0" xmlns:drawooo="http://openoffice.org/2010/draw" xmlns:field="urn:openoffice:names:experimental:ooo-ms-interop:xmlns:field:1.0" xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0" xmlns:number="urn:oasis:names:tc:opendocument:xmlns:datastyle:1.0" xmlns:ooow="http://openoffice.org/2004/writer" xmlns:oooc="http://openoffice.org/2004/calc" xmlns:tableooo="http://openoffice.org/2009/table" xmlns:loext="urn:org:documentfoundation:names:experimental:office:xmlns:loext:1.0" xmlns:math="http://www.w3.org/1998/Math/MathML" xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0" xmlns:script="urn:oasis:names:tc:opendocument:xmlns:script:1.0" xmlns:dom="http://www.w3.org/2001/xml-events" xmlns:xforms="http://www.w3.org/2002/xforms" office:version="1.2" office:mimetype="application/vnd.oasis.opendocument.text">
- <office:meta><meta:creation-date>2017-08-30T18:32:27.429225040</meta:creation-date><dc:date>2023-11-08T19:27:32.511893386</dc:date><meta:editing-duration>P1DT23H44M45S</meta:editing-duration><meta:editing-cycles>436</meta:editing-cycles><meta:generator>LibreOffice/6.4.7.2$Linux_X86_64 LibreOffice_project/40$Build-2</meta:generator><meta:document-statistic meta:table-count="9" meta:image-count="16" meta:object-count="42" meta:page-count="34" meta:paragraph-count="440" meta:word-count="2814" meta:character-count="17105" meta:non-whitespace-character-count="14413"/></office:meta>
+ <office:meta><meta:creation-date>2017-08-30T18:32:27.429225040</meta:creation-date><dc:date>2023-11-08T22:55:19.428457610</dc:date><meta:editing-duration>P2DT42M29S</meta:editing-duration><meta:editing-cycles>437</meta:editing-cycles><meta:generator>LibreOffice/6.4.7.2$Linux_X86_64 LibreOffice_project/40$Build-2</meta:generator><meta:document-statistic meta:table-count="9" meta:image-count="16" meta:object-count="43" meta:page-count="34" meta:paragraph-count="443" meta:word-count="2861" meta:character-count="17336" meta:non-whitespace-character-count="14598"/></office:meta>
  <office:settings>
   <config:config-item-set config:name="ooo:view-settings">
-   <config:config-item config:name="ViewAreaTop" config:type="long">420150</config:config-item>
+   <config:config-item config:name="ViewAreaTop" config:type="long">376758</config:config-item>
    <config:config-item config:name="ViewAreaLeft" config:type="long">0</config:config-item>
-   <config:config-item config:name="ViewAreaWidth" config:type="long">29635</config:config-item>
-   <config:config-item config:name="ViewAreaHeight" config:type="long">15933</config:config-item>
+   <config:config-item config:name="ViewAreaWidth" config:type="long">23220</config:config-item>
+   <config:config-item config:name="ViewAreaHeight" config:type="long">11462</config:config-item>
    <config:config-item config:name="ShowRedlineChanges" config:type="boolean">true</config:config-item>
    <config:config-item config:name="InBrowseMode" config:type="boolean">false</config:config-item>
    <config:config-item-map-indexed config:name="Views">
     <config:config-item-map-entry>
      <config:config-item config:name="ViewId" config:type="string">view2</config:config-item>
-     <config:config-item config:name="ViewLeft" config:type="long">13160</config:config-item>
-     <config:config-item config:name="ViewTop" config:type="long">425319</config:config-item>
+     <config:config-item config:name="ViewLeft" config:type="long">11264</config:config-item>
+     <config:config-item config:name="ViewTop" config:type="long">381527</config:config-item>
      <config:config-item config:name="VisibleLeft" config:type="long">0</config:config-item>
-     <config:config-item config:name="VisibleTop" config:type="long">420150</config:config-item>
-     <config:config-item config:name="VisibleRight" config:type="long">29633</config:config-item>
-     <config:config-item config:name="VisibleBottom" config:type="long">436081</config:config-item>
+     <config:config-item config:name="VisibleTop" config:type="long">376758</config:config-item>
+     <config:config-item config:name="VisibleRight" config:type="long">23218</config:config-item>
+     <config:config-item config:name="VisibleBottom" config:type="long">388218</config:config-item>
      <config:config-item config:name="ZoomType" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutColumns" config:type="short">0</config:config-item>
      <config:config-item config:name="ViewLayoutBookMode" config:type="boolean">false</config:config-item>
-     <config:config-item config:name="ZoomFactor" config:type="short">140</config:config-item>
+     <config:config-item config:name="ZoomFactor" config:type="short">160</config:config-item>
      <config:config-item config:name="IsSelectedFrame" config:type="boolean">false</config:config-item>
      <config:config-item config:name="AnchoredTextOverflowLegacy" config:type="boolean">false</config:config-item>
     </config:config-item-map-entry>
@@ -83,7 +83,7 @@
    <config:config-item config:name="ChartAutoUpdate" config:type="boolean">true</config:config-item>
    <config:config-item config:name="PrinterSetup" config:type="base64Binary"/>
    <config:config-item config:name="AddParaTableSpacingAtStart" config:type="boolean">true</config:config-item>
-   <config:config-item config:name="Rsid" config:type="int">34821154</config:config-item>
+   <config:config-item config:name="Rsid" config:type="int">35105497</config:config-item>
    <config:config-item config:name="EmbeddedDatabaseName" config:type="string"/>
    <config:config-item config:name="FieldAutoUpdate" config:type="boolean">true</config:config-item>
    <config:config-item config:name="OutlineLevelYieldsNumbering" config:type="boolean">false</config:config-item>
@@ -1197,34 +1197,37 @@
   <style:style style:name="P241" style:family="paragraph" style:parent-style-name="Text_20_body">
    <style:text-properties officeooo:rsid="02135422" officeooo:paragraph-rsid="02135422"/>
   </style:style>
-  <style:style style:name="P242" style:family="paragraph">
-   <loext:graphic-properties draw:fill="none"/>
+  <style:style style:name="P242" style:family="paragraph" style:parent-style-name="Text_20_body">
+   <style:text-properties officeooo:rsid="0215343a" officeooo:paragraph-rsid="0215343a"/>
   </style:style>
   <style:style style:name="P243" style:family="paragraph">
-   <style:paragraph-properties fo:text-align="center"/>
+   <loext:graphic-properties draw:fill="none"/>
   </style:style>
   <style:style style:name="P244" style:family="paragraph">
-   <loext:graphic-properties draw:fill="none" draw:fill-color="#ffffff"/>
-   <style:paragraph-properties style:writing-mode="lr-tb"/>
-   <style:text-properties fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
+   <style:paragraph-properties fo:text-align="center"/>
   </style:style>
   <style:style style:name="P245" style:family="paragraph">
    <loext:graphic-properties draw:fill="none" draw:fill-color="#ffffff"/>
    <style:paragraph-properties style:writing-mode="lr-tb"/>
-   <style:text-properties fo:color="#ff3333" fo:font-size="18pt" fo:font-weight="bold" style:font-size-asian="18pt" style:font-weight-asian="bold" style:font-size-complex="18pt" style:font-weight-complex="bold"/>
+   <style:text-properties fo:font-weight="bold" style:font-weight-asian="bold" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="P246" style:family="paragraph">
-   <style:paragraph-properties fo:text-align="center" style:writing-mode="lr-tb"/>
+   <loext:graphic-properties draw:fill="none" draw:fill-color="#ffffff"/>
+   <style:paragraph-properties style:writing-mode="lr-tb"/>
+   <style:text-properties fo:color="#ff3333" fo:font-size="18pt" fo:font-weight="bold" style:font-size-asian="18pt" style:font-weight-asian="bold" style:font-size-complex="18pt" style:font-weight-complex="bold"/>
   </style:style>
   <style:style style:name="P247" style:family="paragraph">
-   <loext:graphic-properties draw:fill="none" draw:fill-color="#000000"/>
    <style:paragraph-properties fo:text-align="center" style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="P248" style:family="paragraph">
    <loext:graphic-properties draw:fill="none" draw:fill-color="#000000"/>
-   <style:paragraph-properties fo:text-align="center"/>
+   <style:paragraph-properties fo:text-align="center" style:writing-mode="lr-tb"/>
   </style:style>
   <style:style style:name="P249" style:family="paragraph">
+   <loext:graphic-properties draw:fill="none" draw:fill-color="#000000"/>
+   <style:paragraph-properties fo:text-align="center"/>
+  </style:style>
+  <style:style style:name="P250" style:family="paragraph">
    <loext:graphic-properties draw:fill="none" draw:fill-color="#000000"/>
    <style:paragraph-properties style:writing-mode="lr-tb"/>
   </style:style>
@@ -1386,6 +1389,9 @@
   </style:style>
   <style:style style:name="T53" style:family="text">
    <style:text-properties officeooo:rsid="02135422"/>
+  </style:style>
+  <style:style style:name="T54" style:family="text">
+   <style:text-properties officeooo:rsid="0215343a"/>
   </style:style>
   <style:style style:name="fr1" style:family="graphic" style:parent-style-name="Frame">
    <style:graphic-properties style:vertical-pos="from-top"/>
@@ -2515,80 +2521,80 @@
    <text:h text:style-name="P162" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc2932_2622575240"/>Constructing the Voltage Node Matrix<text:bookmark-end text:name="__RefHeading___Toc2932_2622575240"/></text:h>
    <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc2595_2622575240"/>Example Circuit<text:bookmark-end text:name="__RefHeading___Toc2595_2622575240"/></text:h>
    <text:p text:style-name="P1">Let&apos;s go through the steps to build the voltage node matrix for the following circuit:</text:p>
-   <text:p text:style-name="P1"><draw:frame text:anchor-type="paragraph" draw:z-index="18" draw:name="Shape1" draw:style-name="gr5" draw:text-style-name="P245" svg:width="0.551cm" svg:height="0.862cm" svg:x="8.61cm" svg:y="0.399cm">
+   <text:p text:style-name="P1"><draw:frame text:anchor-type="paragraph" draw:z-index="18" draw:name="Shape1" draw:style-name="gr5" draw:text-style-name="P246" svg:width="0.551cm" svg:height="0.862cm" svg:x="8.61cm" svg:y="0.399cm">
      <draw:text-box>
       <text:p><text:span text:style-name="T45">2</text:span></text:p>
      </draw:text-box>
     </draw:frame><draw:frame draw:style-name="fr2" draw:name="Frame1" text:anchor-type="as-char" svg:width="16.327cm" draw:z-index="0">
      <draw:text-box fo:min-height="7.232cm">
-      <text:p text:style-name="Frame_20_contents"><draw:g text:anchor-type="paragraph" draw:z-index="1" draw:name="Shape2" draw:style-name="gr1"><draw:custom-shape draw:style-name="gr8" draw:text-style-name="P248" svg:width="1.521cm" svg:height="1.521cm" svg:x="1.512cm" svg:y="2.385cm">
+      <text:p text:style-name="Frame_20_contents"><draw:g text:anchor-type="paragraph" draw:z-index="1" draw:name="Shape2" draw:style-name="gr1"><draw:custom-shape draw:style-name="gr8" draw:text-style-name="P249" svg:width="1.521cm" svg:height="1.521cm" svg:x="1.512cm" svg:y="2.385cm">
          <text:p/>
          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3163 3163 0 10800 3163 18437 10800 21600 18437 18437 21600 10800 18437 3163" draw:text-areas="3163 3163 18437 18437" draw:type="ellipse" draw:enhanced-path="U 10800 10800 10800 10800 0 360 Z N"/>
-        </draw:custom-shape><draw:custom-shape draw:style-name="gr8" draw:text-style-name="P248" svg:width="1.521cm" svg:height="1.521cm" svg:x="1.512cm" svg:y="3.355cm">
+        </draw:custom-shape><draw:custom-shape draw:style-name="gr8" draw:text-style-name="P249" svg:width="1.521cm" svg:height="1.521cm" svg:x="1.512cm" svg:y="3.355cm">
          <text:p/>
          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3163 3163 0 10800 3163 18437 10800 21600 18437 18437 21600 10800 18437 3163" draw:text-areas="3163 3163 18437 18437" draw:type="ellipse" draw:enhanced-path="U 10800 10800 10800 10800 0 360 Z N"/>
-        </draw:custom-shape><draw:line draw:style-name="gr3" draw:text-style-name="P243" svg:x1="0.85cm" svg:y1="4.831cm" svg:x2="0.85cm" svg:y2="2.406cm">
+        </draw:custom-shape><draw:line draw:style-name="gr3" draw:text-style-name="P244" svg:x1="0.85cm" svg:y1="4.831cm" svg:x2="0.85cm" svg:y2="2.406cm">
          <text:p/>
-        </draw:line><draw:line draw:style-name="gr3" draw:text-style-name="P243" svg:x1="0.607cm" svg:y1="2.956cm" svg:x2="0.849cm" svg:y2="2.406cm">
+        </draw:line><draw:line draw:style-name="gr3" draw:text-style-name="P244" svg:x1="0.607cm" svg:y1="2.956cm" svg:x2="0.849cm" svg:y2="2.406cm">
          <text:p/>
-        </draw:line><draw:line draw:style-name="gr3" draw:text-style-name="P243" svg:x1="1.093cm" svg:y1="3cm" svg:x2="0.85cm" svg:y2="2.406cm">
+        </draw:line><draw:line draw:style-name="gr3" draw:text-style-name="P244" svg:x1="1.093cm" svg:y1="3cm" svg:x2="0.85cm" svg:y2="2.406cm">
          <text:p/>
-        </draw:line><draw:line draw:style-name="gr3" draw:text-style-name="P243" svg:x1="2.24cm" svg:y1="2.385cm" svg:x2="2.24cm" svg:y2="1.789cm">
+        </draw:line><draw:line draw:style-name="gr3" draw:text-style-name="P244" svg:x1="2.24cm" svg:y1="2.385cm" svg:x2="2.24cm" svg:y2="1.789cm">
          <text:p/>
-        </draw:line><draw:line draw:style-name="gr3" draw:text-style-name="P243" svg:x1="2.284cm" svg:y1="5.475cm" svg:x2="2.284cm" svg:y2="4.879cm">
+        </draw:line><draw:line draw:style-name="gr3" draw:text-style-name="P244" svg:x1="2.284cm" svg:y1="5.475cm" svg:x2="2.284cm" svg:y2="4.879cm">
          <text:p/>
         </draw:line>
-       </draw:g><draw:custom-shape text:anchor-type="paragraph" draw:z-index="2" draw:name="Shape3" draw:style-name="gr9" draw:text-style-name="P249" svg:width="2.823cm" svg:height="1.015cm" svg:x="4.332cm" svg:y="0.596cm">
-        <text:p text:style-name="P246">R1</text:p>
+       </draw:g><draw:custom-shape text:anchor-type="paragraph" draw:z-index="2" draw:name="Shape3" draw:style-name="gr9" draw:text-style-name="P250" svg:width="2.823cm" svg:height="1.015cm" svg:x="4.332cm" svg:y="0.596cm">
+        <text:p text:style-name="P247">R1</text:p>
         <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-       </draw:custom-shape><draw:custom-shape text:anchor-type="paragraph" draw:z-index="3" draw:name="Shape4" draw:style-name="gr7" draw:text-style-name="P249" svg:width="2.823cm" svg:height="1.015cm" svg:x="10.418cm" svg:y="0.64cm">
-        <text:p text:style-name="P246">R2</text:p>
+       </draw:custom-shape><draw:custom-shape text:anchor-type="paragraph" draw:z-index="3" draw:name="Shape4" draw:style-name="gr7" draw:text-style-name="P250" svg:width="2.823cm" svg:height="1.015cm" svg:x="10.418cm" svg:y="0.64cm">
+        <text:p text:style-name="P247">R2</text:p>
         <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-       </draw:custom-shape><draw:custom-shape text:anchor-type="paragraph" draw:z-index="4" draw:name="Shape5" draw:style-name="gr7" draw:text-style-name="P249" svg:width="2.823cm" svg:height="1.015cm" draw:transform="rotate (1.5707963267949) translate (8.17033333333333cm 5.00591666666667cm)">
-        <text:p text:style-name="P246">R3</text:p>
+       </draw:custom-shape><draw:custom-shape text:anchor-type="paragraph" draw:z-index="4" draw:name="Shape5" draw:style-name="gr7" draw:text-style-name="P250" svg:width="2.823cm" svg:height="1.015cm" draw:transform="rotate (1.5707963267949) translate (8.17033333333333cm 5.00591666666667cm)">
+        <text:p text:style-name="P247">R3</text:p>
         <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-       </draw:custom-shape><draw:custom-shape text:anchor-type="paragraph" draw:z-index="5" draw:name="Shape6" draw:style-name="gr7" draw:text-style-name="P247" svg:width="2.823cm" svg:height="1.015cm" draw:transform="rotate (1.5707963267949) translate (14.3439444444444cm 5.05001388888889cm)">
-        <text:p text:style-name="P246">R4</text:p>
+       </draw:custom-shape><draw:custom-shape text:anchor-type="paragraph" draw:z-index="5" draw:name="Shape6" draw:style-name="gr7" draw:text-style-name="P248" svg:width="2.823cm" svg:height="1.015cm" draw:transform="rotate (1.5707963267949) translate (14.3439444444444cm 5.05001388888889cm)">
+        <text:p text:style-name="P247">R4</text:p>
         <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-       </draw:custom-shape><draw:line text:anchor-type="paragraph" draw:z-index="6" draw:name="Shape7" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="2.304cm" svg:y1="6.087cm" svg:x2="14.96cm" svg:y2="6.087cm">
+       </draw:custom-shape><draw:line text:anchor-type="paragraph" draw:z-index="6" draw:name="Shape7" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="2.304cm" svg:y1="6.087cm" svg:x2="14.96cm" svg:y2="6.087cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="7" draw:name="Shape8" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="2.282cm" svg:y1="5.472cm" svg:x2="2.282cm" svg:y2="6.088cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="7" draw:name="Shape8" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="2.282cm" svg:y1="5.472cm" svg:x2="2.282cm" svg:y2="6.088cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="8" draw:name="Shape9" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="8.632cm" svg:y1="5.006cm" svg:x2="8.632cm" svg:y2="6.087cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="8" draw:name="Shape9" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="8.632cm" svg:y1="5.006cm" svg:x2="8.632cm" svg:y2="6.087cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="9" draw:name="Shape10" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="14.938cm" svg:y1="5.05cm" svg:x2="14.938cm" svg:y2="6.087cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="9" draw:name="Shape10" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="14.938cm" svg:y1="5.05cm" svg:x2="14.938cm" svg:y2="6.087cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="10" draw:name="Shape11" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="4.332cm" svg:y1="1.104cm" svg:x2="2.238cm" svg:y2="1.104cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="10" draw:name="Shape11" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="4.332cm" svg:y1="1.104cm" svg:x2="2.238cm" svg:y2="1.104cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="11" draw:name="Shape12" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="4.332cm" svg:y1="1.104cm" svg:x2="2.238cm" svg:y2="1.104cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="11" draw:name="Shape12" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="4.332cm" svg:y1="1.104cm" svg:x2="2.238cm" svg:y2="1.104cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="12" draw:name="Shape13" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="10.417cm" svg:y1="1.081cm" svg:x2="7.154cm" svg:y2="1.081cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="12" draw:name="Shape13" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="10.417cm" svg:y1="1.081cm" svg:x2="7.154cm" svg:y2="1.081cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="13" draw:name="Shape14" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="14.762cm" svg:y1="1.104cm" svg:x2="13.24cm" svg:y2="1.104cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="13" draw:name="Shape14" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="14.762cm" svg:y1="1.104cm" svg:x2="13.24cm" svg:y2="1.104cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="14" draw:name="Shape15" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="14.871cm" svg:y1="0.972cm" svg:x2="14.871cm" svg:y2="2.228cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="14" draw:name="Shape15" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="14.871cm" svg:y1="0.972cm" svg:x2="14.871cm" svg:y2="2.228cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="15" draw:name="Shape16" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="2.238cm" svg:y1="1.104cm" svg:x2="2.238cm" svg:y2="1.72cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="15" draw:name="Shape16" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="2.238cm" svg:y1="1.104cm" svg:x2="2.238cm" svg:y2="1.72cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="16" draw:name="Shape17" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="8.677cm" svg:y1="1.102cm" svg:x2="8.677cm" svg:y2="2.183cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="16" draw:name="Shape17" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="8.677cm" svg:y1="1.102cm" svg:x2="8.677cm" svg:y2="2.183cm">
         <text:p/>
-       </draw:line><draw:frame text:anchor-type="paragraph" draw:z-index="17" draw:name="Shape18" draw:style-name="gr5" draw:text-style-name="P245" svg:width="0.551cm" svg:height="0.862cm" svg:x="2.833cm" svg:y="0.243cm">
+       </draw:line><draw:frame text:anchor-type="paragraph" draw:z-index="17" draw:name="Shape18" draw:style-name="gr5" draw:text-style-name="P246" svg:width="0.551cm" svg:height="0.862cm" svg:x="2.833cm" svg:y="0.243cm">
         <draw:text-box>
          <text:p><text:span text:style-name="T45">1</text:span></text:p>
         </draw:text-box>
-       </draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="19" draw:name="Shape19" draw:style-name="gr5" draw:text-style-name="P245" svg:width="0.551cm" svg:height="0.862cm" svg:x="14.122cm" svg:y="0.09cm">
+       </draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="19" draw:name="Shape19" draw:style-name="gr5" draw:text-style-name="P246" svg:width="0.551cm" svg:height="0.862cm" svg:x="14.122cm" svg:y="0.09cm">
         <draw:text-box>
          <text:p><text:span text:style-name="T45">3</text:span></text:p>
         </draw:text-box>
-       </draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="20" draw:name="Shape20" draw:style-name="gr5" draw:text-style-name="P245" svg:width="0.551cm" svg:height="0.862cm" svg:x="10.836cm" svg:y="5.05cm">
+       </draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="20" draw:name="Shape20" draw:style-name="gr5" draw:text-style-name="P246" svg:width="0.551cm" svg:height="0.862cm" svg:x="10.836cm" svg:y="5.05cm">
         <draw:text-box>
          <text:p><text:span text:style-name="T45">0</text:span></text:p>
         </draw:text-box>
-       </draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="31" draw:name="Shape21" draw:style-name="gr4" draw:text-style-name="P244" svg:width="0.795cm" svg:height="0.632cm" svg:x="2.408cm" svg:y="4.875cm">
+       </draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="31" draw:name="Shape21" draw:style-name="gr4" draw:text-style-name="P245" svg:width="0.795cm" svg:height="0.632cm" svg:x="2.408cm" svg:y="4.875cm">
         <draw:text-box>
          <text:p><text:span text:style-name="T25">n+</text:span></text:p>
         </draw:text-box>
-       </draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="32" draw:name="Shape22" draw:style-name="gr4" draw:text-style-name="P244" svg:width="0.795cm" svg:height="0.632cm" svg:x="2.468cm" svg:y="1.753cm">
+       </draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="32" draw:name="Shape22" draw:style-name="gr4" draw:text-style-name="P245" svg:width="0.795cm" svg:height="0.632cm" svg:x="2.468cm" svg:y="1.753cm">
         <draw:text-box>
          <text:p><text:span text:style-name="T25">n-</text:span></text:p>
         </draw:text-box>
@@ -4524,7 +4530,7 @@ left [matrix{
    <text:p text:style-name="P42">I know v0 = 0V, but for the sake of not introducing special cases, roll with it.</text:p>
    <text:h text:style-name="Heading_20_3" text:outline-level="3"><text:bookmark-start text:name="__RefHeading___Toc2611_2622575240"/>R4 3 0 5<text:bookmark-end text:name="__RefHeading___Toc2611_2622575240"/></text:h>
    <text:p text:style-name="P24">Finally:</text:p>
-   <text:list xml:id="list194654112401086" text:continue-numbering="true" text:style-name="L5">
+   <text:list xml:id="list225521155698608" text:continue-numbering="true" text:style-name="L5">
     <text:list-item>
      <text:p text:style-name="P218">Firstly, (v3 – v0)/R4 out of node 3</text:p>
     </text:list-item>
@@ -7198,24 +7204,24 @@ over
    <text:h text:style-name="P165" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc2623_2622575240"/>Example<text:bookmark-end text:name="__RefHeading___Toc2623_2622575240"/></text:h>
    <text:p text:style-name="Text_20_body"><draw:frame draw:style-name="fr2" draw:name="Frame2" text:anchor-type="as-char" svg:width="16.327cm" draw:z-index="35">
      <draw:text-box fo:min-height="7.232cm">
-      <text:p text:style-name="Frame_20_contents"><draw:g text:anchor-type="paragraph" draw:z-index="36" draw:name="Shape23" draw:style-name="gr1"><draw:custom-shape draw:style-name="gr8" draw:text-style-name="P248" svg:width="1.521cm" svg:height="1.521cm" svg:x="1.512cm" svg:y="2.385cm">
+      <text:p text:style-name="Frame_20_contents"><draw:g text:anchor-type="paragraph" draw:z-index="36" draw:name="Shape23" draw:style-name="gr1"><draw:custom-shape draw:style-name="gr8" draw:text-style-name="P249" svg:width="1.521cm" svg:height="1.521cm" svg:x="1.512cm" svg:y="2.385cm">
          <text:p/>
          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3163 3163 0 10800 3163 18437 10800 21600 18437 18437 21600 10800 18437 3163" draw:text-areas="3163 3163 18437 18437" draw:type="ellipse" draw:enhanced-path="U 10800 10800 10800 10800 0 360 Z N"/>
-        </draw:custom-shape><draw:custom-shape draw:style-name="gr8" draw:text-style-name="P248" svg:width="1.521cm" svg:height="1.521cm" svg:x="1.512cm" svg:y="3.355cm">
+        </draw:custom-shape><draw:custom-shape draw:style-name="gr8" draw:text-style-name="P249" svg:width="1.521cm" svg:height="1.521cm" svg:x="1.512cm" svg:y="3.355cm">
          <text:p/>
          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:glue-points="10800 0 3163 3163 0 10800 3163 18437 10800 21600 18437 18437 21600 10800 18437 3163" draw:text-areas="3163 3163 18437 18437" draw:type="ellipse" draw:enhanced-path="U 10800 10800 10800 10800 0 360 Z N"/>
-        </draw:custom-shape><draw:line draw:style-name="gr3" draw:text-style-name="P243" svg:x1="0.85cm" svg:y1="4.831cm" svg:x2="0.85cm" svg:y2="2.406cm">
+        </draw:custom-shape><draw:line draw:style-name="gr3" draw:text-style-name="P244" svg:x1="0.85cm" svg:y1="4.831cm" svg:x2="0.85cm" svg:y2="2.406cm">
          <text:p/>
-        </draw:line><draw:line draw:style-name="gr3" draw:text-style-name="P243" svg:x1="0.607cm" svg:y1="2.956cm" svg:x2="0.849cm" svg:y2="2.406cm">
+        </draw:line><draw:line draw:style-name="gr3" draw:text-style-name="P244" svg:x1="0.607cm" svg:y1="2.956cm" svg:x2="0.849cm" svg:y2="2.406cm">
          <text:p/>
-        </draw:line><draw:line draw:style-name="gr3" draw:text-style-name="P243" svg:x1="1.093cm" svg:y1="3cm" svg:x2="0.85cm" svg:y2="2.406cm">
+        </draw:line><draw:line draw:style-name="gr3" draw:text-style-name="P244" svg:x1="1.093cm" svg:y1="3cm" svg:x2="0.85cm" svg:y2="2.406cm">
          <text:p/>
-        </draw:line><draw:line draw:style-name="gr3" draw:text-style-name="P243" svg:x1="2.24cm" svg:y1="2.385cm" svg:x2="2.24cm" svg:y2="1.789cm">
+        </draw:line><draw:line draw:style-name="gr3" draw:text-style-name="P244" svg:x1="2.24cm" svg:y1="2.385cm" svg:x2="2.24cm" svg:y2="1.789cm">
          <text:p/>
-        </draw:line><draw:line draw:style-name="gr3" draw:text-style-name="P243" svg:x1="2.284cm" svg:y1="5.475cm" svg:x2="2.284cm" svg:y2="4.879cm">
+        </draw:line><draw:line draw:style-name="gr3" draw:text-style-name="P244" svg:x1="2.284cm" svg:y1="5.475cm" svg:x2="2.284cm" svg:y2="4.879cm">
          <text:p/>
         </draw:line>
-       </draw:g><draw:g text:anchor-type="paragraph" draw:z-index="53" draw:name="Shape24" draw:style-name="gr1"><draw:custom-shape draw:style-name="gr2" draw:text-style-name="P242" svg:width="0.883cm" svg:height="0.847cm" svg:x="14.303cm" svg:y="3.295cm">
+       </draw:g><draw:g text:anchor-type="paragraph" draw:z-index="53" draw:name="Shape24" draw:style-name="gr1"><draw:custom-shape draw:style-name="gr2" draw:text-style-name="P243" svg:width="0.883cm" svg:height="0.847cm" svg:x="14.303cm" svg:y="3.295cm">
          <text:p/>
          <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:mirror-vertical="true" draw:glue-points="?f0 0 ?f1 10800 0 21600 10800 21600 21600 21600 ?f7 10800" draw:text-areas="?f1 10800 ?f2 18000 ?f3 7200 ?f4 21600" draw:type="isosceles-triangle" draw:modifiers="10800" draw:enhanced-path="M ?f0 0 L 21600 21600 0 21600 Z N">
           <draw:equation draw:name="f0" draw:formula="$0 "/>
@@ -7228,50 +7234,50 @@ over
           <draw:equation draw:name="f7" draw:formula="21600-?f6 "/>
           <draw:handle draw:handle-position="$0 top" draw:handle-range-x-minimum="0" draw:handle-range-x-maximum="21600"/>
          </draw:enhanced-geometry>
-        </draw:custom-shape><draw:line draw:style-name="gr3" draw:text-style-name="P243" svg:x1="14.162cm" svg:y1="4.195cm" svg:x2="15.309cm" svg:y2="4.195cm">
+        </draw:custom-shape><draw:line draw:style-name="gr3" draw:text-style-name="P244" svg:x1="14.162cm" svg:y1="4.195cm" svg:x2="15.309cm" svg:y2="4.195cm">
          <text:p/>
         </draw:line>
-       </draw:g><draw:custom-shape text:anchor-type="paragraph" draw:z-index="37" draw:name="Shape25" draw:style-name="gr7" draw:text-style-name="P247" svg:width="2.823cm" svg:height="1.015cm" svg:x="10.418cm" svg:y="0.64cm">
-        <text:p text:style-name="P246">R2</text:p>
+       </draw:g><draw:custom-shape text:anchor-type="paragraph" draw:z-index="37" draw:name="Shape25" draw:style-name="gr7" draw:text-style-name="P248" svg:width="2.823cm" svg:height="1.015cm" svg:x="10.418cm" svg:y="0.64cm">
+        <text:p text:style-name="P247">R2</text:p>
         <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-       </draw:custom-shape><draw:custom-shape text:anchor-type="paragraph" draw:z-index="38" draw:name="Shape26" draw:style-name="gr7" draw:text-style-name="P247" svg:width="2.823cm" svg:height="1.015cm" draw:transform="rotate (1.5707963267949) translate (8.17033333333333cm 5.00591666666667cm)">
-        <text:p text:style-name="P246">R1</text:p>
+       </draw:custom-shape><draw:custom-shape text:anchor-type="paragraph" draw:z-index="38" draw:name="Shape26" draw:style-name="gr7" draw:text-style-name="P248" svg:width="2.823cm" svg:height="1.015cm" draw:transform="rotate (1.5707963267949) translate (8.17033333333333cm 5.00591666666667cm)">
+        <text:p text:style-name="P247">R1</text:p>
         <draw:enhanced-geometry svg:viewBox="0 0 21600 21600" draw:type="rectangle" draw:enhanced-path="M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N"/>
-       </draw:custom-shape><draw:line text:anchor-type="paragraph" draw:z-index="39" draw:name="Shape27" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="2.304cm" svg:y1="6.087cm" svg:x2="14.78cm" svg:y2="6.087cm">
+       </draw:custom-shape><draw:line text:anchor-type="paragraph" draw:z-index="39" draw:name="Shape27" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="2.304cm" svg:y1="6.087cm" svg:x2="14.78cm" svg:y2="6.087cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="40" draw:name="Shape28" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="2.282cm" svg:y1="5.472cm" svg:x2="2.282cm" svg:y2="6.088cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="40" draw:name="Shape28" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="2.282cm" svg:y1="5.472cm" svg:x2="2.282cm" svg:y2="6.088cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="41" draw:name="Shape29" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="8.632cm" svg:y1="5.006cm" svg:x2="8.632cm" svg:y2="6.087cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="41" draw:name="Shape29" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="8.632cm" svg:y1="5.006cm" svg:x2="8.632cm" svg:y2="6.087cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="42" draw:name="Shape30" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="14.78cm" svg:y1="4.195cm" svg:x2="14.78cm" svg:y2="6.088cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="42" draw:name="Shape30" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="14.78cm" svg:y1="4.195cm" svg:x2="14.78cm" svg:y2="6.088cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="43" draw:name="Shape31" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="10.417cm" svg:y1="1.104cm" svg:x2="2.238cm" svg:y2="1.104cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="43" draw:name="Shape31" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="10.417cm" svg:y1="1.104cm" svg:x2="2.238cm" svg:y2="1.104cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="44" draw:name="Shape32" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="14.762cm" svg:y1="1.104cm" svg:x2="13.24cm" svg:y2="1.104cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="44" draw:name="Shape32" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="14.762cm" svg:y1="1.104cm" svg:x2="13.24cm" svg:y2="1.104cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="45" draw:name="Shape33" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="14.762cm" svg:y1="1.104cm" svg:x2="14.762cm" svg:y2="3.295cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="45" draw:name="Shape33" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="14.762cm" svg:y1="1.104cm" svg:x2="14.762cm" svg:y2="3.295cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="46" draw:name="Shape34" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="2.238cm" svg:y1="1.104cm" svg:x2="2.238cm" svg:y2="1.72cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="46" draw:name="Shape34" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="2.238cm" svg:y1="1.104cm" svg:x2="2.238cm" svg:y2="1.72cm">
         <text:p/>
-       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="47" draw:name="Shape35" draw:style-name="gr6" draw:text-style-name="P243" svg:x1="8.677cm" svg:y1="1.102cm" svg:x2="8.677cm" svg:y2="2.183cm">
+       </draw:line><draw:line text:anchor-type="paragraph" draw:z-index="47" draw:name="Shape35" draw:style-name="gr6" draw:text-style-name="P244" svg:x1="8.677cm" svg:y1="1.102cm" svg:x2="8.677cm" svg:y2="2.183cm">
         <text:p/>
-       </draw:line><draw:frame text:anchor-type="paragraph" draw:z-index="48" draw:name="Shape36" draw:style-name="gr5" draw:text-style-name="P245" svg:width="0.551cm" svg:height="0.862cm" svg:x="8.371cm" svg:y="0.138cm">
+       </draw:line><draw:frame text:anchor-type="paragraph" draw:z-index="48" draw:name="Shape36" draw:style-name="gr5" draw:text-style-name="P246" svg:width="0.551cm" svg:height="0.862cm" svg:x="8.371cm" svg:y="0.138cm">
         <draw:text-box>
          <text:p><text:span text:style-name="T45">1</text:span></text:p>
         </draw:text-box>
-       </draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="49" draw:name="Shape37" draw:style-name="gr5" draw:text-style-name="P245" svg:width="0.551cm" svg:height="0.862cm" svg:x="14.122cm" svg:y="0.09cm">
+       </draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="49" draw:name="Shape37" draw:style-name="gr5" draw:text-style-name="P246" svg:width="0.551cm" svg:height="0.862cm" svg:x="14.122cm" svg:y="0.09cm">
         <draw:text-box>
          <text:p><text:span text:style-name="T45">2</text:span></text:p>
         </draw:text-box>
-       </draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="50" draw:name="Shape38" draw:style-name="gr5" draw:text-style-name="P245" svg:width="0.551cm" svg:height="0.862cm" svg:x="10.836cm" svg:y="5.05cm">
+       </draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="50" draw:name="Shape38" draw:style-name="gr5" draw:text-style-name="P246" svg:width="0.551cm" svg:height="0.862cm" svg:x="10.836cm" svg:y="5.05cm">
         <draw:text-box>
          <text:p><text:span text:style-name="T45">0</text:span></text:p>
         </draw:text-box>
-       </draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="51" draw:name="Shape39" draw:style-name="gr4" draw:text-style-name="P244" svg:width="0.795cm" svg:height="0.632cm" svg:x="2.408cm" svg:y="4.875cm">
+       </draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="51" draw:name="Shape39" draw:style-name="gr4" draw:text-style-name="P245" svg:width="0.795cm" svg:height="0.632cm" svg:x="2.408cm" svg:y="4.875cm">
         <draw:text-box>
          <text:p><text:span text:style-name="T25">n+</text:span></text:p>
         </draw:text-box>
-       </draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="52" draw:name="Shape40" draw:style-name="gr4" draw:text-style-name="P244" svg:width="0.795cm" svg:height="0.632cm" svg:x="2.468cm" svg:y="1.753cm">
+       </draw:frame><draw:frame text:anchor-type="paragraph" draw:z-index="52" draw:name="Shape40" draw:style-name="gr4" draw:text-style-name="P245" svg:width="0.795cm" svg:height="0.632cm" svg:x="2.468cm" svg:y="1.753cm">
         <draw:text-box>
          <text:p><text:span text:style-name="T25">n-</text:span></text:p>
         </draw:text-box>
@@ -12458,7 +12464,8 @@ right ]
      <svg:desc>formula</svg:desc>
     </draw:frame></text:p>
    <text:p text:style-name="P241">I think the VCVS is 2 steps: KCL around n2 and KVL around it too?</text:p>
-   <text:p text:style-name="P241"><text:soft-page-break/><draw:frame draw:style-name="fr7" draw:name="Object41" text:anchor-type="as-char" svg:y="-1.88cm" svg:width="6.442cm" svg:height="3.551cm" draw:z-index="100"><draw:object>
+   <text:p text:style-name="P241"/>
+   <text:p text:style-name="P241"><text:soft-page-break/><text:span text:style-name="T54">(a)</text:span><draw:frame draw:style-name="fr7" draw:name="Object41" text:anchor-type="as-char" svg:y="-1.88cm" svg:width="6.442cm" svg:height="3.551cm" draw:z-index="100"><draw:object>
       <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
        <semantics>
         <mrow>
@@ -12862,7 +12869,7 @@ right ]
       </office:binary-data>
      </draw:image>
      <svg:desc>formula</svg:desc>
-    </draw:frame>, <draw:frame draw:style-name="fr7" draw:name="Object42" text:anchor-type="as-char" svg:y="-1.884cm" svg:width="6.65cm" svg:height="3.62cm" draw:z-index="101"><draw:object>
+    </draw:frame>, <text:s/><text:span text:style-name="T54">(b)</text:span><draw:frame draw:style-name="fr7" draw:name="Object42" text:anchor-type="as-char" svg:y="-1.884cm" svg:width="6.65cm" svg:height="3.62cm" draw:z-index="101"><draw:object>
       <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
        <semantics>
         <mrow>
@@ -13278,7 +13285,424 @@ right ]
      </draw:image>
      <svg:desc>formula</svg:desc>
     </draw:frame></text:p>
-   <text:p text:style-name="P241"/>
+   <text:p text:style-name="P242">I’m not a fan of how Rv made it into the bottom right. If I’m stamping the V for the VCVS, how would I even find Rv? What if there’s more stuff connected? </text:p>
+   <text:p text:style-name="P242">What about this instead? Nah, same problem, I need to multiply by kv.</text:p>
+   <text:p text:style-name="P242"><draw:frame draw:style-name="fr7" draw:name="Object43" text:anchor-type="as-char" svg:y="-1.884cm" svg:width="6.442cm" svg:height="3.62cm" draw:z-index="102"><draw:object>
+      <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+       <semantics>
+        <mrow>
+         <mrow>
+          <mo fence="true" stretchy="true">[</mo>
+          <mrow>
+           <mtable>
+            <mtr>
+             <mtd>
+              <mfrac>
+               <mrow>
+                <mo stretchy="false">−</mo>
+                <mn>1</mn>
+               </mrow>
+               <msub>
+                <mi>R</mi>
+                <mn>1</mn>
+               </msub>
+              </mfrac>
+             </mtd>
+             <mtd>
+              <mn>0</mn>
+             </mtd>
+             <mtd>
+              <mn>0</mn>
+             </mtd>
+             <mtd>
+              <mn>0</mn>
+             </mtd>
+            </mtr>
+            <mtr>
+             <mtd>
+              <msub>
+               <mi>k</mi>
+               <mi>c</mi>
+              </msub>
+             </mtd>
+             <mtd>
+              <mfrac>
+               <mrow>
+                <mo stretchy="false">−</mo>
+                <mn>1</mn>
+               </mrow>
+               <msub>
+                <mi>R</mi>
+                <mi>c</mi>
+               </msub>
+              </mfrac>
+             </mtd>
+             <mtd>
+              <mn>0</mn>
+             </mtd>
+             <mtd>
+              <mn>0</mn>
+             </mtd>
+            </mtr>
+            <mtr>
+             <mtd>
+              <mn>0</mn>
+             </mtd>
+             <mtd>
+              <mn>0</mn>
+             </mtd>
+             <mtd>
+              <mrow>
+               <mrow>
+                <mo stretchy="false">−</mo>
+                <mn>1</mn>
+               </mrow>
+               <mo stretchy="false">/</mo>
+               <msub>
+                <mi>R</mi>
+                <mi>v</mi>
+               </msub>
+              </mrow>
+             </mtd>
+             <mtd>
+              <mn>1</mn>
+             </mtd>
+            </mtr>
+            <mtr>
+             <mtd>
+              <msub>
+               <mi>k</mi>
+               <mi>v</mi>
+              </msub>
+             </mtd>
+             <mtd>
+              <mn>0</mn>
+             </mtd>
+             <mtd>
+              <mrow>
+               <mo stretchy="false">−</mo>
+               <mn>1</mn>
+              </mrow>
+             </mtd>
+             <mtd>
+              <mn>0</mn>
+             </mtd>
+            </mtr>
+           </mtable>
+          </mrow>
+          <mo fence="true" stretchy="true">]</mo>
+         </mrow>
+         <mrow>
+          <mrow>
+           <mo fence="true" stretchy="true">[</mo>
+           <mrow>
+            <mtable>
+             <mtr>
+              <mtd>
+               <mrow>
+                <mi>v</mi>
+                <mrow>
+                 <mo fence="true" stretchy="false">(</mo>
+                 <mrow>
+                  <mi mathvariant="italic">ctl</mi>
+                 </mrow>
+                 <mo fence="true" stretchy="false">)</mo>
+                </mrow>
+               </mrow>
+              </mtd>
+             </mtr>
+             <mtr>
+              <mtd>
+               <mrow>
+                <mi>v</mi>
+                <mrow>
+                 <mo fence="true" stretchy="false">(</mo>
+                 <mrow>
+                  <mrow>
+                   <mi>n</mi>
+                   <mn>1</mn>
+                  </mrow>
+                 </mrow>
+                 <mo fence="true" stretchy="false">)</mo>
+                </mrow>
+               </mrow>
+              </mtd>
+             </mtr>
+             <mtr>
+              <mtd>
+               <mrow>
+                <mi>v</mi>
+                <mrow>
+                 <mo fence="true" stretchy="false">(</mo>
+                 <mrow>
+                  <mrow>
+                   <mi>n</mi>
+                   <mn>2</mn>
+                  </mrow>
+                 </mrow>
+                 <mo fence="true" stretchy="false">)</mo>
+                </mrow>
+               </mrow>
+              </mtd>
+             </mtr>
+             <mtr>
+              <mtd>
+               <mrow>
+                <mi>i</mi>
+                <mrow>
+                 <mo fence="true" stretchy="false">(</mo>
+                 <mrow>
+                  <mrow>
+                   <mi>e</mi>
+                   <mn>1</mn>
+                  </mrow>
+                 </mrow>
+                 <mo fence="true" stretchy="false">)</mo>
+                </mrow>
+               </mrow>
+              </mtd>
+             </mtr>
+            </mtable>
+           </mrow>
+           <mo fence="true" stretchy="true">]</mo>
+          </mrow>
+          <mo stretchy="false">=</mo>
+          <mrow>
+           <mo fence="true" stretchy="true">[</mo>
+           <mrow>
+            <mtable>
+             <mtr>
+              <mtd>
+               <mn>3</mn>
+              </mtd>
+             </mtr>
+             <mtr>
+              <mtd>
+               <mn>0</mn>
+              </mtd>
+             </mtr>
+             <mtr>
+              <mtd>
+               <mn>0</mn>
+              </mtd>
+             </mtr>
+             <mtr>
+              <mtd>
+               <mn>0</mn>
+              </mtd>
+             </mtr>
+            </mtable>
+           </mrow>
+           <mo fence="true" stretchy="true">]</mo>
+          </mrow>
+         </mrow>
+        </mrow>
+        <annotation encoding="StarMath 5.0">left [ 
+matrix { 
+-1 over R_1 # 0 # 0 # 0 ##
+k_c # -1 over R_c # 0 # 0 ##
+0 # 0 # -1/R_v # 1 ##
+k_v # 0 # -1 # 0
+ }
+right ]
+
+left [ 
+matrix { v(ctl) ## v(n1) ## v(n2) ## i(e1) }
+right ]
+
+=
+left [ 
+matrix { 3 ## 0 ## 0 ## 0 }
+right ]
+</annotation>
+       </semantics>
+      </math>
+     </draw:object><draw:image>
+      <office:binary-data>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
+      </office:binary-data>
+     </draw:image>
+     <svg:desc>formula</svg:desc>
+    </draw:frame></text:p>
    <text:h text:style-name="P157" text:outline-level="1"><text:bookmark-start text:name="__RefHeading___Toc2647_2622575240"/><text:span text:style-name="T41">N</text:span>onlinear Stuff<text:bookmark-end text:name="__RefHeading___Toc2647_2622575240"/></text:h>
    <text:p text:style-name="P50">So, I was thinking of a datastructure for nonlinear eqns that I&apos;d keep in the matrix and evaluate at each time step. But this isn&apos;t the way things are done.</text:p>
    <text:h text:style-name="Heading_20_2" text:outline-level="2"><text:bookmark-start text:name="__RefHeading___Toc2649_2622575240"/>Linearisation<text:bookmark-end text:name="__RefHeading___Toc2649_2622575240"/></text:h>

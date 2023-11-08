@@ -3,8 +3,6 @@
 //! * `E` - Voltage-Controlled Voltage Source (VCVS)
 //! * `G` - Voltage-Controlled Current Source (VCCS)
 
-use std::cell::Cell;
-
 use crate::circuit::{NodeId};
 
 /// `E` - VCVS
@@ -36,8 +34,7 @@ pub struct Vccs {
     pub n: NodeId,
     pub cp: NodeId,
     pub cn: NodeId,
-    pub k: f64,
-    v_prev: Cell<f64>,
+    pub k: f64
 }
 
 impl Vccs {
@@ -47,7 +44,6 @@ impl Vccs {
         Vccs {
             ident:ident.to_string(),
             p, n, cp, cn, k,
-            v_prev: Cell::new(0.0),
         }
     }
 

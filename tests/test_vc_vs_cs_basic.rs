@@ -6,6 +6,7 @@ extern crate tiny_spice;
 
 use tiny_spice::spice;
 use tiny_spice::engine;
+use tiny_spice::element::Element;
 
 mod common;
 use crate::common::assert_nearly;
@@ -28,15 +29,25 @@ fn test_vc_vs_cs_basic() {
         return;
     }
 
-    let ckt = reader.get_expanded_circuit();
+    let mut ckt = reader.get_expanded_circuit();
     let cfg = reader.configuration();
+
+    // find the sinewave source and hack the offset to get a non-zero dc value
+    for el in &mut ckt.elements {
+        match el {
+            Element::Isin(ref mut src) => {
+                src.vo = 3.0;
+            },
+            _ => {},
+        }
+    }
 
     let stats = eng.dc_operating_point(&ckt, &cfg);
     let v = eng.dc().unwrap();
 
-    assert_nearly(3.0, v[1]);
-    assert_nearly(6.0, v[2]); // vccs
-//  assert_nearly(9.0, v[3]); // vcvs
+    assert_nearly(v[1], 3.0);
+    assert_nearly(v[2], 6.0); // vccs
+    assert_nearly(v[3], 9.0); // vcvs
 
     // linear solve should only take 2 steps to converge
     assert_eq!(stats.iterations, 2);

@@ -1,7 +1,7 @@
 Voltage Controlled Sources
 
 * Set up a control voltage
-Isrc gnd ctl 3A
+Isrc gnd ctl SIN(0, 3.0, 800)
 R1 ctl gnd 1
 
 * VCCS - voltage controlled current source with load
@@ -9,11 +9,10 @@ Gvccs gnd n1 ctl gnd 2
 Rc n1 gnd 1
 
 * VCVS - voltage controlled voltage source with load
-*Evcvs n2 gnd ctl gnd 3
-*Rv n2 gnd
+Evcvs n2 gnd ctl gnd 3
+Rv n2 gnd 10k
 
 .control
-  op
-  print ctl n1
-* print ctl n1 n2
+  tran 1us 5ms
+  plot v(ctl) v(n1) v(n2)
 .endc

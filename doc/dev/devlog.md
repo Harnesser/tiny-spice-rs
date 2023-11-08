@@ -2,6 +2,38 @@
 
     This is a personal project. It does not have to be rigourously tested.
 
+## 2023-11-08 VCCS
+
+### Fixing `G`
+After a lot of pondering, fixed a bug with `G` at least. The `k` factor needs
+to be part of the system of equations that the Gaussian Elimination step solves
+not, as i had it, calculated as part of an `evaluate()` step with the current
+and previous node voltages.
+
+The `E`s are not fixed yet, but the drum machine circuit uses an opamp macromodel
+with `G`s anyway, and I've seen something that looks half-working.
+
+![Kickdrum waveforms](../doc/readme-images/tiny-spice__kickdrum_basic.png?raw=true)
+
+### Testing
+There is also some basic dc op self-checking sims. The idea i kinda got from 
+Tsoding's `nob` streams is to basically include the top half of the main
+`tiny-spice.rs` program to read in a SPICE file and elaborate the circuit. Then
+the analysis routines can be called programmatically and asserts can be run on
+some results. Before this point, there was no value checks on analyses launched
+from SPICE decks.
+
+The test SPICE files have sinewave sources and transient analysis set up in the
+`.control` blocks. The unittests instead just do a DC operating point analysis
+on the circuit, hacking an offset in the sinewave sources to get a non-zero DC
+value.
+
+### Fixing `E`
+VCVSs are fixed now too. Like the independent souces, a new row+col is added in
+the matrix for the output of the VCVS. There are +1 and -1 in the node rows to
+add the source branch current to the equations. The src row links the input 
+control voltage to the output control voltage by the `k` factor.
+
 ## 2023-10-21 Opamps Don't Work
 The opamp cct i made with a `G` and an `R` doesn't work. The same cct works in
 ngspice.
