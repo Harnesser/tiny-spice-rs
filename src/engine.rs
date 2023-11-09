@@ -18,7 +18,7 @@ fn banner() {
 
     println!("**********************************************");
     println!("***          Tiny-SPICE-Simulator          ***");
-    println!("***       (c) CrapCadCorp 2017-2022        ***");
+    println!("***       (c) CrapCadCorp 2017-2023        ***");
     println!("*** No Patents Pending, No rights reserved ***");
     println!("**********************************************");
 

@@ -1,0 +1,27 @@
+Differential opamp circuit
+* to stress dependent source handling
+
+.subckt opamp_diff ip im op om
+  E1 op vcm ip im 1e6
+  E2 vcm om ip im 1e6
+  Vcm vcm gnd 500m
+.ends opamp diff
+
+Vcm vcm gnd 500m
+Vp inp vcm SIN(0, 50m, 1.2k)
+Vn vcm inm SIN(0, 50m, 1.2k)
+
+Xopamp x1 x2 outp outm opamp_diff
+
+Rtin inp x1 1k
+Rtfb x1 outm 2k
+Rbin inm x2 1k
+Rbfb x2 outp 2k
+
+.control 
+  tran 1us 10ms
+  plot v(inp,inm) v(outp,outm)
+.endc
+
+
+

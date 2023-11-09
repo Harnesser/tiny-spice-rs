@@ -13,7 +13,7 @@ and previous node voltages.
 The `E`s are not fixed yet, but the drum machine circuit uses an opamp macromodel
 with `G`s anyway, and I've seen something that looks half-working.
 
-![Kickdrum waveforms](../doc/readme-images/tiny-spice__kickdrum_basic.png?raw=true)
+![Kickdrum waveforms](./images/tiny-spice__kickdrum_basic.png?raw=true)
 
 ### Testing
 There is also some basic dc op self-checking sims. The idea i kinda got from 
