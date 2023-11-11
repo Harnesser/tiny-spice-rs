@@ -28,7 +28,7 @@
 //!   * Subcircuit definitions with `.subckt` and `.ends`
 //!   * Instantiations with `X...`
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::fs::File;
 use std::io::{BufReader, BufRead};
 
@@ -60,6 +60,7 @@ enum ReadMode {
     Library(String),
 }
 
+
 /// Datastructure for info parsed from the SPICE deck
 pub struct Reader {
     /// Circuit information
@@ -89,13 +90,13 @@ impl Reader {
     }
 
     /// Read and parse a SPICE deck
-    pub fn read(&mut self, filename:&Path) -> bool {
-        self.read_spice(filename, ReadMode::TopLevel)
+    pub fn read(&mut self, filepath:&Path) -> bool {
+        self.read_spice(filepath, ReadMode::TopLevel)
     }
 
-    fn read_spice(&mut self, filename: &Path, readmode: ReadMode) -> bool {
+    fn read_spice(&mut self, filepath: &Path, readmode: ReadMode) -> bool {
 
-        let input = File::open(filename).unwrap();
+        let input = File::open(filepath).unwrap();
         let buf = BufReader::new(input);
         let mut lines_iter = buf.lines();
         let mut in_control_block = false;
@@ -107,18 +108,18 @@ impl Reader {
         match readmode {
             ReadMode::TopLevel => {
                 // circuit name is the SPICE name without any
-                let ckt_name = filename.to_str().expect("cant stringify SPICE filename");
+                let ckt_name = filepath.to_str().expect("cant stringify SPICE filepath");
                 self.cfg.ckt_name = ckt_name.to_string();
                 self.ckts[0].name = ckt_name.to_string();
-                println!("*INFO* Reading toplevel SPICE file: '{}'", filename.display());
+                println!("*INFO* Reading toplevel SPICE file: '{}'", filepath.display());
             },
             ReadMode::Include => {
-                println!("*INFO* Including SPICE file: '{}'", filename.display());
+                println!("*INFO* Including SPICE file: '{}'", filepath.display());
             },
             ReadMode::Library(ref txt) => {
                 libname = Some(txt.to_string());
                 println!("*INFO* Extracting library '{}' from '{}'",
-                         txt, filename.display());
+                         txt, filepath.display());
             }
         };
 
@@ -326,8 +327,12 @@ impl Reader {
                                 if bits.len() != 3 {
                                     panic!("Expected a filename and a libname ");
                                 }
-                                let libpath = Path::new(bits[1]); // TODO:: findpath
-                                let _ = self.read_spice(libpath, ReadMode::Library(bits[2].to_string()));
+                                let libfile_path = look_for_file(filepath, bits[1]);
+                                if let Some(libpath) = libfile_path {
+                                    let _ = self.read_spice(&libpath, ReadMode::Library(bits[2].to_string()));
+                                } else {
+                                    panic!("Couldn't find '{}' in the search paths", bits[1]);
+                                }
                             },
                             ReadMode::Include => {
                                 todo!(".include in a .lib");
@@ -744,6 +749,8 @@ impl Reader {
         Some(inst)
     }
 
+
+
     /// Return a circuit that is the expansion of the toplevel circuit
     ///
     /// The toplevel circuit instantiations are resolved with all subcircuit
@@ -764,6 +771,23 @@ impl Reader {
 // Just take the entire thing as an identifier
 fn extract_identifier(text: &str) -> String {
     text.to_string()
+}
+
+
+/// Look around for an include or library file.
+///
+/// It should be relative to the file it is called from, unless
+/// it starts with '/', but fuck absolute paths for now.
+/// FIXME - absolute paths
+fn look_for_file(caller_filename: &Path, desired_filename: &str) -> Option<PathBuf> {
+    // what is the directory of the file?
+    if let Some(parent) = caller_filename.parent() {
+        let mut pathbuf = parent.to_path_buf();
+        pathbuf.push(Path::new(desired_filename));
+        Some(pathbuf)
+    } else {
+        None
+    }
 }
 
 #[cfg(test)]
