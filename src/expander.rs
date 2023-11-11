@@ -304,9 +304,9 @@ fn expand_subckt(
 
     // check that the instantiation and the subckt agree on the
     // number of ports
-    //dbg!(self.ckts[subckt_id].num_ports, inst.conns.len());
+    //dbg!(ckts[subckt_id].num_ports, inst.conns.len());
     if ckts[subckt_id].num_ports != inst.conns.len() {
-        print!("*ERROR* Instantiation and subcircuit definitions");
+        print!("*ERROR* Instantiation and subcircuit definitions ");
         println!("have different port sizes");
     }
 

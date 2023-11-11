@@ -1,0 +1,31 @@
+Kick Drum implemented as T bridge
+
+.lib kick_drum
+
+* Kickdrum
+.subckt kickdrum trig out
+  C1 fb t 10nF
+  C2 t out 10nF
+  R1 t gnd 1k
+  Rfb out fb 10k
+  Xoa trig fb out opamp
+.ends kickdrum
+
+* opamp
+* CMOS book says VCCS converge better
+.subckt opamp ip in out
+  Gitgud out gnd ip in 1000k
+  Rl out gnd 1
+.ends opamp
+
+.endl
+
+Vgate gate gnd PWL(0,0, 99us, 0v, 100us,5V, 5ms,5V, 5.01ms, 0V)
+Xkd gate out kickdrum
+
+
+.control
+  tran 1u 10ms
+  plot v(gate) v(out)
+.endc
+

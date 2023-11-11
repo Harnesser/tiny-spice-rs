@@ -4,6 +4,7 @@
 * [ ] V with PWL doesn't barf
 * [ ] test_ird comes up with a nonsense if Isat = 1e-12
 * [ ] parameters won't work in I and V sources
+* [ ] no check for correct subcircuit name in `.ends`
 
 ## Fixed
 * [X] `gnd` in subcircuits not treated as a global

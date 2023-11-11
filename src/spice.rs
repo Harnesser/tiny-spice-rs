@@ -50,6 +50,15 @@ macro_rules! trace {
     };
 }
 
+/// Set the SPICE deck read mode
+enum ReadMode {
+    /// Toplevel, like include, but sets the toplevel circuit name
+    TopLevel,
+    /// Include everything in the spice dec
+    Include,
+    /// Include only stuff in the named `.lib` section
+    Library(String),
+}
 
 /// Datastructure for info parsed from the SPICE deck
 pub struct Reader {
@@ -80,22 +89,38 @@ impl Reader {
     }
 
     /// Read and parse a SPICE deck
-    pub fn read(&mut self, filename :&Path) -> bool {
+    pub fn read(&mut self, filename:&Path) -> bool {
+        self.read_spice(filename, ReadMode::TopLevel)
+    }
+
+    fn read_spice(&mut self, filename: &Path, readmode: ReadMode) -> bool {
 
         let input = File::open(filename).unwrap();
         let buf = BufReader::new(input);
         let mut lines_iter = buf.lines();
         let mut in_control_block = false;
         let mut in_subckt = false;
+        let mut in_libdef = false;
+        let mut lib_read_ok = false;
+        let mut libname: Option<String> = None;
 
-
-        // circuit name is the SPICE name without any
-        let ckt_name = filename
-            .file_stem().expect("can't get stem of SPICE file path")
-            .to_str().expect("cant stringify SPICE filename");
-        self.cfg.ckt_name = ckt_name.to_string();
-        self.ckts[0].name = ckt_name.to_string();
-        println!("*INFO* Reading SPICE file: '{}'", filename.display());
+        match readmode {
+            ReadMode::TopLevel => {
+                // circuit name is the SPICE name without any
+                let ckt_name = filename.to_str().expect("cant stringify SPICE filename");
+                self.cfg.ckt_name = ckt_name.to_string();
+                self.ckts[0].name = ckt_name.to_string();
+                println!("*INFO* Reading toplevel SPICE file: '{}'", filename.display());
+            },
+            ReadMode::Include => {
+                println!("*INFO* Including SPICE file: '{}'", filename.display());
+            },
+            ReadMode::Library(ref txt) => {
+                libname = Some(txt.to_string());
+                println!("*INFO* Extracting library '{}' from '{}'",
+                         txt, filename.display());
+            }
+        };
 
         // first line is a comment and is ignored
         lines_iter.next();
@@ -124,6 +149,21 @@ impl Reader {
             }
 
             trace!("Bits: {:?}", bits);
+
+            // if we're reading a lib and we haven't matched the `.lib` start
+            // definition yet, skip...
+            if let Some(ref libn) = libname {
+                if !in_libdef {
+                    if (bits.len() == 2) && (bits[0] == ".lib") && (bits[1] == libn) {
+                        in_libdef = true;
+                        trace!("Found library section '{}'", libn);
+                    } else {
+                        trace!("Not in library definition '{}'...", libn);
+                    }
+                    continue; // either way, skip this line
+                }
+            }
+
 
             // let's go
             if in_control_block {
@@ -276,6 +316,35 @@ impl Reader {
 
                         //self.ckts[0].add_subckt(subckt);
                         in_subckt = true;
+                    } else if bits[0] == ".lib" {
+
+                        match &readmode {
+
+                            ReadMode::TopLevel => {
+                                // i'm not supporting nested lib calls, so this should be a
+                                // library import statement
+                                if bits.len() != 3 {
+                                    panic!("Expected a filename and a libname ");
+                                }
+                                let libpath = Path::new(bits[1]); // TODO:: findpath
+                                let _ = self.read_spice(libpath, ReadMode::Library(bits[2].to_string()));
+                            },
+                            ReadMode::Include => {
+                                todo!(".include in a .lib");
+                            },
+                            ReadMode::Library(_) => {
+                                panic!("*FATAL* nested .lib commands not supported");
+                            }
+                        }
+
+                    } else if bits[0] == ".endl" {
+                        if in_libdef {
+                            trace!("End of lib");
+                            lib_read_ok = true;
+                        } else {
+                            panic!("*FATAL* unexpected .endl");
+                        }
+                        in_libdef = false;
                     } else {
                         println!("*ERROR* unsupported dot-command: {}", bits[0]);
                         self.there_are_errors = true;
@@ -290,6 +359,14 @@ impl Reader {
             //}
 
             //println!("{}", line);
+        }
+
+        // if we were reading a library definition and we haven't found a
+        // start (or FIXME a finish), then complain.
+        if let ReadMode::Library(ref libn) = readmode {
+            if !lib_read_ok {
+                panic!("Did not find lib definition for '{}'", libn);
+            }
         }
 
         println!("Number of subcircuit definitions: {}", self.ckts.len()-1);
@@ -526,7 +603,7 @@ impl Reader {
                 if let Some(param) = self.extract_override(bits[i]) {
                     inst.add_parameter(&param);
                 } else {
-                    println!("*ERROR* paraeter in instance bad");
+                    println!("*ERROR* parameter in instance bad");
                     self.there_are_errors = true;
                 }
             } else {

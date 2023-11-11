@@ -1,0 +1,35 @@
+Drum Machine Trigger Circuit
+
+Vseq seq gnd PWL(0, 0.0, 9us, 0.0, 10us, 12.0V, 200us, 12.0V, 201us, 0.0, 400us, 0.0) r=0
+*V1 seq gnd SIN(0 5 1e3)
+
+.lib dm_trigger
+
+.subckt triggen gate trig cval=4nF
+
+  * input pi
+  R1  gate    gnd    12k
+  Cin gate    a      {cval}
+  R2  a       0      47k
+
+  * diode
+  R3  a       b      27k
+  D1  b       trig
+  R4  trig    GND    10k
+.ends
+
+* would ngspice include this? yes
+* R34 asdf sadfasdf 23.4
+
+.endl
+
+Xtg1 seq trig1 triggen ; cval=1nF
+Xtg2 seq trig2 triggen cval=0.047uF
+
+.control
+  option RMIN = 1
+  tran 100ns 650us
+  plot v(trig1) v(trig2) v(seq)
+.endc
+
+

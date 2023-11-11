@@ -1,0 +1,18 @@
+Somethigns
+
+.lib dm_trigger.spilib dm_trigger
+.lib kick_drum.spilib kick_drum
+
+* Sequencer gate signals
+Vgate gate gnd PWL(0,0, 99us, 0v, 100us,5V, 5ms,5V, 5.01ms, 0V)
+
+* Generate trigger pulse
+Xtg1 gate trig1 triggen ; cval=1nF
+
+Xkd trig1 out kickdrum
+
+.control
+  option RMIN = 1
+  tran 1u 10ms
+  plot v(gate) v(trig1) v(out)
+.endc
