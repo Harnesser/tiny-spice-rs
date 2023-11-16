@@ -4,10 +4,9 @@ I think I want to get this supporting drum machine circuits:
 
 Maybe have the `plot` command at least write the `r8n` command?
 
-Have a .lib command that can read in a spice deck, but ignore the
-toplevel instantiations and `.control` blocks. Only read the
-subcircuit definitions? This would allow me to play with subckts
-locally - it's kinda like allowing blocklevel tests.
+For WAV writing, i need:
+1. samples on a grid
+2. a module to write WAV files
 
-
-
+If i do (1) first, that's ok, it'd need to be done anyway. A module to write
+WAV files, or call out to python, i can decide to do that later. So (1) first.
