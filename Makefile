@@ -44,60 +44,60 @@ diode_lin_run:
 
 
 # Run the commands in the README
-readme: TC=fullwave_rectifier
+readme: TC=ngspice/fullwave_rectifier.spi
 #readme: TC=named_fullwave_rectifier
 readme:
 	\rm -rf waves/${TC} && \
-	cargo run ngspice/${TC}.spi && \
+	cargo run ${TC} && \
 	head -10 waves/${TC}/tran.dat && \
 	python3 bin/r8n -expr "2-3, 4-5" waves/${TC}
-	ngspice ngspice/${TC}.spi
+	ngspice ${TC}
 
-subckt: TC=subckt_fullwave_rectifier
+subckt: TC=ngspice/subckt_fullwave_rectifier.spi
 subckt:
 	\rm -rf waves/${TC} && \
-	cargo run ngspice/${TC}.spi && \
+	cargo run ${TC} && \
 	head -10 waves/${TC}/tran.dat && \
 	python3 bin/r8n -expr "2, 4-5" waves/${TC}
 
-multi: TC=multilevel_subckt_fullwave_rectifier
+multi: TC=ngspice/multilevel_subckt_fullwave_rectifier.spi
 multi:
 	\rm -rf waves/${TC} && \
-	cargo run ${ARGS} ngspice/${TC}.spi && \
+	cargo run ${ARGS} ${TC} && \
 	head -10 waves/${TC}/tran.dat && \
 	python3 bin/r8n -expr "4, 5-6, 7-8, 9-10" waves/${TC}
 
-param: TC=param_fullwave_rectifier
+param: TC=ngspice/param_fullwave_rectifier.spi
 param:
 	\rm -rf waves/${TC} && \
-	cargo run ${ARGS} ngspice/${TC}.spi && \
+	cargo run ${ARGS} ${TC} && \
 	head -10 waves/${TC}/tran.dat && \
 	python3 bin/r8n -expr "4, 5-6, 7-8, 9-10" waves/${TC}
 
 
 ## Sources
-vc: TC=vc_vs_cs
+vc: TC=ngspice/vc_vs_cs.spi
 vc:
 	\rm -rf waves/${TC} && \
-	cargo run ${ARGS} ngspice/${TC}.spi && \
+	cargo run ${ARGS} ${TC} && \
 	head -10 waves/${TC}/tran.dat && \
 	python3 bin/r8n -expr "2,3,4" waves/${TC}
-	ngspice ngspice/${TC}.spi
+	ngspice ngspice/${TC}
 
 ## Drum Machine
 
-trig: TC=dm_trigger
+trig: TC=ngspice/drum-machine/dm_trigger.spi
 trig:
 	\rm -rf waves/${TC} && \
-	cargo run ${ARGS} ngspice/drum-machine/${TC}.spi && \
+	cargo run ${ARGS} ${TC} && \
 	head -10 waves/${TC}/tran.dat && \
 	python3 bin/r8n -expr "2,3,4" waves/${TC}
 
 
-kick: TC=kick_drum
+kick: TC=ngspice/drum-machine/kick_drum.spi
 kick:
 	\rm -rf waves/${TC} && \
-	cargo run ${ARGS} ngspice/drum-machine/${TC}.spi && \
+	cargo run ${ARGS} ${TC} && \
 	head -10 waves/${TC}/tran.dat && \
 	python3 bin/r8n -expr "2,3" waves/${TC}
 
